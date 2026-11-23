@@ -254,7 +254,7 @@
         <button type="button" id="nav-page-1" onclick="switchPage('page-1')" class="side-nav-btn w-full flex items-center justify-between px-2.5 py-2 text-xs text-zinc-600 text-left">
           <span class="flex items-center gap-2">
             <i class="ph ph-chart-line-up text-base"></i>
-            <span>2. Simulasi &amp; CEO</span>
+            <span>2. Simulasi Finansial</span>
           </span>
           <span id="nav-risk-dot" class="w-2 h-2 rounded-full bg-rose-600"></span>
         </button>
@@ -262,14 +262,14 @@
         <button type="button" id="nav-page-2" onclick="switchPage('page-2')" class="side-nav-btn w-full flex items-center justify-between px-2.5 py-2 text-xs text-zinc-600 text-left">
           <span class="flex items-center gap-2">
             <i class="ph ph-factory text-base"></i>
-            <span>3. Biaya &amp; Lini</span>
+            <span>3. Biaya &amp; Produksi</span>
           </span>
         </button>
 
         <button type="button" id="nav-page-3" onclick="switchPage('page-3')" class="side-nav-btn w-full flex items-center justify-between px-2.5 py-2 text-xs text-zinc-600 text-left">
           <span class="flex items-center gap-2">
             <i class="ph ph-calendar-check text-base"></i>
-            <span>4. Jadwal &amp; Kas</span>
+            <span>4. Jadwal &amp; Arus Kas</span>
           </span>
         </button>
       </nav>
@@ -468,14 +468,14 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- VIEW 2: RINGKASAN EKSEKUTIF & CEO (PROJECT SIMULATION)              -->
+    <!-- VIEW 2: SIMULASI FINANSIAL, TERMIN & KELAYAKAN PROYEK               -->
     <!-- =================================================================== -->
     <div id="page-1" class="page-view hidden space-y-6 print-page-break">
 
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 2 · Simulasi Proyek &amp; Keamanan Pembayaran</p>
-          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Ringkasan Eksekutif, Arus Kas &amp; Negosiasi CEO</h2>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 2 · Simulasi Finansial &amp; Skema Termin</p>
+          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Simulasi Finansial, Termin Pembayaran &amp; Analisis Kas</h2>
           <p class="text-xs text-zinc-500 mt-1" id="p1-vessel-subtitle"></p>
         </div>
         <button type="button" onclick="switchPage('page-spec')" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700">
@@ -483,23 +483,23 @@
         </button>
       </div>
 
-      <!-- Primary Control Deck: 3 Editable Parameters + Fee Controls -->
+      <!-- Primary Control Deck: Volume, Markup, Custom Multi-Termin Builder & Fee Controls -->
       <section class="panel overflow-hidden no-print">
         <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-4 items-start">
-          <div class="xl:col-span-3 space-y-1.5">
+          <div class="xl:col-span-2 space-y-1.5">
             <label for="ctrl-units" class="block text-xs font-semibold text-zinc-700">Volume Proyek</label>
             <div class="input-shell flex items-center px-3 py-2">
               <input id="ctrl-units" type="number" min="1" max="5000" step="1" value="1000"
                 oninput="recalculateAll()"
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
-              <span class="text-xs font-medium text-zinc-400 pl-2 shrink-0">unit</span>
+              <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">u</span>
             </div>
-            <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
-              <button type="button" onclick="setInputVal('ctrl-units', 1)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">1</button>
-              <button type="button" onclick="setInputVal('ctrl-units', 100)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">100</button>
-              <button type="button" onclick="setInputVal('ctrl-units', 200)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">200</button>
-              <button type="button" onclick="setInputVal('ctrl-units', 500)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">500</button>
-              <button type="button" onclick="setInputVal('ctrl-units', 1000)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">1.000</button>
+            <div class="flex flex-wrap items-center gap-1 pt-0.5">
+              <button type="button" onclick="setInputVal('ctrl-units', 1)" class="chip-btn text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">1</button>
+              <button type="button" onclick="setInputVal('ctrl-units', 100)" class="chip-btn text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">100</button>
+              <button type="button" onclick="setInputVal('ctrl-units', 200)" class="chip-btn text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">200</button>
+              <button type="button" onclick="setInputVal('ctrl-units', 500)" class="chip-btn text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">500</button>
+              <button type="button" onclick="setInputVal('ctrl-units', 1000)" class="chip-btn text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">1.000</button>
             </div>
           </div>
 
@@ -510,31 +510,42 @@
               <input id="ctrl-markup" type="number" min="0" max="200" step="1" value="50"
                 oninput="recalculateAll()"
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
-              <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">%</span>
+              <span class="text-xs font-medium text-zinc-400 pl-1 shrink-0">%</span>
             </div>
-            <div class="flex items-center gap-1.5 pt-0.5">
-              <button type="button" onclick="setInputVal('ctrl-markup', 35)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">+35%</button>
-              <button type="button" onclick="setInputVal('ctrl-markup', 50)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">+50%</button>
-              <button type="button" onclick="setInputVal('ctrl-markup', 65)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">+65%</button>
-            </div>
-          </div>
-
-          <div class="xl:col-span-2 space-y-1.5">
-            <label for="ctrl-dp" class="block text-xs font-semibold text-zinc-700">Termin DP Pemerintah</label>
-            <div class="input-shell flex items-center px-3 py-2">
-              <input id="ctrl-dp" type="number" min="0" max="60" step="1" value="30"
-                oninput="recalculateAll()"
-                class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
-              <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">%</span>
-            </div>
-            <div class="flex items-center gap-1.5 pt-0.5">
-              <button type="button" onclick="setInputVal('ctrl-dp', 0)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">0%</button>
-              <button type="button" onclick="setInputVal('ctrl-dp', 20)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">20%</button>
-              <button type="button" onclick="setInputVal('ctrl-dp', 30)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">30%</button>
+            <div class="flex items-center gap-1 pt-0.5">
+              <button type="button" onclick="setInputVal('ctrl-markup', 35)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">+35%</button>
+              <button type="button" onclick="setInputVal('ctrl-markup', 50)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">+50%</button>
+              <button type="button" onclick="setInputVal('ctrl-markup', 65)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">+65%</button>
             </div>
           </div>
 
-          <div class="md:col-span-2 xl:col-span-5 space-y-1.5">
+          <!-- Custom Multi-Installment Payment Termin Builder -->
+          <div class="md:col-span-2 xl:col-span-4 space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <label class="block text-xs font-semibold text-zinc-700">Termin Pembayaran Klien / Pemerintah</label>
+              <div class="flex items-center gap-1">
+                <span class="text-[10px] text-zinc-400">Dipecah:</span>
+                <div class="inline-flex rounded-md bg-zinc-200/80 p-0.5 text-[10px] font-semibold tnum">
+                  <button type="button" id="term-cnt-1" onclick="setTerminCount(1)" class="seg-btn px-1.5 py-0.5 text-zinc-600">1×</button>
+                  <button type="button" id="term-cnt-2" onclick="setTerminCount(2)" class="seg-btn px-1.5 py-0.5 text-zinc-600">2×</button>
+                  <button type="button" id="term-cnt-3" onclick="setTerminCount(3)" class="seg-btn px-1.5 py-0.5 text-zinc-600">3×</button>
+                  <button type="button" id="term-cnt-4" onclick="setTerminCount(4)" class="seg-btn px-1.5 py-0.5 text-zinc-600">4×</button>
+                  <button type="button" id="term-cnt-5" onclick="setTerminCount(5)" class="seg-btn active px-1.5 py-0.5 text-zinc-600">5×</button>
+                </div>
+              </div>
+            </div>
+            <!-- Hidden legacy input kept synced for preset compatibility -->
+            <input id="ctrl-dp" type="hidden" value="30" />
+            <div id="termin-inputs-row" class="grid grid-cols-5 gap-1.5">
+              <!-- Populated dynamically by renderTerminInputs() -->
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-0.5">
+              <span id="termin-summary-hint">DP 30% + 3 Termin Progres + BAST 5%</span>
+              <span id="termin-sum-badge" class="font-bold text-emerald-700 tnum">Total: 100%</span>
+            </div>
+          </div>
+
+          <div class="md:col-span-2 xl:col-span-4 space-y-1.5">
             <div class="flex items-center justify-between">
               <label class="block text-xs font-semibold text-zinc-700">Skema Pembayaran Fee (Total <span id="lbl-total-fee-pct" class="tnum">16</span>%)</label>
               <span class="text-[11px] text-zinc-500">Bandingkan tuntutan mitra vs opsi aman</span>
@@ -643,34 +654,7 @@
         <div id="kpi-strip" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-zinc-200 bg-white"></div>
       </section>
 
-      <!-- Contextual Scenario Comparison Table -->
-      <section id="scenario-compare-section" class="panel overflow-hidden">
-        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 id="scenario-compare-title" class="text-sm font-bold text-zinc-950">Komparasi 3 Skenario Kapal Ikan 3 GT (Klik untuk Muat)</h3>
-            <p class="text-[11px] text-zinc-500">Perbandingan paket sekelas menggunakan asumsi volume, markup, SPK, dan overhead yang sedang aktif.</p>
-          </div>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-zinc-50/50 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
-                <th class="py-2.5 px-4">Paket / Skenario</th>
-                <th class="py-2.5 px-3 text-right">HPP / Unit</th>
-                <th class="py-2.5 px-3 text-right">Nilai / Unit</th>
-                <th class="py-2.5 px-3 text-right">Nilai Proyek</th>
-                <th class="py-2.5 px-3 text-right">Dana Berisiko H-0</th>
-                <th class="py-2.5 px-3 text-right">Bunga Talangan</th>
-                <th class="py-2.5 px-3 text-right">Laba Bersih Riil</th>
-                <th class="py-2.5 px-4 text-right">Durasi</th>
-              </tr>
-            </thead>
-            <tbody id="scenario-compare-body" class="divide-y divide-zinc-200 text-xs"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- Cashflow Chart + CEO Walk-Away Box -->
+      <!-- Cashflow Chart + Risk & Negotiation Box -->
       <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div class="lg:col-span-7 panel p-5 flex flex-col">
           <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
@@ -678,7 +662,7 @@
               <h3 class="text-base font-bold tracking-tight text-zinc-950">Kurva Arus Kas Kumulatif</h3>
               <p class="text-xs text-zinc-500 mt-0.5">Skema aktif vs opsi aman (0% saat teken kontrak, bayar fee proporsional tiap termin).</p>
             </div>
-            <button type="button" onclick="switchPage('page-3')" class="no-print text-xs font-semibold text-brand-700 hover:text-brand-800 shrink-0">Tabel per Fase →</button>
+            <button type="button" onclick="switchPage('page-3')" class="no-print text-xs font-semibold text-brand-700 hover:text-brand-800 shrink-0">Tabel &amp; Edit Jadwal Fase →</button>
           </div>
           <div class="h-72 relative flex-1">
             <canvas id="cashflowChart"></canvas>
@@ -691,9 +675,9 @@
               <div>
                 <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
                   <i class="ph-bold ph-shield-warning text-rose-600 text-base"></i>
-                  Batas Aman Negosiasi CEO
+                  Analisis Risiko Kas &amp; Batas Negosiasi
                 </h3>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Uji batas kas bebas IMI yang aman ditempatkan sebelum DP pemerintah cair.</p>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Uji batas kas bebas IMI yang aman ditempatkan sebelum DP cair.</p>
               </div>
               <span id="ceo-plafon-badge" class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
             </div>
@@ -855,12 +839,12 @@
     <div id="page-3" class="page-view hidden space-y-6 print-page-break">
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 4 · Timeline &amp; Jadwal Arus Kas</p>
-          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Gantt Produksi &amp; Breakdown Pembayaran per Fase</h2>
-          <p class="text-xs text-zinc-500 mt-1">Atur pemecahan SPK, basis fee Netto/Bruto PPN, WAPU/BG, delay SP2D, dan bunga modal talangan.</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 4 · Jadwal Pelaksanaan &amp; Arus Kas Fase</p>
+          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Gantt Produksi Interaktif &amp; Breakdown Kas per Fase</h2>
+          <p class="text-xs text-zinc-500 mt-1">Klik baris <strong>Fase &amp; Deliverable</strong> pada Gantt atau tabel di bawah untuk mengubah tanggal mulai, tanggal selesai, dan durasi fase.</p>
         </div>
         <button type="button" onclick="switchPage('page-1')" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700">
-          ← Kembali ke Ringkasan CEO
+          ← Kembali ke Simulasi Finansial
         </button>
       </div>
 
@@ -923,15 +907,33 @@
         </div>
       </section>
 
-      <!-- Gantt Chart -->
+      <!-- Gantt Chart (Interactive Click-to-Edit Dates) -->
       <section class="panel p-5 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 class="text-base font-bold tracking-tight text-zinc-950">Gantt Chart &amp; Fase Produksi</h3>
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="text-base font-bold tracking-tight text-zinc-950">Gantt Chart &amp; Jadwal Fase Produksi</h3>
+              <span class="no-print text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">Klik Fase untuk Edit Tanggal</span>
+            </div>
             <p class="text-xs text-zinc-500 mt-0.5" id="timeline-subtitle"></p>
           </div>
-          <div class="flex flex-wrap items-center gap-4 text-[11px] text-zinc-500">
-            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-600"></span> Kontrak &amp; Tunggu SP2D</span>
+          <div class="flex flex-wrap items-center gap-3 no-print">
+            <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-lg px-2.5 py-1.5">
+              <i class="ph ph-calendar-blank text-brand-700 text-sm"></i>
+              <span>Mulai Kontrak:</span>
+              <input id="ctrl-start-date" type="date" value="2026-12-01" onchange="onProjectStartDateChange(this.value)"
+                class="text-xs font-bold text-zinc-950 bg-transparent focus:outline-none tnum" />
+            </label>
+            <button id="btn-reset-schedule" type="button" onclick="resetPhaseScheduleOverrides()"
+              class="hidden text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 transition">
+              Reset Jadwal Otomatis
+            </button>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-500 pt-1 border-t border-zinc-100">
+          <span>Klik baris fase di bawah untuk menyesuaikan tanggal mulai/selesai atau menggeser jadwal.</span>
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-600"></span> Kontrak &amp; SP2D</span>
             <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-zinc-700"></span> Moulding &amp; Pengadaan</span>
             <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-brand-700"></span> Produksi Batch</span>
             <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-600"></span> QC, Dokumen &amp; BAST</span>
@@ -1295,6 +1297,72 @@
       <div class="px-5 py-3.5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-2 shrink-0">
         <button type="button" onclick="closeCustomCardModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
         <button type="button" onclick="saveCustomCard()" class="px-4 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">Simpan &amp; Pasang Kartu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PHASE SCHEDULE & DATE EDITOR MODAL (PAGE 4 CLICK FASE & DELIVERABLE)  -->
+  <!-- ===================================================================== -->
+  <div id="phase-schedule-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closePhaseScheduleModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+        <div>
+          <span id="ps-code-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700">F0</span>
+          <h3 class="text-sm font-bold text-zinc-950 mt-1">Ubah Jadwal &amp; Tanggal Fase</h3>
+        </div>
+        <button type="button" onclick="closePhaseScheduleModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-base"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3.5 text-xs">
+        <div>
+          <label for="ps-name" class="block font-semibold text-zinc-700 mb-1">Nama Fase &amp; Deliverable</label>
+          <div class="input-shell px-3 py-2">
+            <input id="ps-name" type="text" class="w-full text-xs font-semibold text-zinc-950 bg-transparent focus:outline-none" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="ps-start-date" class="block font-semibold text-zinc-700 mb-1">Tanggal Mulai</label>
+            <div class="input-shell px-2.5 py-2">
+              <input id="ps-start-date" type="date" onchange="onPhaseModalDateChange()" class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label for="ps-end-date" class="block font-semibold text-zinc-700 mb-1">Tanggal Selesai</label>
+            <div class="input-shell px-2.5 py-2">
+              <input id="ps-end-date" type="date" onchange="onPhaseModalDateChange()" class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="ps-start-day" class="block font-semibold text-zinc-700 mb-1">Mulai Hari ke-</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <span class="text-zinc-400 pr-1">H-</span>
+              <input id="ps-start-day" type="number" min="0" max="2000" step="1" oninput="onPhaseModalDayChange()" class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label for="ps-duration" class="block font-semibold text-zinc-700 mb-1">Durasi Fase (Hari)</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <input id="ps-duration" type="number" min="1" max="1500" step="1" oninput="onPhaseModalDayChange()" class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-zinc-400 pl-1">hr</span>
+            </div>
+          </div>
+        </div>
+        <label class="inline-flex items-center gap-2 pt-1 text-xs text-zinc-700 cursor-pointer select-none">
+          <input id="ps-cascade" type="checkbox" checked class="rounded border-zinc-300 text-brand-700 focus:ring-brand-700" />
+          <span>Geser otomatis fase-fase setelahnya sesuai perubahan selesai</span>
+        </label>
+      </div>
+      <div class="px-5 py-3 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-2">
+        <button type="button" onclick="resetSinglePhaseSchedule()" class="text-xs font-semibold text-zinc-600 hover:text-zinc-950">Reset Fase Ini</button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closePhaseScheduleModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
+          <button type="button" onclick="savePhaseScheduleModal()" class="px-4 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">Simpan Tanggal</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1732,6 +1800,219 @@
     let procEditingCatId = null;
     let draftCustomBom = [];
     let cashflowChartInstance = null;
+
+    // Customizable Client / Government Payment Termins (1x to 5x installments)
+    let clientTermins = [
+      { label: 'DP',   pct: 30, phase: 'F1' },
+      { label: 'T1',   pct: 21, phase: 'F3' },
+      { label: 'T2',   pct: 22, phase: 'F4' },
+      { label: 'T3',   pct: 22, phase: 'F5' },
+      { label: 'BAST', pct: 5,  phase: 'F7' }
+    ];
+
+    // Interactive Project Calendar & Phase Schedule Overrides (Page 4)
+    let projectStartDate = '2026-12-01';
+    let phaseScheduleOverrides = {}; // { [phaseKey]: { startDay, endDay, customName } }
+    let editingPhaseKey = null;
+
+    const TERMIN_PRESETS = {
+      1: [{ label: 'BAST 100%', pct: 100, phase: 'F7' }],
+      2: [
+        { label: 'DP Awal', pct: 30, phase: 'F1' },
+        { label: 'Lunas BAST', pct: 70, phase: 'F7' }
+      ],
+      3: [
+        { label: 'DP Awal', pct: 30, phase: 'F1' },
+        { label: 'Termin 1', pct: 50, phase: 'F4' },
+        { label: 'BAST', pct: 20, phase: 'F7' }
+      ],
+      4: [
+        { label: 'DP', pct: 30, phase: 'F1' },
+        { label: 'Termin 1', pct: 30, phase: 'F3' },
+        { label: 'Termin 2', pct: 30, phase: 'F5' },
+        { label: 'BAST', pct: 10, phase: 'F7' }
+      ],
+      5: [
+        { label: 'DP', pct: 30, phase: 'F1' },
+        { label: 'T1', pct: 21, phase: 'F3' },
+        { label: 'T2', pct: 22, phase: 'F4' },
+        { label: 'T3', pct: 22, phase: 'F5' },
+        { label: 'BAST', pct: 5, phase: 'F7' }
+      ]
+    };
+
+    function setTerminCount(n) {
+      const template = TERMIN_PRESETS[n] || TERMIN_PRESETS[5];
+      clientTermins = template.map(t => ({ ...t }));
+      syncDpInputFromTermins();
+      updateSegGroup(['term-cnt-1', 'term-cnt-2', 'term-cnt-3', 'term-cnt-4', 'term-cnt-5'], `term-cnt-${clientTermins.length}`);
+      recalculateAll();
+    }
+
+    function syncDpInputFromTermins() {
+      const dpItem = clientTermins.find(t => t.phase === 'F1');
+      const dpEl = document.getElementById('ctrl-dp');
+      if (dpEl) dpEl.value = dpItem ? dpItem.pct : 0;
+    }
+
+    function onTerminPctInput(idx, val) {
+      const num = Math.max(0, Math.min(100, parseFloat(val) || 0));
+      if (!clientTermins[idx]) return;
+      clientTermins[idx].pct = num;
+      // Auto-balance final installment (BAST) when editing earlier installments
+      if (clientTermins.length > 1 && idx < clientTermins.length - 1) {
+        const sumPrev = clientTermins.slice(0, clientTermins.length - 1).reduce((a, t) => a + t.pct, 0);
+        clientTermins[clientTermins.length - 1].pct = Math.max(0, Number((100 - sumPrev).toFixed(1)));
+      }
+      syncDpInputFromTermins();
+      recalculateAll();
+    }
+
+    function renderTerminInputs() {
+      const container = document.getElementById('termin-inputs-row');
+      if (!container) return;
+      const n = clientTermins.length;
+      container.className = `grid grid-cols-${n} gap-1.5`;
+      updateSegGroup(['term-cnt-1', 'term-cnt-2', 'term-cnt-3', 'term-cnt-4', 'term-cnt-5'], `term-cnt-${n}`);
+
+      container.innerHTML = clientTermins.map((t, idx) => `
+        <div class="rounded-lg border border-zinc-200 bg-white px-2 py-1">
+          <div class="text-[9px] font-semibold text-zinc-400 truncate">${idx + 1}. ${t.label}</div>
+          <div class="flex items-center">
+            <input type="number" min="0" max="100" step="1" value="${t.pct}"
+              onchange="onTerminPctInput(${idx}, this.value)"
+              class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+            <span class="text-[10px] text-zinc-400">%</span>
+          </div>
+        </div>
+      `).join('');
+
+      const sumPct = Math.round(clientTermins.reduce((a, t) => a + (Number(t.pct) || 0), 0) * 10) / 10;
+      const badgeEl = document.getElementById('termin-sum-badge');
+      if (badgeEl) {
+        badgeEl.textContent = `Total: ${sumPct}%`;
+        badgeEl.className = `font-bold tnum ${Math.abs(sumPct - 100) < 0.5 ? 'text-emerald-700' : 'text-amber-700'}`;
+      }
+      const hintEl = document.getElementById('termin-summary-hint');
+      if (hintEl) {
+        hintEl.textContent = `${n}× pembayaran (${clientTermins.map(t => `${t.label} ${t.pct}%`).join(' · ')})`;
+      }
+    }
+
+    // Calendar Date & Phase Schedule Helpers
+    const MONTHS_ID_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    function dayOffsetToDateStr(dayOffset) {
+      const base = new Date((projectStartDate || '2026-12-01') + 'T00:00:00Z');
+      if (isNaN(base.getTime())) return '2026-12-01';
+      base.setUTCDate(base.getUTCDate() + Math.round(dayOffset || 0));
+      return base.toISOString().slice(0, 10);
+    }
+
+    function fmtDateShortId(dayOffset) {
+      const iso = dayOffsetToDateStr(dayOffset);
+      const [y, m, d] = iso.split('-').map(Number);
+      return `${String(d).padStart(2, '0')} ${MONTHS_ID_SHORT[(m || 1) - 1]} ${y}`;
+    }
+
+    function dateStrToDayOffset(dateStr) {
+      const base = new Date((projectStartDate || '2026-12-01') + 'T00:00:00Z');
+      const target = new Date((dateStr || projectStartDate) + 'T00:00:00Z');
+      if (isNaN(base.getTime()) || isNaN(target.getTime())) return 0;
+      return Math.max(0, Math.round((target.getTime() - base.getTime()) / 86400000));
+    }
+
+    function onProjectStartDateChange(val) {
+      if (!val) return;
+      projectStartDate = val;
+      recalculateAll();
+    }
+
+    function openPhaseScheduleModal(phaseKey) {
+      const sim = computeSimulation();
+      const ph = sim.phases.find(p => p.key === phaseKey);
+      if (!ph) return;
+      editingPhaseKey = phaseKey;
+      document.getElementById('ps-code-badge').textContent = `${ph.code} · Jadwal Fase`;
+      document.getElementById('ps-name').value = ph.name;
+      document.getElementById('ps-start-day').value = ph.startDay;
+      document.getElementById('ps-duration').value = Math.max(1, ph.endDay - ph.startDay);
+      document.getElementById('ps-start-date').value = dayOffsetToDateStr(ph.startDay);
+      document.getElementById('ps-end-date').value = dayOffsetToDateStr(ph.endDay);
+      document.getElementById('phase-schedule-modal').classList.remove('hidden');
+    }
+
+    function closePhaseScheduleModal() {
+      editingPhaseKey = null;
+      document.getElementById('phase-schedule-modal').classList.add('hidden');
+    }
+
+    function onPhaseModalDateChange() {
+      const sDate = document.getElementById('ps-start-date').value;
+      const eDate = document.getElementById('ps-end-date').value;
+      const sDay = dateStrToDayOffset(sDate);
+      const eDay = Math.max(sDay + 1, dateStrToDayOffset(eDate));
+      document.getElementById('ps-start-day').value = sDay;
+      document.getElementById('ps-duration').value = Math.max(1, eDay - sDay);
+      document.getElementById('ps-end-date').value = dayOffsetToDateStr(eDay);
+    }
+
+    function onPhaseModalDayChange() {
+      const sDay = Math.max(0, parseInt(document.getElementById('ps-start-day').value, 10) || 0);
+      const dur = Math.max(1, parseInt(document.getElementById('ps-duration').value, 10) || 1);
+      document.getElementById('ps-start-date').value = dayOffsetToDateStr(sDay);
+      document.getElementById('ps-end-date').value = dayOffsetToDateStr(sDay + dur);
+    }
+
+    function savePhaseScheduleModal() {
+      if (!editingPhaseKey) return;
+      const sim = computeSimulation();
+      const idx = sim.phases.findIndex(p => p.key === editingPhaseKey);
+      if (idx < 0) return;
+
+      const sDay = Math.max(0, parseInt(document.getElementById('ps-start-day').value, 10) || 0);
+      const dur = Math.max(1, parseInt(document.getElementById('ps-duration').value, 10) || 1);
+      const eDay = sDay + dur;
+      const customName = (document.getElementById('ps-name').value || '').trim();
+      const cascade = document.getElementById('ps-cascade').checked;
+      const deltaEnd = eDay - sim.phases[idx].endDay;
+
+      phaseScheduleOverrides[editingPhaseKey] = {
+        startDay: sDay,
+        endDay: eDay,
+        ...(customName ? { customName } : {})
+      };
+
+      if (cascade && deltaEnd !== 0) {
+        for (let j = idx + 1; j < sim.phases.length; j++) {
+          const nextP = sim.phases[j];
+          const prevOv = phaseScheduleOverrides[nextP.key] || {};
+          phaseScheduleOverrides[nextP.key] = {
+            ...prevOv,
+            startDay: Math.max(0, nextP.startDay + deltaEnd),
+            endDay: Math.max(1, nextP.endDay + deltaEnd)
+          };
+        }
+      }
+
+      closePhaseScheduleModal();
+      recalculateAll();
+      showToast('Jadwal & tanggal fase diperbarui.');
+    }
+
+    function resetSinglePhaseSchedule() {
+      if (!editingPhaseKey) return;
+      delete phaseScheduleOverrides[editingPhaseKey];
+      closePhaseScheduleModal();
+      recalculateAll();
+      showToast('Jadwal fase dikembalikan ke perhitungan otomatis.');
+    }
+
+    function resetPhaseScheduleOverrides() {
+      phaseScheduleOverrides = {};
+      recalculateAll();
+      showToast('Seluruh jadwal fase dikembalikan ke perhitungan otomatis.');
+    }
 
     function getMaterialById(matId) {
       return MATERIAL_DB.find(m => m.id === matId) || MATERIAL_DB[MATERIAL_DB.length - 1];
@@ -3259,6 +3540,12 @@
           feeBase = saved.params.feeBase || 'netto';
           delayDays = saved.params.delayDays || 0;
           capacityMultiplier = saved.params.capacityMultiplier || 1;
+          if (Array.isArray(saved.params.clientTermins) && saved.params.clientTermins.length > 0) {
+            clientTermins = saved.params.clientTermins.map(t => ({ ...t }));
+            syncDpInputFromTermins();
+          }
+          if (saved.params.projectStartDate) projectStartDate = saved.params.projectStartDate;
+          if (saved.params.phaseScheduleOverrides) phaseScheduleOverrides = { ...saved.params.phaseScheduleOverrides };
         }
         recalculateAll();
       }
@@ -3323,7 +3610,10 @@
           units: inp.units, markupPct: inp.markupPct, dpPct: inp.dpPct,
           overheadPerDayJt: inp.overheadPerDayJt, accelCostJt: inp.accelCostJt,
           wapuBgPct: inp.wapuBgPct, costOfCapitalPct: inp.costOfCapitalPct,
-          spkCount, feeBase, delayDays, capacityMultiplier
+          spkCount, feeBase, delayDays, capacityMultiplier,
+          clientTermins: clientTermins.map(t => ({ ...t })),
+          projectStartDate,
+          phaseScheduleOverrides: { ...phaseScheduleOverrides }
         }
       };
 
@@ -3500,15 +3790,32 @@
       const procDays = Math.max(15, Math.ceil(prepDays * 0.7) + Math.ceil(engineLeadAdd * 0.6));
       const qcBastDays = Math.max(10, Math.ceil(permitAdd * (inp.units === 1 ? 0.5 : 0.85)));
 
-      const f0Start = 0, f0End = adminDpDays;
-      const p1Start = f0End, p1End = p1Start + prepDays;
-      const p2Start = p1Start, p2End = p2Start + procDays;
-      const p3Start = p1End, p3End = p3Start + batch1Days;
-      const p4Start = p3End, p4End = p4Start + batch2Days;
-      const p5Start = p4End, p5End = p5Start + batch3Days;
-      const p6Start = p5End, p6End = p6Start + batch4Days + qcBastDays;
-      const p7Start = p6End, p7End = p7Start + 14 + Math.round(effDelayDays * 0.5);
-      const totalDays = p7End;
+      let f0Start = 0, f0End = adminDpDays;
+      let p1Start = f0End, p1End = p1Start + prepDays;
+      let p2Start = p1Start, p2End = p2Start + procDays;
+      let p3Start = p1End, p3End = p3Start + batch1Days;
+      let p4Start = p3End, p4End = p4Start + batch2Days;
+      let p5Start = p4End, p5End = p5Start + batch3Days;
+      let p6Start = p5End, p6End = p6Start + batch4Days + qcBastDays;
+      let p7Start = p6End, p7End = p7Start + 14 + Math.round(effDelayDays * 0.5);
+
+      const applyOv = (key, s, e) => {
+        const ov = phaseScheduleOverrides[key];
+        if (!ov) return [s, e];
+        const ns = Math.max(0, Number.isFinite(ov.startDay) ? ov.startDay : s);
+        const ne = Math.max(ns + 1, Number.isFinite(ov.endDay) ? ov.endDay : e);
+        return [ns, ne];
+      };
+      [f0Start, f0End] = applyOv('sign', f0Start, f0End);
+      [p1Start, p1End] = applyOv('dp', p1Start, p1End);
+      [p2Start, p2End] = applyOv('proc', p2Start, p2End);
+      [p3Start, p3End] = applyOv('b1', p3Start, p3End);
+      [p4Start, p4End] = applyOv('b2', p4Start, p4End);
+      [p5Start, p5End] = applyOv('b3', p5Start, p5End);
+      [p6Start, p6End] = applyOv('b4', p6Start, p6End);
+      [p7Start, p7End] = applyOv('bast', p7Start, p7End);
+
+      const totalDays = Math.max(1, f0End, p1End, p2End, p3End, p4End, p5End, p6End, p7End);
 
       // 2. Time-Driven Overhead & Acceleration COGS
       const overheadCostTotal = Math.round(effOverheadJt * 1e6) * totalDays;
@@ -3540,18 +3847,25 @@
       const govFrictionTotal = Math.round(projectValue * (inp.wapuBgPct / 100));
       const netCashInTotal = projectValue - govFrictionTotal;
 
-      // 4. Termin Structure & Delay Shifts
-      const dpPct = inp.dpPct;
-      const retensiPct = Math.min(5, Math.max(0, 100 - dpPct));
-      const progressPool = Math.max(0, 100 - dpPct - retensiPct);
-      const t1Pct = Math.round(progressPool * 0.32);
-      const t2Pct = Math.round(progressPool * 0.34);
-      const t3Pct = Math.max(0, progressPool - t1Pct - t2Pct);
+      // 4. Custom Multi-Installment Termin Structure & Delay Shifts
+      const rawTerminSum = clientTermins.reduce((a, t) => a + Math.max(0, Number(t.pct) || 0), 0);
+      const normFactor = rawTerminSum > 0 ? (100 / rawTerminSum) : 1;
+      const phasePctMap = { F1: 0, F3: 0, F4: 0, F5: 0, F7: 0 };
+      clientTermins.forEach(t => {
+        const ph = phasePctMap[t.phase] !== undefined ? t.phase : 'F7';
+        phasePctMap[ph] += Math.max(0, Number(t.pct) || 0) * normFactor;
+      });
 
-      const totalDpNetIn = Math.round(netCashInTotal * (dpPct / 100));
-      const rawT1In = Math.round(netCashInTotal * (t1Pct / 100));
-      const rawT2In = Math.round(netCashInTotal * (t2Pct / 100));
-      const rawT3In = Math.round(netCashInTotal * (t3Pct / 100));
+      const dpPct = Math.round(phasePctMap.F1 * 10) / 10;
+      const t1Pct = Math.round(phasePctMap.F3 * 10) / 10;
+      const t2Pct = Math.round(phasePctMap.F4 * 10) / 10;
+      const t3Pct = Math.round(phasePctMap.F5 * 10) / 10;
+      const retensiPct = Math.max(0, Math.round((100 - dpPct - t1Pct - t2Pct - t3Pct) * 10) / 10);
+
+      const totalDpNetIn = Math.round(netCashInTotal * (phasePctMap.F1 / 100));
+      const rawT1In = Math.round(netCashInTotal * (phasePctMap.F3 / 100));
+      const rawT2In = Math.round(netCashInTotal * (phasePctMap.F4 / 100));
+      const rawT3In = Math.round(netCashInTotal * (phasePctMap.F5 / 100));
 
       const lagRatio = Math.min(1, effDelayDays / 35);
       const t1Lag = Math.round(rawT1In * lagRatio);
@@ -4418,43 +4732,9 @@
         </div>
       `).join('');
 
-      // Contextual Preset Comparison (shows presets matching activeVesselClass)
-      const matchingPresets = PREDEFINED_PRESETS.filter(p => p.vesselClass === activeVesselClass);
-      const compareSection = document.getElementById('scenario-compare-section');
-      if (matchingPresets.length <= 1) {
-        compareSection.classList.add('hidden');
-      } else {
-        compareSection.classList.remove('hidden');
-        document.getElementById('scenario-compare-title').textContent =
-          activeVesselClass === 'fishing-3gt'
-            ? 'Komparasi 3 Skenario Kapal Ikan 3 GT (Klik untuk Muat)'
-            : `Komparasi Preset ${vc ? vc.name : ''} (Klik untuk Muat)`;
-        document.getElementById('scenario-compare-body').innerHTML = matchingPresets.map(p => {
-          const s = computeSimulation(p.cards);
-          const isActive = activePresetId === p.id;
-          return `
-            <tr onclick="loadPresetById('${p.id}')" class="scenario-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
-              <td class="py-3 px-4">
-                <div class="flex items-center gap-2.5">
-                  <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-brand-700 bg-brand-700' : 'border-zinc-300 bg-white'}">
-                    ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}
-                  </span>
-                  <span class="font-semibold text-zinc-950">${p.name}</span>
-                </div>
-              </td>
-              <td class="py-3 px-3 text-right font-medium tnum text-zinc-700 whitespace-nowrap">${fmtRpShort(s.cogsUnit)}</td>
-              <td class="py-3 px-3 text-right font-medium tnum text-zinc-900 whitespace-nowrap">${fmtRpShort(s.valUnit)}</td>
-              <td class="py-3 px-3 text-right font-bold tnum text-brand-700 whitespace-nowrap">${fmtRpShort(s.projectValue)}</td>
-              <td class="py-3 px-3 text-right font-semibold tnum ${s.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">${s.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(s.cashAtRiskDay0) : 'Rp 0'}</td>
-              <td class="py-3 px-3 text-right font-medium tnum text-rose-700 whitespace-nowrap">-${fmtRpShort(s.financingCost)}</td>
-              <td class="py-3 px-3 text-right font-semibold tnum ${s.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'} whitespace-nowrap">${fmtRpShort(s.realNetProfit)}</td>
-              <td class="py-3 px-4 text-right font-semibold tnum text-zinc-900 whitespace-nowrap">${s.totalDays} hari</td>
-            </tr>
-          `;
-        }).join('');
-      }
+      renderTerminInputs();
 
-      // CEO Walk-Away Box
+      // Risk & Negotiation Box
       const plafonRp = sim.ceoPlafonM * 1e9;
       const isWithinPlafon = sim.cashAtRiskDay0 <= plafonRp;
       const overPlafonRp = Math.max(0, sim.cashAtRiskDay0 - plafonRp);
@@ -4641,25 +4921,36 @@
       const colorMap = { fee: 'bg-rose-600', prep: 'bg-zinc-700', prod: 'bg-brand-700', qc: 'bg-emerald-600' };
       const ticks = [0, 0.2, 0.4, 0.6, 0.8, 1.0].map(r => Math.round(total * r));
 
+      const hasSchedOv = Object.keys(phaseScheduleOverrides).length > 0;
+      const resetSchedBtn = document.getElementById('btn-reset-schedule');
+      if (resetSchedBtn) resetSchedBtn.classList.toggle('hidden', !hasSchedOv);
+      const startDateEl = document.getElementById('ctrl-start-date');
+      if (startDateEl && startDateEl.value !== projectStartDate) startDateEl.value = projectStartDate;
+
       document.getElementById('gantt-container').innerHTML = `
         <div class="grid grid-cols-12 gap-3 items-center pb-2.5 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
-          <div class="col-span-4">Fase &amp; Deliverable</div>
-          <div class="col-span-6 flex justify-between tnum px-1">${ticks.map(d => `<span>Hari ${d}</span>`).join('')}</div>
-          <div class="col-span-2 text-right">Durasi / Net Kas</div>
+          <div class="col-span-4">Fase &amp; Deliverable (Klik untuk Edit Tanggal)</div>
+          <div class="col-span-6 flex justify-between tnum px-1">${ticks.map(d => `<span>H-${d} (${fmtDateShortId(d).slice(0, 6)})</span>`).join('')}</div>
+          <div class="col-span-2 text-right">Tanggal / Net Kas</div>
         </div>
         ${sim.phases.map(p => {
+          const ov = phaseScheduleOverrides[p.key];
+          if (ov && ov.customName) p.name = ov.customName;
           const leftPct = (p.startDay / total) * 100;
           const dur = Math.max(1, p.endDay - p.startDay);
           const widthPct = Math.max(2.2, (dur / total) * 100);
           const netCls = p.netCash < 0 ? 'text-rose-700' : 'text-emerald-700';
+          const dateRangeTxt = `${fmtDateShortId(p.startDay)} – ${fmtDateShortId(p.endDay)}`;
           return `
-            <div class="grid grid-cols-12 gap-3 items-center py-1.5 hover:bg-zinc-50 rounded-lg px-1 transition">
+            <div onclick="openPhaseScheduleModal('${p.key}')" title="Klik untuk ubah jadwal & tanggal ${p.code}"
+              class="cursor-pointer grid grid-cols-12 gap-3 items-center py-2 hover:bg-brand-50/40 rounded-lg px-1.5 transition group">
               <div class="col-span-4 pr-2">
-                <div class="text-xs font-semibold text-zinc-900 flex items-center gap-1.5">
-                  <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 tnum">${p.code}</span>
+                <div class="text-xs font-semibold text-zinc-900 group-hover:text-brand-700 flex items-center gap-1.5">
+                  <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${ov ? 'bg-amber-100 text-amber-800' : 'bg-zinc-100 text-zinc-600'} tnum">${p.code}</span>
                   <span class="truncate" title="${p.name}">${p.name}</span>
+                  <i class="ph ph-pencil-simple text-xs text-zinc-400 group-hover:text-brand-700 shrink-0"></i>
                 </div>
-                <div class="text-[11px] text-zinc-500 truncate mt-0.5" title="${p.detail}">${p.detail}</div>
+                <div class="text-[10px] text-zinc-500 truncate mt-0.5 tnum">${dateRangeTxt} · ${dur} hr</div>
               </div>
               <div class="col-span-6 relative h-7 bg-zinc-100 rounded-md overflow-hidden">
                 <div class="gantt-bar absolute top-1 bottom-1 rounded ${colorMap[p.category]} flex items-center justify-center text-[10px] font-semibold text-white tnum px-1.5 truncate"
@@ -4677,7 +4968,7 @@
       `;
 
       document.getElementById('timeline-subtitle').innerHTML =
-        `Total durasi <strong>${sim.units.toLocaleString('id-ID')} unit</strong> (${sim.spkCount} SPK): <strong class="tnum text-zinc-900">${sim.totalDays} hari (± ${(sim.totalDays / 30).toFixed(1)} bulan)</strong> · Jeda SP2D +${sim.delayDays} hr.`;
+        `Periode kontrak: <strong class="tnum text-zinc-900">${fmtDateShortId(0)} – ${fmtDateShortId(sim.totalDays)}</strong> (<strong class="tnum text-zinc-900">${sim.totalDays} hari / ± ${(sim.totalDays / 30).toFixed(1)} bln</strong>) · ${sim.spkCount} SPK · Jeda SP2D +${sim.delayDays} hr.`;
 
       document.getElementById('table-unit-badge').textContent =
         `${sim.units.toLocaleString('id-ID')} Unit · ${sim.spkCount} SPK · Kas Masuk Bersih ${fmtRpShort(sim.netCashInTotal)}`;
@@ -4687,10 +4978,12 @@
         const badge = isNeg
           ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800">DEFISIT</span>`
           : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">SURPLUS</span>`;
+        const dateRangeTxt = `${fmtDateShortId(p.startDay)} – ${fmtDateShortId(p.endDay)}`;
         return `
-          <tr class="${isNeg ? 'bg-rose-50/40' : 'bg-white'} hover:bg-zinc-50 transition">
-            <td class="py-3 px-4"><div class="font-semibold text-zinc-950"><span class="tnum text-zinc-400 mr-1.5">${p.code}</span>${p.name}</div><div class="text-[11px] text-zinc-500 mt-0.5">${p.detail}</div></td>
-            <td class="py-3 px-3 tnum text-zinc-700 whitespace-nowrap">H-${p.startDay}–H-${p.endDay}<div class="text-[10px] text-zinc-400">${Math.max(1, p.endDay - p.startDay)} hari</div></td>
+          <tr onclick="openPhaseScheduleModal('${p.key}')" title="Klik untuk edit tanggal fase ${p.code}"
+            class="cursor-pointer ${isNeg ? 'bg-rose-50/40' : 'bg-white'} hover:bg-brand-50/40 transition">
+            <td class="py-3 px-4"><div class="font-semibold text-zinc-950 flex items-center gap-1.5"><span class="tnum text-zinc-400">${p.code}</span><span>${p.name}</span><i class="ph ph-pencil-simple text-xs text-zinc-400"></i></div><div class="text-[11px] text-zinc-500 mt-0.5">${p.detail}</div></td>
+            <td class="py-3 px-3 tnum text-zinc-800 whitespace-nowrap"><div class="font-semibold">${dateRangeTxt}</div><div class="text-[10px] text-zinc-400">H-${p.startDay}–H-${p.endDay} (${Math.max(1, p.endDay - p.startDay)} hr)</div></td>
             <td class="py-3 px-3 text-right tnum font-medium ${p.inflow > 0 ? 'text-brand-700' : 'text-zinc-400'} whitespace-nowrap">${p.inflow > 0 ? '+' + fmtRpShort(p.inflow) : '—'}</td>
             <td class="py-3 px-3 text-right tnum font-medium ${p.feeOut > 0 ? 'text-rose-700' : 'text-zinc-400'} whitespace-nowrap">${p.feeOut > 0 ? '-' + fmtRpShort(p.feeOut) : '—'}</td>
             <td class="py-3 px-3 text-right tnum font-medium ${p.prodOut > 0 ? 'text-zinc-800' : 'text-zinc-400'} whitespace-nowrap">${p.prodOut > 0 ? '-' + fmtRpShort(p.prodOut) : '—'}</td>
