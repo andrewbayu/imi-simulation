@@ -124,6 +124,29 @@
       background-color: #dbeafe !important;
       box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.18);
     }
+    .equip-slot {
+      transition: all 0.16s ease;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .equip-slot:hover {
+      border-color: #93c5fd;
+    }
+    .equip-slot.is-focused {
+      border-color: #1d4ed8;
+      box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.16);
+      background-color: #eff6ff;
+    }
+    .equip-slot.drag-over {
+      border-color: #1d4ed8 !important;
+      background-color: #dbeafe !important;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.22);
+    }
+    .blueprint-grid {
+      background-color: #fafafa;
+      background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
     .scenario-row, .tradeoff-row {
       transition: background-color 0.14s ease;
       cursor: pointer;
@@ -317,72 +340,109 @@
         </div>
       </section>
 
-      <!-- Step 1B: Split Builder Workspace (Catalog Left + Blueprint Right) -->
-      <section class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <!-- Step 1B: Naval Equipment Loadout (Left 7 cols) + Focused Armory/Inventory (Right 5 cols) -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
 
-        <!-- LEFT: Component Card Catalog -->
-        <div class="xl:col-span-7 panel overflow-hidden">
-          <!-- Short Clean Category Tabs (Zero Clipping) -->
-          <div class="px-4 py-3 border-b border-zinc-200 flex items-center justify-between gap-2 bg-white">
-            <div class="flex items-center gap-1 overflow-x-auto no-print" id="catalog-filter-tabs">
-              <!-- Populated by JS -->
+        <!-- LEFT: PAPER-DOLL / RPG VESSEL EQUIPMENT LOADOUT STAGE -->
+        <div class="xl:col-span-7 space-y-3">
+
+          <!-- Compact Compatibility Strip -->
+          <div id="ontology-alert-panel" class="rounded-xl px-3.5 py-2.5 border text-xs">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Loadout Stage Panel -->
+          <div class="panel overflow-hidden">
+            <div class="px-4 py-2.5 border-b border-zinc-200 bg-white flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-zinc-950">Equipment Loadout Kapal</span>
+                <span class="text-[11px] text-zinc-400">Klik slot untuk ganti komponen · Tarik kartu ke slot</span>
+              </div>
+              <span id="bp-unit-cogs" class="text-xs font-bold tnum text-brand-700"></span>
+            </div>
+
+            <!-- Blueprint Stage Canvas with Boat Silhouette + 5 Equipment Slots -->
+            <div class="blueprint-grid p-4 space-y-3">
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                <!-- Left Equipment Column (Navigasi + Body) -->
+                <div id="loadout-slots-left" class="md:col-span-4 space-y-2.5 order-2 md:order-1">
+                  <!-- Populated by JS: nav_elec, hull -->
+                </div>
+
+                <!-- Center Boat Schematic + Character Stats -->
+                <div class="md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center space-y-2.5">
+                  <div id="vessel-schematic-box" class="w-full rounded-xl bg-white/90 border border-zinc-200/90 p-3 flex flex-col items-center justify-center shadow-sm">
+                    <!-- Dynamic SVG Schematic + Hotspots populated by JS -->
+                  </div>
+                  <!-- Vessel RPG Stats Strip -->
+                  <div id="vessel-stats-grid" class="w-full grid grid-cols-2 gap-1.5 text-[11px] tnum">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
+
+                <!-- Right Equipment Column (Outfitting + Engine) -->
+                <div id="loadout-slots-right" class="md:col-span-4 space-y-2.5 order-3">
+                  <!-- Populated by JS: outfitting, engine -->
+                </div>
+              </div>
+
+              <!-- Bottom Equipment Slot (Perizinan, BKI & Pengiriman) -->
+              <div id="loadout-slot-bottom">
+                <!-- Populated by JS: permit_delivery -->
+              </div>
+            </div>
+
+            <!-- Compact Footer Bar with Reference Photo Toggle & CTA -->
+            <div class="px-4 py-3 border-t border-zinc-200 bg-white flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="text-[11px] text-zinc-500">
+                  Lead Time: <strong id="bp-extra-days" class="text-zinc-900 tnum"></strong>
+                </div>
+                <button id="btn-toggle-ref-photos" type="button" onclick="toggleRefPhotos()" class="hidden no-print text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 underline underline-offset-2">
+                  Foto Referensi 3 GT
+                </button>
+              </div>
+              <button type="button" onclick="switchPage('page-1')" class="no-print inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
+                <span>Simulasi Proyek</span>
+                <i class="ph-bold ph-arrow-right text-xs"></i>
+              </button>
+            </div>
+
+            <!-- Collapsible Reference Photos (Hidden by default to keep stage ultra clean) -->
+            <div id="bp-reference-photos" class="hidden p-3 border-t border-zinc-200 bg-zinc-50/70 grid grid-cols-2 gap-2.5">
+              <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
+                <img src="assets/ref-kapal-1.jpg" alt="Referensi Kapal 3 GT 1" class="w-full h-24 object-cover" />
+                <figcaption class="px-2 py-1 text-[10px] text-zinc-500 truncate">Ref 1 · Lambung terbuka 9,2m × 1,2m</figcaption>
+              </figure>
+              <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
+                <img src="assets/ref-kapal-2.jpg" alt="Referensi Kapal 3 GT 2" class="w-full h-24 object-cover" />
+                <figcaption class="px-2 py-1 text-[10px] text-zinc-500 truncate">Ref 2 · Yamaha 15 PK + Box Ikan</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: FOCUSED INVENTORY / ARMORY FOR SELECTED SLOT -->
+        <div class="xl:col-span-5 panel overflow-hidden">
+          <div class="px-4 py-3 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between gap-2">
+            <div>
+              <div id="inventory-title" class="text-xs font-bold text-zinc-950">Gudang Opsi Komponen</div>
+              <div class="text-[11px] text-zinc-500">Klik <strong>(+) Pasang</strong> atau tarik kartu ke slot kapal</div>
             </div>
             <button id="btn-reset-cards" type="button" onclick="resetCatalogEdits()" class="hidden no-print shrink-0 text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded transition">
               Reset
             </button>
           </div>
 
-          <div id="catalog-cards-container" class="p-4 space-y-5">
+          <div class="px-3.5 py-2 border-b border-zinc-200 flex items-center gap-1 overflow-x-auto bg-white no-print" id="catalog-filter-tabs">
+            <!-- Populated by JS -->
+          </div>
+
+          <div id="catalog-cards-container" class="p-3.5 space-y-3">
             <!-- Populated by JS -->
           </div>
         </div>
 
-        <!-- RIGHT: Compatibility Status + Clean Hairline Blueprint -->
-        <div class="xl:col-span-5 space-y-4">
-
-          <!-- Compact Compatibility Bar -->
-          <div id="ontology-alert-panel" class="rounded-xl px-3.5 py-2.5 border text-xs">
-            <!-- Populated by JS -->
-          </div>
-
-          <!-- Active Vessel Blueprint Drop Slots (Light header + hairline divide-y rows) -->
-          <div class="panel overflow-hidden">
-            <div class="px-4 py-3 border-b border-zinc-200 bg-zinc-50/80 flex items-center justify-between">
-              <div>
-                <div class="text-xs font-bold text-zinc-950">Blueprint Terpasang</div>
-                <div class="text-[11px] text-zinc-500">Tarik kartu ke baris atau klik untuk ubah harga</div>
-              </div>
-              <span id="bp-unit-cogs" class="text-xs font-bold tnum text-brand-700"></span>
-            </div>
-
-            <div id="blueprint-slots-container" class="divide-y divide-zinc-200 bg-white">
-              <!-- Populated by JS -->
-            </div>
-
-            <!-- Reference Visual Strip (3GT only) -->
-            <div id="bp-reference-photos" class="p-3 border-t border-zinc-200 bg-zinc-50/40 grid grid-cols-2 gap-2.5">
-              <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
-                <img src="assets/ref-kapal-1.jpg" alt="Referensi Kapal 3 GT 1" class="w-full h-20 object-cover" />
-                <figcaption class="px-2 py-1 text-[10px] text-zinc-500 truncate">Ref 1 · 9,2m × 1,2m</figcaption>
-              </figure>
-              <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
-                <img src="assets/ref-kapal-2.jpg" alt="Referensi Kapal 3 GT 2" class="w-full h-20 object-cover" />
-                <figcaption class="px-2 py-1 text-[10px] text-zinc-500 truncate">Ref 2 · Yamaha 15 PK</figcaption>
-              </figure>
-            </div>
-
-            <div class="px-4 py-3 border-t border-zinc-200 bg-white flex items-center justify-between gap-3 no-print">
-              <div class="text-[11px] text-zinc-500">
-                Lead Time: <strong id="bp-extra-days" class="text-zinc-900 tnum"></strong>
-              </div>
-              <button type="button" onclick="switchPage('page-1')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
-                <span>Simulasi Proyek</span>
-                <i class="ph-bold ph-arrow-right text-xs"></i>
-              </button>
-            </div>
-          </div>
-
-        </div>
       </section>
     </div>
 
@@ -1279,7 +1339,7 @@
       nav_elec: 'nav-3gt-ff',
       permit_delivery: 'perm-3gt-reg'
     };
-    let catalogCategoryFilter = 'all'; // 'all' | WBS category
+    let catalogCategoryFilter = 'hull'; // 'all' | WBS category
     let showIncompatibleCards = false;
     let activePresetId = 'preset-3gt-2';
     let activeFeeMode = 'requested';
@@ -1306,18 +1366,34 @@
       const permit = getCardById(cardMap.permit_delivery);
 
       const alerts = [];
+      const slotIssues = {
+        hull: 'ok',
+        engine: 'ok',
+        outfitting: 'ok',
+        nav_elec: 'ok',
+        permit_delivery: 'ok'
+      };
+      const bumpIssue = (slot, level) => {
+        if (!slotIssues[slot]) return;
+        if (level === 'critical') slotIssues[slot] = 'critical';
+        else if (level === 'warning' && slotIssues[slot] === 'ok') slotIssues[slot] = 'warning';
+      };
 
       // Rule 1: Engine Power vs Vessel Class / Hull Geometry
       if (engine && vc) {
         if (engine.totalHp < vc.minHp) {
+          bumpIssue('engine', 'critical');
           alerts.push({
             level: 'critical',
+            slot: 'engine',
             title: 'Mesin Terlalu Kecil (Underpowered)',
             msg: `${engine.name} (${engine.totalHp} HP) di bawah kebutuhan minimum ${vc.name} (min. ${vc.minHp} HP). Kapal tidak mampu mencapai kecepatan dinas / gagal uji laut.`
           });
         } else if (engine.totalHp > vc.maxHp) {
+          bumpIssue('engine', 'critical');
           alerts.push({
             level: 'critical',
+            slot: 'engine',
             title: 'Mesin Terlalu Besar (Overpowered)',
             msg: `${engine.name} (${engine.totalHp} HP) melampaui batas aman lambung ${vc.name} (maks. ${vc.maxHp} HP). Berisiko merusak transom & stabilitas.`
           });
@@ -1326,39 +1402,64 @@
 
       // Rule 2: KAK Compliance for 3 GT Fishing Boat
       if (vc.requireYamaha15 && engine && !engine.isYamaha15Pk) {
+        bumpIssue('engine', 'critical');
         alerts.push({
           level: 'critical',
+          slot: 'engine',
           title: 'Pelanggaran KAK Wajib Yamaha 15 PK',
-          msg: `Proyek ${vc.name} mewajibkan mesin **YAMAHA 15 PK**, namun kartu terpasang adalah ${engine.name}.`
+          msg: `Proyek ${vc.name} mewajibkan mesin <strong>YAMAHA 15 PK</strong>, namun komponen terpasang adalah ${engine.name}.`
         });
       }
 
       // Rule 3: Open-Deck Hull vs Cabin Outfitting / AC & Genset
       if (hull && !hull.hasCabin) {
-        if ((outfitting && outfitting.requiresCabin) || (nav && nav.hasHeavyAcOrGenset)) {
+        if (outfitting && outfitting.requiresCabin) {
+          bumpIssue('outfitting', 'warning');
+          bumpIssue('hull', 'warning');
           alerts.push({
             level: 'warning',
-            title: 'Korelasi Lambung Open-Deck vs Kabin/AC',
-            msg: `${hull.name} adalah lambung terbuka tanpa rumah geladak, tidak kompatibel penuh dengan paket kabin tertutup / Genset AC 220V.`
+            slot: 'outfitting',
+            title: 'Korelasi Lambung Open-Deck vs Kabin',
+            msg: `${hull.name} adalah lambung terbuka tanpa rumah geladak, tidak kompatibel penuh dengan ${outfitting.name}.`
+          });
+        }
+        if (nav && nav.hasHeavyAcOrGenset) {
+          bumpIssue('nav_elec', 'warning');
+          bumpIssue('hull', 'warning');
+          alerts.push({
+            level: 'warning',
+            slot: 'nav_elec',
+            title: 'Korelasi Lambung Open-Deck vs Genset AC 220V',
+            msg: `${hull.name} adalah lambung terbuka tanpa kabin tertutup untuk instalasi aman ${nav.name}.`
           });
         }
       }
 
       // Rule 4: Hull Class Compatibility Check
-      [hull, outfitting, nav, permit].forEach(c => {
+      [
+        { slot: 'hull', c: hull },
+        { slot: 'outfitting', c: outfitting },
+        { slot: 'nav_elec', c: nav },
+        { slot: 'permit_delivery', c: permit }
+      ].forEach(({ slot, c }) => {
         if (c && !c.compatibleClasses.includes(vc.id)) {
+          bumpIssue(slot, 'warning');
           alerts.push({
             level: 'warning',
+            slot,
             title: `Komponen di Luar Kelas ${vc.name}`,
-            msg: `Kartu "${c.name}" dikurasi untuk kelas lain (${c.compatibleClasses.join(', ')}). Pastikan dimensi & bobot disesuaikan.`
+            msg: `Komponen "${c.name}" dikurasi untuk kelas lain (${c.compatibleClasses.join(', ')}). Pastikan dimensi & bobot disesuaikan.`
           });
         }
       });
 
       // Rule 5: Economy Hull vs Full Classification BKI/RINA
       if (hull && hull.hullGrade === 'economy' && permit && permit.requiresBkiOrRina) {
+        bumpIssue('hull', 'warning');
+        bumpIssue('permit_delivery', 'warning');
         alerts.push({
           level: 'warning',
+          slot: 'permit_delivery',
           title: 'Risiko Survei BKI pada Laminasi Ekonomis',
           msg: `${permit.name} mensyaratkan verifikasi struktural ketat; pertimbangkan upgrade lambung ke Hybrid atau Heavy Alu/FRP.`
         });
@@ -1368,7 +1469,7 @@
       const warningCount = alerts.filter(a => a.level === 'warning').length;
       const status = criticalCount > 0 ? 'critical' : (warningCount > 0 ? 'warning' : 'valid');
 
-      return { status, criticalCount, warningCount, alerts };
+      return { status, criticalCount, warningCount, alerts, slotIssues };
     }
 
     // =========================================================================
@@ -1459,6 +1560,16 @@
       catalogCategoryFilter = catId;
       renderCatalogTabs();
       renderCatalogCards();
+      renderOntologyAndBlueprint(computeSimulation(), evaluateOntology());
+    }
+
+    function focusSlot(catId) {
+      setCatalogCategoryFilter(catId);
+    }
+
+    function toggleRefPhotos() {
+      const box = document.getElementById('bp-reference-photos');
+      if (box) box.classList.toggle('hidden');
     }
 
     function equipCard(cardId) {
@@ -1490,6 +1601,8 @@
       event.currentTarget.classList.remove('drag-over');
       const cardId = event.dataTransfer.getData('text/plain');
       if (cardId) {
+        const card = getCardById(cardId);
+        if (card) catalogCategoryFilter = card.category;
         equipCard(cardId);
       }
     }
@@ -2190,6 +2303,16 @@
       );
       document.getElementById('btn-reset-cards').classList.toggle('hidden', !anyModified);
 
+      const invTitleEl = document.getElementById('inventory-title');
+      if (invTitleEl) {
+        if (catalogCategoryFilter === 'all') {
+          invTitleEl.textContent = 'Gudang Komponen: Semua Kategori';
+        } else {
+          const activeCatObj = WBS_CATEGORIES.find(c => c.id === catalogCategoryFilter);
+          invTitleEl.textContent = `Opsi Slot: ${activeCatObj ? activeCatObj.title : catalogCategoryFilter}`;
+        }
+      }
+
       const catsToShow = catalogCategoryFilter === 'all'
         ? WBS_CATEGORIES
         : WBS_CATEGORIES.filter(c => c.id === catalogCategoryFilter);
@@ -2203,19 +2326,26 @@
         });
 
         return `
-          <div class="space-y-2.5">
-            <div class="flex items-center justify-between text-xs font-semibold text-zinc-500">
-              <span>${cat.code} · ${cat.title}</span>
-              <span class="text-[11px] font-normal text-zinc-400 tnum">${cards.length} opsi</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="space-y-2">
+            ${catalogCategoryFilter === 'all' ? `
+              <div class="flex items-center justify-between text-xs font-semibold text-zinc-500 pt-1">
+                <span>${cat.code} · ${cat.title}</span>
+                <span class="text-[11px] font-normal text-zinc-400 tnum">${cards.length} opsi</span>
+              </div>
+            ` : `
+              <div class="flex items-center justify-between text-[11px] text-zinc-400">
+                <span>${cat.code}</span>
+                <span class="tnum">${cards.length} opsi tersedia</span>
+              </div>
+            `}
+            <div class="grid grid-cols-1 gap-2">
               ${cards.map(card => {
                 const isEquipped = selectedCards[card.category] === card.id;
                 const isCompatible = card.compatibleClasses.includes(activeVesselClass);
                 const leadTxt = card.category === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} u/hr` : (card.extraDays > 0 ? `+${card.extraDays} hr` : '+0 hr');
                 return `
                   <div draggable="true" ondragstart="onCardDragStart(event, '${card.id}')"
-                    class="catalog-card p-3 border bg-white ${isEquipped ? 'is-equipped' : 'border-zinc-200 hover:border-zinc-300'} flex flex-col justify-between gap-2.5">
+                    class="catalog-card p-3 border bg-white ${isEquipped ? 'is-equipped' : 'border-zinc-200 hover:border-zinc-300'} flex flex-col justify-between gap-2">
                     <div>
                       <div class="flex items-start justify-between gap-2">
                         <span class="text-xs font-semibold text-zinc-950 leading-snug">${card.name}</span>
@@ -2230,7 +2360,7 @@
                     <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
                       <div class="tnum">
                         <div class="text-xs font-bold text-zinc-950">${fmtRpShort(card.cost)}<span class="text-[10px] font-normal text-zinc-400">/u</span></div>
-                        <div class="text-[10px] text-zinc-400">${leadTxt}</div>
+                        <div class="text-[10px] text-zinc-400">${leadTxt} · DP ${card.dpSupplierPct}%</div>
                       </div>
                       <div class="flex items-center gap-1">
                         <button type="button" onclick="openInspectorModal('${card.id}')" title="Ubah Harga, Lead Time & DP Supplier"
@@ -2252,10 +2382,212 @@
       }).join('');
     }
 
+    function buildVesselSchematicSvg(vesselClassId, slotIssues, activeCat) {
+      const profiles = {
+        'fishing-3gt': `
+          <!-- Hull 9.2m x 1.2m Open Deck -->
+          <path d="M28,90 L214,82 C210,98 196,105 178,105 L32,105 L28,90 Z" fill="#f8fafc" stroke="#0f172a" stroke-width="1.8"/>
+          <path d="M31,96 L205,91" fill="none" stroke="#94a3b8" stroke-width="0.9" stroke-dasharray="3 2"/>
+          <!-- Fish box & thwarts -->
+          <rect x="98" y="79" width="44" height="11" rx="1.5" fill="#e2e8f0" stroke="#334155" stroke-width="1.2"/>
+          <line x1="62" y1="88" x2="62" y2="96" stroke="#475569" stroke-width="1.2"/>
+          <line x1="164" y1="84" x2="164" y2="94" stroke="#475569" stroke-width="1.2"/>
+          <!-- Nav light pole -->
+          <line x1="88" y1="86" x2="88" y2="44" stroke="#334155" stroke-width="1.4"/>
+          <circle cx="88" cy="42" r="2.5" fill="#1d4ed8"/>
+          <!-- Outboard 15 PK stern -->
+          <path d="M16,74 L28,74 L28,94 L22,94 L20,108 L15,108 L18,90 L14,88 Z" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.4"/>
+        `,
+        'patrol-fast': `
+          <!-- Deep-V Patrol Hull 9.5m -->
+          <path d="M28,88 L216,76 C210,96 192,106 172,106 L32,106 L28,88 Z" fill="#f8fafc" stroke="#0f172a" stroke-width="1.8"/>
+          <path d="M30,96 L204,88" fill="none" stroke="#94a3b8" stroke-width="0.9" stroke-dasharray="3 2"/>
+          <!-- Patrol Cabin -->
+          <path d="M76,84 L82,56 L146,56 L160,80 Z" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5"/>
+          <polygon points="122,60 144,60 153,75 122,75" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <rect x="86" y="61" width="28" height="12" rx="1" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <!-- Radar arch & strobe -->
+          <path d="M90,56 L94,40 L106,40 L108,56" fill="none" stroke="#0f172a" stroke-width="1.4"/>
+          <rect x="95" y="36" width="10" height="4" rx="1" fill="#1d4ed8"/>
+          <!-- Twin Outboards -->
+          <path d="M13,70 L28,70 L28,94 L22,94 L19,109 L14,109 L17,89 L13,86 Z" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.4"/>
+        `,
+        'crew-workboat': `
+          <!-- Heavy Workboat 13m -->
+          <path d="M26,88 L220,78 C215,98 196,106 176,106 L30,106 L26,88 Z" fill="#f8fafc" stroke="#0f172a" stroke-width="1.8"/>
+          <path d="M28,97 L210,90" fill="none" stroke="#94a3b8" stroke-width="0.9" stroke-dasharray="3 2"/>
+          <!-- Forward Wheelhouse + Aft Work Deck -->
+          <path d="M116,82 L120,52 L170,52 L182,79 Z" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5"/>
+          <rect x="125" y="57" width="22" height="12" rx="1" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <polygon points="151,57 167,57 175,72 151,72" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <rect x="44" y="77" width="60" height="8" rx="1" fill="#cbd5e1" stroke="#475569" stroke-width="1.1"/>
+          <!-- Radar mast -->
+          <line x1="138" y1="52" x2="138" y2="34" stroke="#0f172a" stroke-width="1.4"/>
+          <line x1="130" y1="39" x2="146" y2="39" stroke="#1d4ed8" stroke-width="2"/>
+          <!-- Twin Heavy Outboards -->
+          <path d="M12,69 L26,69 L26,95 L20,95 L18,110 L13,110 L15,89 L12,86 Z" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.4"/>
+        `,
+        'passenger-ferry': `
+          <!-- Commuter / Flybridge 15m -->
+          <path d="M24,89 L222,79 C216,99 198,107 176,107 L28,107 L24,89 Z" fill="#f8fafc" stroke="#0f172a" stroke-width="1.8"/>
+          <path d="M26,97 L212,91" fill="none" stroke="#94a3b8" stroke-width="0.9" stroke-dasharray="3 2"/>
+          <!-- Main Passenger Deckhouse -->
+          <path d="M52,86 L56,57 L176,54 L188,80 Z" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5"/>
+          <rect x="64" y="62" width="18" height="11" rx="1" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <rect x="87" y="62" width="18" height="11" rx="1" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <rect x="110" y="62" width="18" height="11" rx="1" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <rect x="133" y="61" width="18" height="11" rx="1" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <polygon points="156,60 173,60 181,74 156,74" fill="#dbeafe" stroke="#334155" stroke-width="1"/>
+          <!-- Flybridge roof -->
+          <path d="M84,56 L88,43 L138,43 L144,55 Z" fill="#f1f5f9" stroke="#334155" stroke-width="1.2"/>
+          <!-- Propulsion -->
+          <path d="M12,72 L24,72 L24,95 L18,95 L16,109 L12,109 L14,89 Z" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.4"/>
+        `
+      };
+
+      const hotspots = [
+        { id: 'nav_elec', x: 92, y: 42, code: 'N', title: 'Navigasi & Listrik' },
+        { id: 'outfitting', x: 132, y: 72, code: 'O', title: 'Outfitting & Deck' },
+        { id: 'hull', x: 120, y: 98, code: 'B', title: 'Body & Lambung' },
+        { id: 'engine', x: 20, y: 84, code: 'M', title: 'Mesin & Propulsi' },
+        { id: 'permit_delivery', x: 196, y: 88, code: 'I', title: 'Izin, BKI & Kirim' }
+      ];
+
+      const hotspotSvg = hotspots.map(h => {
+        const issue = (slotIssues && slotIssues[h.id]) || 'ok';
+        const isActive = activeCat === h.id;
+        let fill = '#475569';
+        let stroke = '#ffffff';
+        let halo = '';
+        if (issue === 'critical') {
+          fill = '#e11d48';
+          halo = `<circle cx="${h.x}" cy="${h.y}" r="11" fill="#e11d48" fill-opacity="0.18"/>`;
+        } else if (issue === 'warning') {
+          fill = '#d97706';
+          halo = `<circle cx="${h.x}" cy="${h.y}" r="11" fill="#d97706" fill-opacity="0.18"/>`;
+        } else if (isActive) {
+          fill = '#1d4ed8';
+          halo = `<circle cx="${h.x}" cy="${h.y}" r="11" fill="#1d4ed8" fill-opacity="0.18"/>`;
+        }
+        return `
+          <g class="cursor-pointer" onclick="focusSlot('${h.id}')">
+            <title>${h.title}</title>
+            ${halo}
+            <circle cx="${h.x}" cy="${h.y}" r="7.5" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>
+            <text x="${h.x}" y="${h.y + 3}" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff" font-family="Inter, sans-serif">${h.code}</text>
+          </g>
+        `;
+      }).join('');
+
+      const vc = VESSEL_CLASSES.find(v => v.id === vesselClassId) || VESSEL_CLASSES[0];
+      return `
+        <svg viewBox="0 0 240 132" class="w-full max-w-[240px] h-auto select-none">
+          <!-- Reference waterline -->
+          <line x1="10" y1="105" x2="230" y2="105" stroke="#93c5fd" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <!-- Hull & deck profile -->
+          ${profiles[vesselClassId] || profiles['fishing-3gt']}
+          <!-- Centerline datum -->
+          <line x1="28" y1="120" x2="216" y2="120" stroke="#cbd5e1" stroke-width="1"/>
+          <line x1="28" y1="117" x2="28" y2="123" stroke="#94a3b8" stroke-width="1"/>
+          <line x1="216" y1="117" x2="216" y2="123" stroke="#94a3b8" stroke-width="1"/>
+          <text x="122" y="129" text-anchor="middle" font-size="7.5" font-weight="600" fill="#64748b" font-family="Inter, sans-serif">${vc.name.toUpperCase()} · ${vc.badge}</text>
+          <!-- Clickable subsystem hotspots -->
+          ${hotspotSvg}
+        </svg>
+      `;
+    }
+
+    function renderEquipmentSlotCard(catId, ontology) {
+      const cat = WBS_CATEGORIES.find(c => c.id === catId);
+      const card = getCardById(selectedCards[catId]);
+      if (!cat || !card) return '';
+
+      const slotMeta = {
+        nav_elec: { label: 'Navigasi & Listrik', icon: 'ph-compass' },
+        hull: { label: 'Body & Lambung', icon: 'ph-boat' },
+        outfitting: { label: 'Outfitting & Deck', icon: 'ph-lifebuoy' },
+        engine: { label: 'Mesin & Propulsi', icon: 'ph-engine' },
+        permit_delivery: { label: 'Perizinan, BKI & Kirim', icon: 'ph-certificate' }
+      }[catId] || { label: cat.title, icon: 'ph-cube' };
+
+      const issue = (ontology.slotIssues && ontology.slotIssues[catId]) || 'ok';
+      const isFocused = catalogCategoryFilter === catId;
+
+      let stateClass = 'border-zinc-200 bg-white';
+      let badgeHtml = '';
+      if (issue === 'critical') {
+        stateClass = 'border-rose-400 bg-rose-50/75';
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-100 text-rose-800">Kritis</span>';
+      } else if (issue === 'warning') {
+        stateClass = 'border-amber-400 bg-amber-50/70';
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Cek</span>';
+      } else if (isFocused) {
+        stateClass = 'is-focused';
+        badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-brand-100 text-brand-800">Aktif</span>';
+      }
+
+      const isBottom = catId === 'permit_delivery';
+      if (isBottom) {
+        return `
+          <div onclick="focusSlot('${catId}')"
+            ondragover="onSlotDragOver(event)" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, '${catId}')"
+            class="equip-slot cursor-pointer rounded-xl border p-3 ${stateClass} flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
+                <i class="ph-bold ${slotMeta.icon} text-base"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-semibold text-zinc-500">${slotMeta.label}</span>
+                  ${badgeHtml}
+                </div>
+                <div class="text-xs font-bold text-zinc-950 truncate">${card.name}</div>
+                <div class="text-[10px] text-zinc-500 truncate tnum">${card.locked.brand} · ${card.locked.powerLabel} · DP ${card.dpSupplierPct}%</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0 tnum">
+              <div class="text-right">
+                <div class="text-xs font-bold text-brand-700">${fmtRpShort(card.cost)}</div>
+                <div class="text-[10px] text-zinc-400">+${card.extraDays} hr</div>
+              </div>
+              <button type="button" onclick="event.stopPropagation(); openInspectorModal('${card.id}')"
+                class="px-2.5 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition">
+                Ubah
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div onclick="focusSlot('${catId}')"
+          ondragover="onSlotDragOver(event)" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, '${catId}')"
+          class="equip-slot cursor-pointer rounded-xl border p-2.5 ${stateClass} space-y-1.5">
+          <div class="flex items-center justify-between gap-1.5">
+            <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-500 truncate">
+              <i class="ph-bold ${slotMeta.icon} text-xs text-zinc-600 shrink-0"></i>
+              <span class="truncate">${slotMeta.label}</span>
+            </span>
+            ${badgeHtml}
+          </div>
+          <div class="text-xs font-bold text-zinc-950 leading-snug line-clamp-2" title="${card.name}">${card.name}</div>
+          <div class="text-[10px] text-zinc-500 truncate tnum">${card.locked.brand} · ${card.locked.powerLabel}</div>
+          <div class="pt-1.5 border-t border-zinc-100 flex items-center justify-between gap-2 tnum">
+            <span class="text-[11px] font-bold text-brand-700">${fmtRpShort(card.cost)}</span>
+            <button type="button" onclick="event.stopPropagation(); openInspectorModal('${card.id}')"
+              class="text-[10px] font-semibold text-zinc-600 hover:text-zinc-950 underline underline-offset-2">
+              Ubah
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
     function renderOntologyAndBlueprint(sim, ontology) {
-      // 1. Compact Compatibility Banner (Single-line when valid; expands on alerts)
+      // 1. Compact Compatibility Banner
       const ontPanel = document.getElementById('ontology-alert-panel');
-      const vcName = VESSEL_CLASSES.find(v => v.id === activeVesselClass).name;
+      const vc = VESSEL_CLASSES.find(v => v.id === activeVesselClass) || VESSEL_CLASSES[0];
+      const vcName = vc.name;
 
       if (ontology.alerts.length === 0) {
         ontPanel.className = 'rounded-xl px-3.5 py-2.5 border border-emerald-200 bg-emerald-50/70 flex items-center justify-between gap-2 text-xs';
@@ -2277,7 +2609,7 @@
             </span>
           </div>
           <div class="space-y-1.5">${ontology.alerts.map(a => `
-            <div class="p-2 rounded-lg bg-white border ${a.level === 'critical' ? 'border-rose-200' : 'border-amber-200'} text-[11px]">
+            <div onclick="${a.slot ? `focusSlot('${a.slot}')` : ''}" class="cursor-pointer p-2 rounded-lg bg-white border ${a.level === 'critical' ? 'border-rose-200 hover:border-rose-400' : 'border-amber-200 hover:border-amber-400'} text-[11px] transition">
               <div class="font-semibold ${a.level === 'critical' ? 'text-rose-800' : 'text-amber-800'}">${a.title}</div>
               <div class="text-zinc-600 mt-0.5 leading-snug">${a.msg}</div>
             </div>
@@ -2285,36 +2617,56 @@
         `;
       }
 
-      // 2. Blueprint 5 Hairline Drop Slots
+      // 2. Unit COGS & Lead Time Summary
       document.getElementById('bp-unit-cogs').textContent = `${fmtRpShort(sim.baseUnitCost)} / unit`;
       const extraDaysSum = sim.engine.extraDays + sim.outfitting.extraDays + sim.nav.extraDays + sim.permit.extraDays;
       document.getElementById('bp-extra-days').textContent = `+${extraDaysSum} hr (Mould ${sim.hull.prepDays} hr)`;
 
-      document.getElementById('blueprint-slots-container').innerHTML = WBS_CATEGORIES.map(cat => {
-        const card = getCardById(selectedCards[cat.id]);
-        const isMismatch = card && !card.compatibleClasses.includes(activeVesselClass);
-        return `
-          <div onclick="openInspectorModal('${card.id}')"
-            ondragover="onSlotDragOver(event)" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, '${cat.id}')"
-            class="drop-slot cursor-pointer px-4 py-3 ${isMismatch ? 'bg-rose-50/40' : 'hover:bg-zinc-50'} flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <div class="text-[10px] font-semibold ${isMismatch ? 'text-rose-700' : 'text-zinc-400'}">
-                ${cat.code} · ${cat.title} ${isMismatch ? '· Tidak Cocok' : ''}
-              </div>
-              <div class="text-xs font-semibold text-zinc-950 truncate mt-0.5">${card.name}</div>
-              <div class="text-[11px] text-zinc-500 mt-0.5 truncate tnum">
-                ${card.locked.brand} · ${card.locked.powerLabel} · DP ${card.dpSupplierPct}%
-              </div>
-            </div>
-            <div class="text-right shrink-0 tnum">
-              <div class="text-xs font-bold text-brand-700">${fmtRpShort(card.cost)}</div>
-              <div class="text-[10px] text-zinc-400">Ubah →</div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      // 3. Paper-Doll 5 Equipment Slots (Left: Navigasi + Body; Right: Outfitting + Mesin; Bottom: Izin & Kirim)
+      document.getElementById('loadout-slots-left').innerHTML =
+        renderEquipmentSlotCard('nav_elec', ontology) + renderEquipmentSlotCard('hull', ontology);
+      document.getElementById('loadout-slots-right').innerHTML =
+        renderEquipmentSlotCard('outfitting', ontology) + renderEquipmentSlotCard('engine', ontology);
+      document.getElementById('loadout-slot-bottom').innerHTML =
+        renderEquipmentSlotCard('permit_delivery', ontology);
 
-      document.getElementById('bp-reference-photos').classList.toggle('hidden', activeVesselClass !== 'fishing-3gt');
+      // 4. Center CAD Silhouette + Interactive Hotspots
+      document.getElementById('vessel-schematic-box').innerHTML =
+        buildVesselSchematicSvg(activeVesselClass, ontology.slotIssues, catalogCategoryFilter);
+
+      // 5. Vessel Character Stats Grid
+      const statusTxt = ontology.status === 'critical'
+        ? `${ontology.criticalCount} Kritis`
+        : (ontology.status === 'warning' ? `${ontology.warningCount} Catatan` : '5/5 Valid');
+      const statusCls = ontology.status === 'critical'
+        ? 'text-rose-700'
+        : (ontology.status === 'warning' ? 'text-amber-700' : 'text-emerald-700');
+
+      document.getElementById('vessel-stats-grid').innerHTML = `
+        <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
+          <div class="text-[9px] font-medium text-zinc-400">Tenaga Mesin</div>
+          <div class="text-xs font-bold text-zinc-950">${sim.engine.totalHp} HP <span class="text-[9px] font-normal text-zinc-400">(${vc.minHp}-${vc.maxHp})</span></div>
+        </div>
+        <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
+          <div class="text-[9px] font-medium text-zinc-400">Laju Lini</div>
+          <div class="text-xs font-bold text-zinc-950">${sim.hull.unitsPerDay} u/hr</div>
+        </div>
+        <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
+          <div class="text-[9px] font-medium text-zinc-400">HPP Fisik/u</div>
+          <div class="text-xs font-bold text-brand-700">${fmtRpShort(sim.baseUnitCost)}</div>
+        </div>
+        <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
+          <div class="text-[9px] font-medium text-zinc-400">Status Teknis</div>
+          <div class="text-xs font-bold ${statusCls}">${statusTxt}</div>
+        </div>
+      `;
+
+      // 6. Collapsible 3 GT Reference Photos Button
+      const is3Gt = activeVesselClass === 'fishing-3gt';
+      const refBtn = document.getElementById('btn-toggle-ref-photos');
+      const refBox = document.getElementById('bp-reference-photos');
+      if (refBtn) refBtn.classList.toggle('hidden', !is3Gt);
+      if (refBox && !is3Gt) refBox.classList.add('hidden');
     }
 
     function renderSidebarTelemetry(sim, ontology) {
