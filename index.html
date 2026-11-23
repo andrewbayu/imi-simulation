@@ -1411,7 +1411,7 @@
         <div>
           <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700">Supabase Cloud Database</span>
           <h3 class="text-base font-bold text-zinc-950 mt-1">Sinkronisasi Database Tim IMI</h3>
-          <p class="text-[11px] text-zinc-500">Project ID: <code class="font-mono text-zinc-700">cjcjlkmsygjggiqcopbb</code> · DB Material, Kartu Custom &amp; Preset Tersimpan.</p>
+          <p class="text-[11px] text-zinc-500">Project ID: <code class="font-mono text-zinc-700">immdmdiegbnmqhegkacq</code> · DB Material, Kartu Custom &amp; Preset Tersimpan.</p>
         </div>
         <button type="button" onclick="closeCloudSyncModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
           <i class="ph ph-x text-lg"></i>
@@ -1448,13 +1448,13 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <div class="font-bold text-zinc-950">Setup Awal Tabel Supabase (Cukup Sekali)</div>
-              <p class="text-[11px] text-zinc-500">Salin SQL di bawah lalu jalankan di Supabase Dashboard → SQL Editor project IMI (<code class="font-mono">cjcjlkmsygjggiqcopbb</code>).</p>
+              <p class="text-[11px] text-zinc-500">Salin SQL di bawah lalu jalankan di Supabase Dashboard → SQL Editor project (<code class="font-mono">immdmdiegbnmqhegkacq</code>).</p>
             </div>
             <div class="flex items-center gap-2">
               <button type="button" onclick="copySupabaseSchemaSql()" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-800">
                 <i class="ph ph-copy text-xs"></i> Salin SQL
               </button>
-              <a href="https://supabase.com/dashboard/project/cjcjlkmsygjggiqcopbb/sql/new" target="_blank" rel="noopener noreferrer"
+              <a href="https://supabase.com/dashboard/project/immdmdiegbnmqhegkacq/sql/new" target="_blank" rel="noopener noreferrer"
                 class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-semibold">
                 Buka SQL Editor <i class="ph ph-arrow-square-out text-xs"></i>
               </a>
@@ -1821,19 +1821,19 @@
     const CUSTOM_CARDS_STORAGE_KEY = 'imi_custom_cards_v1';
     const SUPABASE_MIGRATED_KEY = 'imi_supabase_migrated_v1';
 
-    // Supabase Project PT Inovasi Maritim Indonesia (cjcjlkmsygjggiqcopbb)
-    const SUPABASE_URL = 'https://cjcjlkmsygjggiqcopbb.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqY2psa21zeWdqZ2dpcWNvcGJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NzY0MTIsImV4cCI6MjA4MzI1MjQxMn0.EuhqpjQL9KJtLwtF8YmL6c_Y4CXvnLEbN-B3hkHX0Mw';
+    // Supabase Project Simulator IMI (immdmdiegbnmqhegkacq)
+    const SUPABASE_URL = 'https://immdmdiegbnmqhegkacq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltbWRtZGllZ2JubXFoZWdrYWNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0Mjc4MTQsImV4cCI6MjEwNjAwMzgxNH0.cxBbiPWaPo-EwjBjT1jRYFxUsvdmPTqt8hwotEHTrJw';
 
     const supabaseSyncState = {
       status: 'connecting', // 'connecting' | 'connected' | 'needs_schema' | 'offline'
       lastSyncAt: null,
-      detail: 'Menghubungkan ke Supabase IMI...',
+      detail: 'Menghubungkan ke Supabase...',
       counts: { materials: 0, customCards: 0, savedConfigs: 0 }
     };
 
     const SUPABASE_SCHEMA_SQL = [
-      '-- Jalankan sekali di Supabase Dashboard -> SQL Editor (cjcjlkmsygjggiqcopbb)',
+      '-- Jalankan sekali di Supabase Dashboard -> SQL Editor (immdmdiegbnmqhegkacq)',
       'CREATE TABLE IF NOT EXISTS public.sim_materials (',
       '  id text PRIMARY KEY, cat text NOT NULL, name text NOT NULL, unit text NOT NULL,',
       '  price numeric NOT NULL DEFAULT 0 CHECK (price >= 0), updated_at timestamptz NOT NULL DEFAULT now()',
@@ -2064,7 +2064,7 @@
           customCards: finalCardRows.length,
           savedConfigs: finalConfigs.length
         };
-        updateCloudStatus('connected', 'Tersinkron dengan database Supabase IMI (cjcjlkmsygjggiqcopbb). Semua tim melihat data yang sama.');
+        updateCloudStatus('connected', 'Tersinkron dengan database Supabase (immdmdiegbnmqhegkacq). Semua tim melihat data yang sama.');
         recalculateAll();
         if (notify) showToast('Sinkronisasi Supabase IMI berhasil.');
       } catch (err) {

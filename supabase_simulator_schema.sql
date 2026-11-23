@@ -1,6 +1,6 @@
 -- ============================================================================
 -- IMI Vessel Builder & Project Finance Simulator — Supabase Cloud Schema
--- Target Project: cjcjlkmsygjggiqcopbb (PT Inovasi Maritim Indonesia)
+-- Target Project: immdmdiegbnmqhegkacq (InfinitiLabs studio / Simulator IMI)
 -- Jalankan script ini sekali di Supabase Dashboard -> SQL Editor -> New Query
 -- ============================================================================
 
