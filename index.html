@@ -208,7 +208,7 @@
           </div>
           <div class="min-w-0">
             <div class="text-sm font-bold tracking-tight text-zinc-950 truncate">PT Inovasi Maritim</div>
-            <div class="text-[11px] text-zinc-500 truncate">Spec Builder &amp; Project Sim</div>
+            <div class="text-[11px] text-zinc-500 truncate">Rancang Kapal &amp; Simulasi Proyek</div>
           </div>
         </div>
         <button type="button" onclick="toggleMobileSidebar(false)" class="lg:hidden text-zinc-400 hover:text-zinc-700 p-1">
@@ -223,15 +223,15 @@
         <button type="button" id="nav-page-spec" onclick="switchPage('page-spec')" class="side-nav-btn active w-full flex items-center justify-between px-3 py-2.5 text-xs text-left">
           <span class="flex items-center gap-2.5">
             <i class="ph ph-cubes text-base"></i>
-            <span>1. Builder Spesifikasi</span>
+            <span>1. Rancang Spesifikasi</span>
           </span>
-          <span id="nav-ontology-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full">OK</span>
+          <span id="nav-ontology-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full">Sesuai</span>
         </button>
 
         <button type="button" id="nav-page-1" onclick="switchPage('page-1')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
           <span class="flex items-center gap-2.5">
             <i class="ph ph-chart-line-up text-base"></i>
-            <span>2. Simulasi Proyek &amp; CEO</span>
+            <span>2. Simulasi &amp; Risiko CEO</span>
           </span>
           <span id="nav-risk-dot" class="w-2 h-2 rounded-full bg-rose-600"></span>
         </button>
@@ -246,7 +246,7 @@
         <button type="button" id="nav-page-3" onclick="switchPage('page-3')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
           <span class="flex items-center gap-2.5">
             <i class="ph ph-calendar-check text-base"></i>
-            <span>4. Timeline &amp; Arus Kas</span>
+            <span>4. Jadwal &amp; Arus Kas</span>
           </span>
         </button>
       </nav>
@@ -254,8 +254,8 @@
       <!-- Live Vessel & Financial Telemetry in Sidebar -->
       <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2.5">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Blueprint Aktif</span>
-          <span id="sb-class-pill" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">3 GT Ikan</span>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Ringkasan Aktif</span>
+          <span id="sb-class-pill" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">Kapal Ikan 3 GT</span>
         </div>
         <div id="sb-telemetry" class="space-y-2 text-xs tnum">
           <!-- Populated by JS -->
@@ -293,40 +293,41 @@
       <!-- Header + Predefined Dropdown + Save Controls -->
       <section class="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1.5">Langkah 1 · Konfigurator Spesifikasi Kapal</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1.5">Langkah 1 · Rancang Spesifikasi Kapal</p>
           <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 leading-[1.15]">
-            Builder Spesifikasi &amp; Korelasi Teknis Kapal
+            Rancang Spesifikasi &amp; Cek Kecocokan Teknis
           </h1>
-          <p class="text-sm text-zinc-600 mt-1.5 max-w-[66ch]">
-            Pilih jenis kapal atau muat preset, lalu <strong>klik (+) atau seret (drag &amp; drop)</strong> kartu komponen ke blueprint kapal. Klik kartu aktif untuk mengubah harga, lead time, atau DP supplier (parameter OEM/PK tetap terkunci).
+          <p class="text-sm text-zinc-600 mt-1.5 max-w-[62ch]">
+            Pilih jenis kapal atau muat preset, lalu klik <strong>(+)</strong> atau tarik kartu ke blueprint di kanan.
           </p>
         </div>
 
         <!-- Predefined & Saved Presets Dropdown + Save Button -->
         <div class="flex flex-wrap items-center gap-2.5 shrink-0 no-print">
           <div class="min-w-[260px]">
-            <label for="preset-dropdown" class="block text-[11px] font-semibold text-zinc-500 mb-1">Preset Kapal &amp; Setting Tersimpan</label>
+            <label for="preset-dropdown" class="block text-[11px] font-semibold text-zinc-500 mb-1">Pilih Preset Kapal &amp; Konfigurasi</label>
             <select id="preset-dropdown" onchange="onPresetDropdownChange(this.value)" class="w-full text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
               <!-- Populated dynamically with Built-in + LocalStorage saved presets -->
             </select>
           </div>
           <div class="pt-4">
             <button type="button" onclick="openSaveModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition">
-              <i class="ph ph-floppy-disk text-sm"></i> Simpan Setting
+              <i class="ph ph-floppy-disk text-sm"></i> Simpan Konfigurasi
             </button>
           </div>
         </div>
       </section>
 
-      <!-- Step 1A: Pilih Jenis Kapal (Curates Component Catalog & Sets Ontology Rules) -->
+      <!-- Step 1A: Pilih Jenis Kapal -->
       <section class="panel p-4 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-zinc-950">1. Pilih Jenis Kapal (Menentukan Kurasi Kartu &amp; Aturan Ontologi)</span>
+          <div>
+            <span class="text-xs font-bold text-zinc-950">1. Pilih Jenis Kapal</span>
+            <span class="text-[11px] text-zinc-500 ml-1.5">Otomatis menyaring komponen &amp; mengecek kecocokan teknis</span>
           </div>
           <label class="inline-flex items-center gap-2 text-xs text-zinc-600 cursor-pointer select-none no-print">
             <input id="toggle-show-all-cards" type="checkbox" onchange="onToggleCuration(this.checked)" class="rounded border-zinc-300 text-brand-700 focus:ring-brand-700" />
-            <span>Tampilkan juga opsi di luar kelas kapal (untuk uji alert ontologi)</span>
+            <span>Tampilkan semua opsi (termasuk yang tidak cocok)</span>
           </label>
         </div>
         <div id="vessel-class-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
@@ -334,18 +335,18 @@
         </div>
       </section>
 
-      <!-- Step 1B: Split Builder Workspace (Catalog Left + Blueprint Drop Slots & Ontology Right) -->
+      <!-- Step 1B: Split Builder Workspace (Catalog Left + Blueprint Drop Slots & Compatibility Right) -->
       <section class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
 
         <!-- LEFT: Component Card Catalog (Drag or Click +) -->
         <div class="xl:col-span-7 panel overflow-hidden">
           <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 class="text-sm font-bold text-zinc-950">2. Katalog Komponen (Klik <span class="text-brand-700">(+)</span> atau Drag ke Blueprint)</h2>
-              <p class="text-[11px] text-zinc-500">Kartu dikurasi otomatis sesuai jenis kapal aktif. Parameter Brand/PK/Material terkunci; Harga &amp; Lead Time bisa diedit.</p>
+              <h2 class="text-sm font-bold text-zinc-950">2. Katalog Komponen (Klik <span class="text-brand-700">(+)</span> atau Tarik ke Kanan)</h2>
+              <p class="text-[11px] text-zinc-500">Spesifikasi OEM/PK/Material terkunci; harga satuan, jadwal &amp; DP supplier bisa diubah.</p>
             </div>
             <button id="btn-reset-cards" type="button" onclick="resetCatalogEdits()" class="hidden no-print text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-md transition">
-              Reset Nilai Kartu
+              Reset Nilai Standar
             </button>
           </div>
 
@@ -359,10 +360,10 @@
           </div>
         </div>
 
-        <!-- RIGHT: Active Vessel Blueprint (5 Drop Zones) + Ontology & Correlation Alerts -->
+        <!-- RIGHT: Active Vessel Blueprint (5 Drop Zones) + Compatibility Alerts -->
         <div class="xl:col-span-5 space-y-4">
 
-          <!-- Ontology & Correlation Status Panel -->
+          <!-- Compatibility Status Panel -->
           <div id="ontology-alert-panel" class="panel p-4 space-y-2.5">
             <!-- Populated by JS -->
           </div>
@@ -371,8 +372,8 @@
           <div class="panel overflow-hidden">
             <div class="px-4 py-3 bg-zinc-950 text-white flex items-center justify-between">
               <div>
-                <div class="text-xs font-bold">Blueprint Kapal Terpasang (5 Slot WBS)</div>
-                <div class="text-[11px] text-zinc-400">Drop kartu ke slot di bawah atau klik slot untuk Inspector Harga/Lead Time</div>
+                <div class="text-xs font-bold">Spesifikasi Kapal Terpasang (5 Komponen)</div>
+                <div class="text-[11px] text-zinc-400">Tarik kartu ke slot di bawah atau klik untuk atur harga &amp; jadwal</div>
               </div>
               <span id="bp-unit-cogs" class="text-xs font-bold tnum text-blue-300"></span>
             </div>
@@ -385,7 +386,7 @@
             <div id="bp-reference-photos" class="p-3.5 pt-0 grid grid-cols-2 gap-2.5">
               <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
                 <img src="assets/ref-kapal-1.jpg" alt="Referensi Kapal 3 GT 1" class="w-full h-24 object-cover" />
-                <figcaption class="px-2 py-1 text-[10px] text-zinc-600 truncate">Ref 1: Open-hull 9,2m × 1,2m</figcaption>
+                <figcaption class="px-2 py-1 text-[10px] text-zinc-600 truncate">Ref 1: Lambung terbuka 9,2m × 1,2m</figcaption>
               </figure>
               <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
                 <img src="assets/ref-kapal-2.jpg" alt="Referensi Kapal 3 GT 2" class="w-full h-24 object-cover" />
@@ -395,7 +396,7 @@
 
             <div class="p-3.5 border-t border-zinc-200 bg-white flex items-center justify-between gap-3 no-print">
               <div class="text-[11px] text-zinc-500">
-                Total Lead Time Tambahan: <strong id="bp-extra-days" class="text-zinc-900 tnum"></strong>
+                Tambahan Lead Time: <strong id="bp-extra-days" class="text-zinc-900 tnum"></strong>
               </div>
               <button type="button" onclick="switchPage('page-1')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
                 <span>Simulasi Proyek &amp; Pembayaran</span>
@@ -477,7 +478,7 @@
           <div class="md:col-span-2 xl:col-span-5 space-y-1.5">
             <div class="flex items-center justify-between">
               <label class="block text-xs font-semibold text-zinc-700">Skema Pembayaran Fee (Total <span id="lbl-total-fee-pct" class="tnum">16</span>%)</label>
-              <span class="text-[11px] text-zinc-500">Skema diminta vs negosiasi</span>
+              <span class="text-[11px] text-zinc-500">Bandingkan tuntutan mitra vs opsi aman</span>
             </div>
             <div class="grid grid-cols-3 gap-1 p-1 rounded-lg bg-zinc-100 border border-zinc-200/80">
               <button type="button" id="seg-requested" onclick="setFeeMode('requested')" class="seg-btn active text-xs py-1.5 px-2 text-zinc-600 truncate">
@@ -492,14 +493,14 @@
             </div>
             <div class="flex flex-wrap items-center gap-3 pt-0.5 text-[11px] text-zinc-500">
               <label class="inline-flex items-center gap-1.5">
-                <span>Teken:</span>
+                <span>Saat Teken:</span>
                 <input id="ctrl-fee-sign" type="number" min="0" max="30" step="0.5" value="8"
                   oninput="onCustomFeeInput()"
                   class="w-12 px-1.5 py-0.5 rounded border border-zinc-300 bg-white text-zinc-900 font-semibold tnum text-center focus:outline-none focus:border-brand-700" />
                 <span>%</span>
               </label>
               <label class="inline-flex items-center gap-1.5">
-                <span>Post-DP:</span>
+                <span>Setelah DP:</span>
                 <input id="ctrl-fee-dp" type="number" min="0" max="30" step="0.5" value="8"
                   oninput="onCustomFeeInput()"
                   class="w-12 px-1.5 py-0.5 rounded border border-zinc-300 bg-white text-zinc-900 font-semibold tnum text-center focus:outline-none focus:border-brand-700" />
@@ -515,7 +516,7 @@
           <div class="flex items-center gap-3 shrink-0">
             <button type="button" onclick="switchPage('page-2')" class="font-semibold text-brand-700 hover:text-brand-800">Overhead &amp; Kapasitas →</button>
             <span class="text-zinc-300">|</span>
-            <button type="button" onclick="switchPage('page-3')" class="font-semibold text-brand-700 hover:text-brand-800">SPK, WAPU &amp; Delay →</button>
+            <button type="button" onclick="switchPage('page-3')" class="font-semibold text-brand-700 hover:text-brand-800">SPK, PPh 22 &amp; Telat Cair →</button>
           </div>
         </div>
       </section>
@@ -526,26 +527,26 @@
         <div id="kpi-strip" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-zinc-200 bg-white"></div>
       </section>
 
-      <!-- 3-Scenario Comparison Table -->
-      <section class="panel overflow-hidden">
+      <!-- Contextual Scenario Comparison Table -->
+      <section id="scenario-compare-section" class="panel overflow-hidden">
         <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 class="text-sm font-bold text-zinc-950">Komparasi Cepat 3 Skenario Kapal Ikan 3 GT (Klik untuk Muat)</h3>
-            <p class="text-[11px] text-zinc-500">Membandingkan paket Termurah, Sedang, dan Termahal dengan asumsi volume, markup, SPK, dan overhead yang sedang aktif.</p>
+            <h3 id="scenario-compare-title" class="text-sm font-bold text-zinc-950">Komparasi 3 Skenario Kapal Ikan 3 GT (Klik untuk Muat)</h3>
+            <p class="text-[11px] text-zinc-500">Perbandingan paket sekelas menggunakan asumsi volume, markup, SPK, dan overhead yang sedang aktif.</p>
           </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-zinc-50/50 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
-                <th class="py-2.5 px-4">Skenario 3 GT</th>
-                <th class="py-2.5 px-3 text-right">COGS / Unit</th>
+                <th class="py-2.5 px-4">Paket / Skenario</th>
+                <th class="py-2.5 px-3 text-right">HPP / Unit</th>
                 <th class="py-2.5 px-3 text-right">Nilai / Unit</th>
                 <th class="py-2.5 px-3 text-right">Nilai Proyek</th>
-                <th class="py-2.5 px-3 text-right">Eksposur H-0</th>
+                <th class="py-2.5 px-3 text-right">Dana Berisiko H-0</th>
                 <th class="py-2.5 px-3 text-right">Bunga Talangan</th>
-                <th class="py-2.5 px-3 text-right">Net Profit Riil</th>
-                <th class="py-2.5 px-4 text-right">Timeline</th>
+                <th class="py-2.5 px-3 text-right">Laba Bersih Riil</th>
+                <th class="py-2.5 px-4 text-right">Durasi</th>
               </tr>
             </thead>
             <tbody id="scenario-compare-body" class="divide-y divide-zinc-200 text-xs"></tbody>
@@ -559,9 +560,9 @@
           <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
             <div>
               <h3 class="text-base font-bold tracking-tight text-zinc-950">Kurva Arus Kas Kumulatif</h3>
-              <p class="text-xs text-zinc-500 mt-0.5">Skema aktif vs benchmark aman (0% teken, pro-rata termin, netto PPN).</p>
+              <p class="text-xs text-zinc-500 mt-0.5">Skema aktif vs opsi aman (0% saat teken kontrak, bayar fee proporsional tiap termin).</p>
             </div>
-            <button type="button" onclick="switchPage('page-3')" class="no-print text-xs font-semibold text-brand-700 hover:text-brand-800 shrink-0">Tabel Fase →</button>
+            <button type="button" onclick="switchPage('page-3')" class="no-print text-xs font-semibold text-brand-700 hover:text-brand-800 shrink-0">Tabel per Fase →</button>
           </div>
           <div class="h-72 relative flex-1">
             <canvas id="cashflowChart"></canvas>
@@ -574,16 +575,16 @@
               <div>
                 <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
                   <i class="ph-bold ph-shield-warning text-rose-600 text-base"></i>
-                  Batas Merah Negosiasi CEO (Walk-Away)
+                  Batas Aman Negosiasi CEO
                 </h3>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Uji eksposur hari ke-0 terhadap plafon kas bebas IMI.</p>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Uji batas kas bebas IMI yang aman ditempatkan sebelum DP pemerintah cair.</p>
               </div>
               <span id="ceo-plafon-badge" class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
             </div>
 
             <div class="p-3 rounded-lg bg-white border border-zinc-200 space-y-2 no-print">
               <div class="flex items-center justify-between gap-3">
-                <label for="ctrl-ceo-plafon" class="text-xs font-semibold text-zinc-700">Plafon Kas Bebas IMI (Risiko Hari-0)</label>
+                <label for="ctrl-ceo-plafon" class="text-xs font-semibold text-zinc-700">Plafon Kas Bebas IMI (Hari ke-0)</label>
                 <div class="input-shell flex items-center px-2.5 py-1 w-32">
                   <input id="ctrl-ceo-plafon" type="number" min="0" max="100" step="0.5" value="3"
                     oninput="recalculateAll()"
@@ -592,7 +593,7 @@
                 </div>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-[11px] text-zinc-400">Quick plafon:</span>
+                <span class="text-[11px] text-zinc-400">Pilih cepat:</span>
                 <div class="flex items-center gap-1.5">
                   <button type="button" onclick="setInputVal('ctrl-ceo-plafon', 1)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">1 M</button>
                   <button type="button" onclick="setInputVal('ctrl-ceo-plafon', 3)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">3 M</button>
@@ -605,7 +606,7 @@
             <div id="ceo-walkaway-metrics" class="space-y-2.5 text-xs"></div>
           </div>
           <div class="pt-3 border-t border-zinc-200 text-[11px] text-zinc-500">
-            Net Profit Riil memperhitungkan COGS komponen + overhead waktu + akselerasi + WAPU/BG + bunga talangan.
+            Laba Bersih Riil sudah dikurangi HPP komponen, overhead waktu, akselerasi lini, potongan PPh 22/BG, dan bunga modal talangan.
           </div>
         </div>
       </section>
@@ -749,17 +750,17 @@
 
         <div class="lg:col-span-3 space-y-1">
           <div class="flex items-center justify-between text-[11px]">
-            <span class="font-semibold text-zinc-700">Basis Hitung Fee</span>
+            <span class="font-semibold text-zinc-700">Dasar Hitung Fee</span>
             <span id="lbl-fee-base-delta" class="text-brand-700 font-medium tnum"></span>
           </div>
           <div class="grid grid-cols-2 gap-1 p-0.5 rounded-lg bg-zinc-200/70">
-            <button type="button" id="fbase-netto" onclick="setFeeBase('netto')" class="seg-btn active text-[11px] py-1.5 text-zinc-600 truncate">Netto (Excl. PPN)</button>
-            <button type="button" id="fbase-bruto" onclick="setFeeBase('bruto')" class="seg-btn text-[11px] py-1.5 text-zinc-600 truncate">Bruto (Incl. 11%)</button>
+            <button type="button" id="fbase-netto" onclick="setFeeBase('netto')" class="seg-btn active text-[11px] py-1.5 text-zinc-600 truncate">Netto (Tanpa PPN)</button>
+            <button type="button" id="fbase-bruto" onclick="setFeeBase('bruto')" class="seg-btn text-[11px] py-1.5 text-zinc-600 truncate">Bruto (+PPN 11%)</button>
           </div>
         </div>
 
         <div class="lg:col-span-2 space-y-1">
-          <label for="ctrl-wapu" class="block text-[11px] font-semibold text-zinc-700">WAPU PPh22 + Provisi BG</label>
+          <label for="ctrl-wapu" title="Potongan pajak bendahara (PPh 22 1,5%) & provisi jaminan bank (~1%)" class="block text-[11px] font-semibold text-zinc-700">PPh 22 &amp; Bank Garansi</label>
           <div class="input-shell flex items-center px-2.5 py-1.5 bg-white">
             <input id="ctrl-wapu" type="number" min="0" max="15" step="0.5" value="2.5"
               oninput="recalculateAll()"
@@ -770,10 +771,10 @@
 
         <div class="lg:col-span-2 space-y-1">
           <div class="flex items-center justify-between text-[11px]">
-            <span class="font-semibold text-zinc-700">Delay Cair SP2D</span>
+            <span class="font-semibold text-zinc-700">Jeda Cair SP2D</span>
           </div>
           <div class="grid grid-cols-4 gap-1 p-0.5 rounded-lg bg-zinc-200/70">
-            <button type="button" id="delay-0" onclick="setDelayDays(0)" class="seg-btn active text-[11px] py-1.5 text-zinc-600 tnum">0h</button>
+            <button type="button" id="delay-0" onclick="setDelayDays(0)" class="seg-btn active text-[11px] py-1.5 text-zinc-600 tnum">0 hr</button>
             <button type="button" id="delay-15" onclick="setDelayDays(15)" class="seg-btn text-[11px] py-1.5 text-zinc-600 tnum">+15</button>
             <button type="button" id="delay-30" onclick="setDelayDays(30)" class="seg-btn text-[11px] py-1.5 text-zinc-600 tnum">+30</button>
             <button type="button" id="delay-45" onclick="setDelayDays(45)" class="seg-btn text-[11px] py-1.5 text-zinc-600 tnum">+45</button>
@@ -781,7 +782,7 @@
         </div>
 
         <div class="lg:col-span-2 space-y-1">
-          <label for="ctrl-coc" class="block text-[11px] font-semibold text-zinc-700">Bunga Talangan (p.a.)</label>
+          <label for="ctrl-coc" class="block text-[11px] font-semibold text-zinc-700">Bunga Modal (/tahun)</label>
           <div class="input-shell flex items-center px-2.5 py-1.5 bg-white">
             <input id="ctrl-coc" type="number" min="0" max="36" step="0.5" value="14"
               oninput="recalculateAll()"
@@ -841,10 +842,16 @@
     </div>
 
     <footer class="pt-4 pb-6 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-3 text-[11px] text-zinc-500">
-      <div>Basis data: <strong>IMI RAB Studio</strong> (Parametric L/13 &amp; 9,2m × 1,2m Open-Hull Fishing Boat + Ontologi Korelasi Teknis-Finansial).</div>
+      <div>Basis data: <strong>IMI RAB Studio</strong> (Skala Parametrik L/13 &amp; 9,2m × 1,2m + Validasi Kecocokan Teknis &amp; Simulasi Arus Kas).</div>
       <div>PT Inovasi Maritim Indonesia · Dokumen Internal Management</div>
     </footer>
   </main>
+
+  <!-- TOAST NOTIFICATION BANNER -->
+  <div id="toast-banner" class="hidden fixed bottom-5 right-5 z-50 bg-zinc-950 text-white text-xs font-medium px-4 py-2.5 rounded-xl shadow-lg border border-zinc-800 flex items-center gap-2 no-print">
+    <i class="ph-fill ph-check-circle text-emerald-400 text-base"></i>
+    <span id="toast-message"></span>
+  </div>
 
   <!-- ===================================================================== -->
   <!-- CARD INSPECTOR MODAL (LOCKED SPECS VS EDITABLE COMMERCIAL/TIMELINE)   -->
@@ -854,7 +861,7 @@
       <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
         <div>
           <span id="insp-wbs-tag" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700"></span>
-          <h3 id="insp-title" class="text-base font-bold text-zinc-950 mt-1">Inspector Komponen</h3>
+          <h3 id="insp-title" class="text-base font-bold text-zinc-950 mt-1">Atur Harga, Jadwal &amp; DP Supplier</h3>
         </div>
         <button type="button" onclick="closeInspectorModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
           <i class="ph ph-x text-lg"></i>
@@ -865,7 +872,7 @@
         <!-- Locked Immutable Engineering Specs -->
         <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
           <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-            <i class="ph-bold ph-lock-key text-zinc-500"></i> Spesifikasi Terkunci (Tidak Dapat Diedit)
+            <i class="ph-bold ph-lock-key text-zinc-500"></i> Spesifikasi Teknis Terkunci
           </div>
           <div id="insp-locked-grid" class="grid grid-cols-2 gap-2.5 text-xs">
             <!-- Populated by JS -->
@@ -875,7 +882,7 @@
         <!-- Editable Commercial & Timeline Parameters -->
         <div class="space-y-3">
           <div class="text-[11px] font-bold uppercase tracking-wider text-brand-700 flex items-center gap-1.5">
-            <i class="ph-bold ph-sliders-horizontal"></i> Parameter Komersial &amp; Jadwal (Bisa Diedit)
+            <i class="ph-bold ph-sliders-horizontal"></i> Parameter Komersial &amp; Jadwal (Bisa Diubah)
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -897,21 +904,21 @@
               <label for="insp-extra-days" class="block text-xs font-semibold text-zinc-700 mb-1">Tambahan Lead Time (Hari)</label>
               <div class="input-shell flex items-center px-3 py-2">
                 <input id="insp-extra-days" type="number" min="0" max="365" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">hari</span>
+                <span class="text-xs text-zinc-400 pl-1">hr</span>
               </div>
             </div>
             <div id="insp-hull-prep-wrap" class="hidden">
-              <label for="insp-prep-days" class="block text-xs font-semibold text-zinc-700 mb-1">Persiapan Mould/Jig (Hari)</label>
+              <label for="insp-prep-days" class="block text-xs font-semibold text-zinc-700 mb-1">Siap Cetakan / Mould (Hari)</label>
               <div class="input-shell flex items-center px-3 py-2">
                 <input id="insp-prep-days" type="number" min="1" max="180" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">hari</span>
+                <span class="text-xs text-zinc-400 pl-1">hr</span>
               </div>
             </div>
             <div id="insp-hull-rate-wrap" class="hidden">
               <label for="insp-rate" class="block text-xs font-semibold text-zinc-700 mb-1">Output Produksi (Unit / Hari)</label>
               <div class="input-shell flex items-center px-3 py-2">
                 <input id="insp-rate" type="number" min="0.05" max="50" step="0.05" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">u/h</span>
+                <span class="text-xs text-zinc-400 pl-1">unit/hr</span>
               </div>
             </div>
           </div>
@@ -920,14 +927,14 @@
 
       <div class="px-5 py-3.5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-3">
         <button type="button" onclick="resetSingleCardFromInspector()" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900">
-          Reset Default Kartu
+          Kembalikan ke Standar
         </button>
         <div class="flex items-center gap-2">
           <button type="button" onclick="closeInspectorModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700 hover:bg-zinc-50">
             Batal
           </button>
           <button type="button" onclick="saveInspectorChanges()" class="px-4 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">
-            Simpan &amp; Pasang
+            Terapkan &amp; Pasang
           </button>
         </div>
       </div>
@@ -940,7 +947,7 @@
   <div id="save-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeSaveModal()">
     <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
       <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
-        <h3 class="text-sm font-bold text-zinc-950">Simpan Konfigurasi Kapal &amp; Proyek</h3>
+        <h3 class="text-sm font-bold text-zinc-950">Simpan Konfigurasi</h3>
         <button type="button" onclick="closeSaveModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
           <i class="ph ph-x text-base"></i>
         </button>
@@ -949,14 +956,14 @@
         <div>
           <label for="save-config-name" class="block text-xs font-semibold text-zinc-700 mb-1">Nama Konfigurasi</label>
           <div class="input-shell px-3 py-2">
-            <input id="save-config-name" type="text" placeholder="Contoh: Kapal Ikan 3GT Hybrid - Nego Yamaha 28Jt" class="w-full text-sm font-medium bg-transparent focus:outline-none" />
+            <input id="save-config-name" type="text" placeholder="Contoh: Kapal Ikan 3 GT Hybrid · Yamaha 28 Jt" class="w-full text-sm font-medium bg-transparent focus:outline-none" />
           </div>
-          <p class="text-[11px] text-zinc-500 mt-1.5">Menyimpan jenis kapal, 5 kartu terpilih, editan harga/lead time, volume, markup, DP, SPK, dan overhead ke memori browser dan menampilkannya di dropdown preset.</p>
+          <p class="text-[11px] text-zinc-500 mt-1.5">Konfigurasi tersimpan di browser ini dan langsung muncul di dropdown pilihan preset.</p>
         </div>
       </div>
       <div class="px-5 py-3 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-2">
         <button type="button" onclick="closeSaveModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
-        <button type="button" onclick="confirmSaveConfig()" class="px-4 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold">Simpan Sekarang</button>
+        <button type="button" onclick="confirmSaveConfig()" class="px-4 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold">Simpan Konfigurasi</button>
       </div>
     </div>
   </div>
@@ -1420,7 +1427,7 @@
 
       const nextBtn = document.getElementById('sb-next-btn');
       const order = ['page-spec', 'page-1', 'page-2', 'page-3'];
-      const labels = ['Lanjut: Simulasi Proyek', 'Lanjut: Struktur Biaya', 'Lanjut: Timeline & Kas', 'Kembali: Builder Kapal'];
+      const labels = ['Lanjut: Simulasi Proyek', 'Lanjut: Struktur Biaya', 'Lanjut: Jadwal & Arus Kas', 'Kembali: Rancang Spesifikasi'];
       if (nextBtn) {
         nextBtn.querySelector('span').textContent = labels[order.indexOf(pageId)] || 'Lanjut';
       }
@@ -1597,6 +1604,16 @@
       recalculateAll();
     }
 
+    function showToast(msg) {
+      const box = document.getElementById('toast-banner');
+      const txt = document.getElementById('toast-message');
+      if (!box || !txt) return;
+      txt.textContent = msg;
+      box.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => box.classList.add('hidden'), 3200);
+    }
+
     function resetCatalogEdits() {
       COMPONENT_CATALOG.forEach(c => {
         c.cost = c.defaultCost;
@@ -1608,6 +1625,7 @@
         }
       });
       recalculateAll();
+      showToast('Nilai kartu dikembalikan ke harga dan jadwal standar.');
     }
 
     // Preset Dropdown + Save to LocalStorage
@@ -1706,6 +1724,7 @@
       activePresetId = entry.id;
       closeSaveModal();
       recalculateAll();
+      showToast(`Konfigurasi "${name}" tersimpan ke dropdown preset.`);
     }
 
     // =========================================================================
@@ -2145,7 +2164,7 @@
       });
 
       if (saved.length > 0) {
-        html += `<optgroup label="Tersimpan di Browser (Saved)">`;
+        html += `<optgroup label="Konfigurasi Tersimpan">`;
         saved.forEach(s => {
           html += `<option value="${s.id}" ${activePresetId === s.id ? 'selected' : ''}>★ ${s.name}</option>`;
         });
@@ -2213,7 +2232,7 @@
               ${cards.map(card => {
                 const isEquipped = selectedCards[card.category] === card.id;
                 const isCompatible = card.compatibleClasses.includes(activeVesselClass);
-                const leadTxt = card.category === 'hull' ? `Prep ${card.prepDays}h · ${card.unitsPerDay} u/h` : (card.extraDays > 0 ? `+${card.extraDays}h` : '+0h');
+                const leadTxt = card.category === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} unit/hr` : (card.extraDays > 0 ? `+${card.extraDays} hr` : '+0 hr');
                 return `
                   <div draggable="true" ondragstart="onCardDragStart(event, '${card.id}')"
                     class="catalog-card p-3 border bg-white ${isEquipped ? 'is-equipped' : 'border-zinc-200 hover:border-zinc-300'} flex flex-col justify-between gap-2.5">
@@ -2223,7 +2242,7 @@
                           <i class="ph ph-dots-six-vertical text-zinc-300 shrink-0 text-sm"></i>
                           <span class="text-xs font-bold text-zinc-950 leading-snug">${card.name}</span>
                         </div>
-                        ${!isCompatible ? '<span class="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Luar Kelas</span>' : ''}
+                        ${!isCompatible ? '<span class="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Tidak Cocok</span>' : ''}
                       </div>
                       <div class="mt-1.5 flex flex-wrap items-center gap-1 text-[10px]">
                         <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 font-medium">
@@ -2237,11 +2256,11 @@
 
                     <div class="pt-2 border-t border-zinc-200/70 flex items-center justify-between gap-2">
                       <div class="tnum">
-                        <div class="text-xs font-bold text-zinc-950">${fmtRpShort(card.cost)}<span class="text-[10px] font-normal text-zinc-400">/u</span></div>
-                        <div class="text-[10px] text-zinc-500">${leadTxt} · DP ${card.dpSupplierPct}%</div>
+                        <div class="text-xs font-bold text-zinc-950">${fmtRpShort(card.cost)}<span class="text-[10px] font-normal text-zinc-400">/unit</span></div>
+                        <div class="text-[10px] text-zinc-500">${leadTxt} · DP Supplier ${card.dpSupplierPct}%</div>
                       </div>
                       <div class="flex items-center gap-1">
-                        <button type="button" onclick="openInspectorModal('${card.id}')" title="Edit Harga, Lead Time & DP Supplier"
+                        <button type="button" onclick="openInspectorModal('${card.id}')" title="Ubah Harga, Lead Time & DP Supplier"
                           class="p-1.5 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 text-xs">
                           <i class="ph ph-sliders-horizontal"></i>
                         </button>
@@ -2261,21 +2280,21 @@
     }
 
     function renderOntologyAndBlueprint(sim, ontology) {
-      // 1. Ontology Panel
+      // 1. Compatibility Status Panel
       const ontPanel = document.getElementById('ontology-alert-panel');
       let headerBg, iconCls, titleTxt;
       if (ontology.status === 'critical') {
         headerBg = 'bg-rose-50 border-rose-300';
         iconCls = 'ph-fill ph-warning-octagon text-rose-600';
-        titleTxt = `Peringatan Ontologi (${ontology.criticalCount} Kritis, ${ontology.warningCount} Peringatan)`;
+        titleTxt = `Peringatan Kecocokan Teknis (${ontology.criticalCount} Kritis, ${ontology.warningCount} Catatan)`;
       } else if (ontology.status === 'warning') {
         headerBg = 'bg-amber-50 border-amber-300';
         iconCls = 'ph-fill ph-warning text-amber-600';
-        titleTxt = `Catatan Korelasi Teknis (${ontology.warningCount} Peringatan)`;
+        titleTxt = `Catatan Kecocokan Teknis (${ontology.warningCount} Peringatan)`;
       } else {
         headerBg = 'bg-emerald-50 border-emerald-300';
         iconCls = 'ph-fill ph-check-circle text-emerald-600';
-        titleTxt = 'Ontologi & Korelasi Kapal Valid (100% Sesuai)';
+        titleTxt = 'Kecocokan Teknis: Sesuai (Siap Simulasi)';
       }
 
       ontPanel.className = `panel p-4 space-y-2.5 border ${headerBg}`;
@@ -2285,10 +2304,10 @@
             <i class="${iconCls} text-base"></i>
             <span>${titleTxt}</span>
           </div>
-          <span class="text-[10px] font-semibold text-zinc-500">Auto-Check</span>
+          <span class="text-[10px] font-semibold text-zinc-500">Cek Otomatis</span>
         </div>
         ${ontology.alerts.length === 0
-          ? `<p class="text-[11px] text-emerald-900">Korelasi Lambung, Mesin (${sim.engine.locked.powerLabel}), Outfitting, Kelistrikan, dan Dokumen sesuai dengan kelas <strong>${VESSEL_CLASSES.find(v=>v.id===activeVesselClass).name}</strong>.</p>`
+          ? `<p class="text-[11px] text-emerald-900">Lambung, Mesin (${sim.engine.locked.powerLabel}), Outfitting, Kelistrikan, dan Dokumen cocok untuk kelas <strong>${VESSEL_CLASSES.find(v=>v.id===activeVesselClass).name}</strong>.</p>`
           : `<div class="space-y-1.5">${ontology.alerts.map(a => `
               <div class="p-2.5 rounded-lg bg-white border ${a.level === 'critical' ? 'border-rose-200' : 'border-amber-200'} text-[11px]">
                 <div class="font-bold ${a.level === 'critical' ? 'text-rose-800' : 'text-amber-800'}">${a.title}</div>
@@ -2301,7 +2320,7 @@
       // 2. Blueprint 5 Drop Slots
       document.getElementById('bp-unit-cogs').textContent = `${fmtRpShort(sim.baseUnitCost)} / unit (Fisik)`;
       const extraDaysSum = sim.engine.extraDays + sim.outfitting.extraDays + sim.nav.extraDays + sim.permit.extraDays;
-      document.getElementById('bp-extra-days').textContent = `+${extraDaysSum} hari (Prep ${sim.hull.prepDays}h)`;
+      document.getElementById('bp-extra-days').textContent = `+${extraDaysSum} hari (Mould ${sim.hull.prepDays} hr)`;
 
       document.getElementById('blueprint-slots-container').innerHTML = WBS_CATEGORIES.map(cat => {
         const card = getCardById(selectedCards[cat.id]);
@@ -2313,17 +2332,17 @@
             <div class="min-w-0">
               <div class="flex items-center gap-1.5 text-[10px] font-semibold text-zinc-500">
                 <span>${cat.code} · ${cat.title}</span>
-                ${isMismatch ? '<span class="text-rose-700 font-bold">· Perlu Review</span>' : ''}
+                ${isMismatch ? '<span class="text-rose-700 font-bold">· Tidak Sesuai Kelas</span>' : ''}
               </div>
               <div class="text-xs font-bold text-zinc-950 truncate mt-0.5">${card.name}</div>
               <div class="text-[10px] text-zinc-500 mt-0.5 flex items-center gap-2 tnum">
                 <span><i class="ph-fill ph-lock-simple text-zinc-400"></i> ${card.locked.brand} · ${card.locked.powerLabel}</span>
-                <span>DP Sup: ${card.dpSupplierPct}%</span>
+                <span>DP Supplier: ${card.dpSupplierPct}%</span>
               </div>
             </div>
             <div class="text-right shrink-0 tnum">
               <div class="text-xs font-bold text-brand-700">${fmtRpShort(card.cost)}</div>
-              <div class="text-[10px] text-zinc-400">Klik untuk Edit</div>
+              <div class="text-[10px] text-zinc-400">Ubah Harga &amp; Jadwal</div>
             </div>
           </div>
         `;
@@ -2345,7 +2364,7 @@
         ontBadge.textContent = `${ontology.warningCount}`;
       } else {
         ontBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
-        ontBadge.textContent = 'OK';
+        ontBadge.textContent = 'Sesuai';
       }
 
       const riskDot = document.getElementById('nav-risk-dot');
@@ -2353,11 +2372,11 @@
 
       document.getElementById('sb-telemetry').innerHTML = `
         <div class="flex justify-between gap-2"><span class="text-zinc-500">Mesin</span><span class="font-semibold text-zinc-900 truncate">${sim.engine.locked.brand} ${sim.engine.locked.powerLabel.split(' ')[0]}</span></div>
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">Volume / Durasi</span><span class="font-semibold text-zinc-900">${sim.units.toLocaleString('id-ID')} u · ${sim.totalDays}h</span></div>
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">COGS All-In / Unit</span><span class="font-semibold text-zinc-900">${fmtRpShort(sim.cogsUnit)}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Volume / Durasi</span><span class="font-semibold text-zinc-900">${sim.units.toLocaleString('id-ID')} u · ${sim.totalDays} hr</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">HPP All-In / Unit</span><span class="font-semibold text-zinc-900">${fmtRpShort(sim.cogsUnit)}</span></div>
         <div class="flex justify-between gap-2"><span class="text-zinc-500">Nilai Proyek (DPP)</span><span class="font-bold text-brand-700">${fmtRpShort(sim.projectValue)}</span></div>
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">Risiko Hari ke-0</span><span class="font-bold ${sim.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'}">${sim.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(sim.cashAtRiskDay0) : 'Rp 0'}</span></div>
-        <div class="flex justify-between gap-2 pt-1.5 border-t border-zinc-200"><span class="text-zinc-600 font-semibold">Net Profit Riil</span><span class="font-bold ${sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'}">${fmtRpShort(sim.realNetProfit)}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Dana Berisiko (H-0)</span><span class="font-bold ${sim.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'}">${sim.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(sim.cashAtRiskDay0) : 'Rp 0'}</span></div>
+        <div class="flex justify-between gap-2 pt-1.5 border-t border-zinc-200"><span class="text-zinc-600 font-semibold">Laba Bersih Riil</span><span class="font-bold ${sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'}">${fmtRpShort(sim.realNetProfit)}</span></div>
       `;
     }
 
@@ -2367,30 +2386,30 @@
         `Konfigurasi aktif: <strong>${vc ? vc.name : ''}</strong> (${sim.hull.name} + <strong>${sim.engine.name}</strong>).`;
 
       document.getElementById('p1-assumption-pill').innerHTML =
-        `Asumsi aktif: <strong>${sim.spkCount} SPK</strong> · Fee <strong>${sim.feeBase.toUpperCase()}</strong> · Overhead <strong>Rp ${sim.overheadPerDayJt} Jt/h</strong> · Lini <strong>${sim.capacityMultiplier}×</strong> · Delay <strong>+${sim.delayDays}h</strong> · WAPU/BG <strong>${sim.wapuBgPct}%</strong>`;
+        `Asumsi aktif: <strong>${sim.spkCount} SPK</strong> · Fee <strong>${sim.feeBase.toUpperCase()}</strong> · Overhead <strong>Rp ${sim.overheadPerDayJt} Jt/hr</strong> · Lini <strong>${sim.capacityMultiplier}×</strong> · Jeda SP2D <strong>+${sim.delayDays} hr</strong> · PPh/BG <strong>${sim.wapuBgPct}%</strong>`;
       document.getElementById('lbl-total-fee-pct').textContent = sim.totalFeePct;
 
       // Verdict Banner
       const banner = document.getElementById('verdict-banner');
       let bgCls, dotCls, badgeCls, badgeText, title, desc;
       const spkDeltaText = sim.spkCount > 1 && singleSpkSim.cashAtRiskDay0 > 0
-        ? ` Pemecahan <strong>${sim.spkCount} SPK</strong> memangkas risiko Hari ke-0 dari ${fmtRpShort(singleSpkSim.cashAtRiskDay0)} menjadi ${fmtRpShort(sim.cashAtRiskDay0)}.` : '';
+        ? ` Pemecahan <strong>${sim.spkCount} SPK</strong> memangkas dana berisiko di Hari ke-0 dari ${fmtRpShort(singleSpkSim.cashAtRiskDay0)} menjadi ${fmtRpShort(sim.cashAtRiskDay0)}.` : '';
 
       if (sim.safetyStatus === 'DANGER') {
         bgCls = 'bg-rose-50/80'; dotCls = 'bg-rose-600'; badgeCls = 'bg-rose-100 text-rose-800 border-rose-200';
         badgeText = 'TIDAK AMAN · RISIKO TUNAI HARI KE-0';
-        title = `Eksposur tunai ${fmtRpShort(sim.cashAtRiskDay0)} di Hari ke-0 sebelum SP2D DP cair`;
-        desc = `Skema ini menempatkan kas tanpa agunan di awal, dengan puncak defisit ${fmtRpShort(sim.peakDeficit)} dan biaya bunga talangan ${fmtRpShort(sim.financingCost)}.${spkDeltaText}`;
+        title = `Perlu dana tunai ${fmtRpShort(sim.cashAtRiskDay0)} di Hari ke-0 sebelum DP pemerintah cair`;
+        desc = `Skema ini menempatkan kas tanpa jaminan di awal, dengan puncak defisit ${fmtRpShort(sim.peakDeficit)} dan biaya bunga talangan ${fmtRpShort(sim.financingCost)}.${spkDeltaText}`;
       } else if (sim.safetyStatus === 'CAUTION') {
         bgCls = 'bg-amber-50/70'; dotCls = 'bg-amber-600'; badgeCls = 'bg-amber-100 text-amber-800 border-amber-200';
         badgeText = 'WASPADA · PERLU MODAL TALANGAN';
         title = `Risiko Hari ke-0 nol, namun butuh modal kerja ${fmtRpShort(Math.abs(sim.peakDeficit))}`;
-        desc = `Tanpa risiko di hari ke-0, namun friksi WAPU/BG (${sim.wapuBgPct}%), delay SP2D (+${sim.delayDays}h), dan DP supplier memicu defisit dengan biaya bunga ${fmtRpShort(sim.financingCost)}.`;
+        desc = `Tanpa dana keluar saat teken kontrak, namun potongan PPh/BG (${sim.wapuBgPct}%), jeda SP2D (+${sim.delayDays} hr), dan DP supplier memicu defisit kas dengan beban bunga ${fmtRpShort(sim.financingCost)}.`;
       } else {
         bgCls = 'bg-emerald-50/70'; dotCls = 'bg-emerald-600'; badgeCls = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-        badgeText = 'AMAN · SELF-FUNDING';
+        badgeText = 'AMAN · BIAYA MANDIRI';
         title = 'Arus kas kumulatif positif dari awal hingga BAST 100%';
-        desc = `Tidak ada eksposur kas di Hari ke-0 dan proyek membiayai dirinya sendiri selama ${sim.totalDays} hari dengan Net Profit Riil ${fmtRpShort(sim.realNetProfit)}.`;
+        desc = `Tidak ada dana berisiko di Hari ke-0 dan proyek membiayai dirinya sendiri selama ${sim.totalDays} hari dengan Laba Bersih Riil ${fmtRpShort(sim.realNetProfit)}.`;
       }
 
       banner.className = `p-5 border-b border-zinc-200 transition-colors ${bgCls}`;
@@ -2405,7 +2424,7 @@
           </div>
           <div class="flex items-center gap-6 shrink-0 pt-2 lg:pt-0 lg:pl-6 lg:border-l border-zinc-200/80">
             <div>
-              <div class="text-[11px] font-medium text-zinc-500">Cash-at-Risk (Hari 0)</div>
+              <div class="text-[11px] font-medium text-zinc-500">Dana Berisiko (Hari ke-0)</div>
               <div class="text-lg font-bold tnum ${sim.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'} mt-0.5">
                 ${sim.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(sim.cashAtRiskDay0) : 'Rp 0'}
               </div>
@@ -2421,11 +2440,11 @@
       `;
 
       const kpis = [
-        { label: `Total COGS (${sim.units.toLocaleString('id-ID')} u)`, val: fmtRpShort(sim.totalCOGS), sub: `${fmtRpShort(sim.cogsUnit)} / unit`, cls: 'text-zinc-950' },
+        { label: `Total HPP / COGS (${sim.units.toLocaleString('id-ID')} u)`, val: fmtRpShort(sim.totalCOGS), sub: `${fmtRpShort(sim.cogsUnit)} / unit`, cls: 'text-zinc-950' },
         { label: `Nilai Proyek (DPP)`, val: fmtRpShort(sim.projectValue), sub: `Bruto PPN: ${fmtRpShort(sim.grossContractValue)}`, cls: 'text-brand-700' },
         { label: `Fee ${sim.totalFeePct}% (${sim.feeBase === 'bruto' ? 'Bruto' : 'Netto'})`, val: fmtRpShort(sim.totalFee), sub: `Hari-0: ${fmtRpShort(sim.cashAtRiskDay0)}`, cls: 'text-rose-700' },
-        { label: `Overhead + Akselerasi`, val: fmtRpShort(sim.overheadCostTotal + sim.accelCostTotal), sub: `${sim.totalDays}h × ${sim.overheadPerDayJt}Jt + Aksel`, cls: 'text-zinc-800' },
-        { label: `Net Profit Riil`, val: fmtRpShort(sim.realNetProfit), sub: `Bunga Talangan: -${fmtRpShort(sim.financingCost)}`, cls: sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700' },
+        { label: `Overhead + Akselerasi`, val: fmtRpShort(sim.overheadCostTotal + sim.accelCostTotal), sub: `${sim.totalDays} hr × ${sim.overheadPerDayJt}Jt + Aksel`, cls: 'text-zinc-800' },
+        { label: `Laba Bersih Riil`, val: fmtRpShort(sim.realNetProfit), sub: `Bunga Talangan: -${fmtRpShort(sim.financingCost)}`, cls: sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700' },
         { label: 'Total Durasi', val: `${sim.totalDays} Hari`, sub: `± ${(sim.totalDays / 30).toFixed(1)} Bln · ${sim.capacityMultiplier}× Lini`, cls: 'text-zinc-950' }
       ];
       document.getElementById('kpi-strip').innerHTML = kpis.map(k => `
@@ -2436,31 +2455,41 @@
         </div>
       `).join('');
 
-      // 3-Scenario 3 GT Comparison
-      const gtPresets = PREDEFINED_PRESETS.slice(0, 3);
-      document.getElementById('scenario-compare-body').innerHTML = gtPresets.map(p => {
-        const s = computeSimulation(p.cards);
-        const isActive = activePresetId === p.id;
-        return `
-          <tr onclick="loadPresetById('${p.id}')" class="scenario-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
-            <td class="py-3 px-4">
-              <div class="flex items-center gap-2.5">
-                <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-brand-700 bg-brand-700' : 'border-zinc-300 bg-white'}">
-                  ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}
-                </span>
-                <span class="font-semibold text-zinc-950">${p.name}</span>
-              </div>
-            </td>
-            <td class="py-3 px-3 text-right font-medium tnum text-zinc-700 whitespace-nowrap">${fmtRpShort(s.cogsUnit)}</td>
-            <td class="py-3 px-3 text-right font-medium tnum text-zinc-900 whitespace-nowrap">${fmtRpShort(s.valUnit)}</td>
-            <td class="py-3 px-3 text-right font-bold tnum text-brand-700 whitespace-nowrap">${fmtRpShort(s.projectValue)}</td>
-            <td class="py-3 px-3 text-right font-semibold tnum ${s.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">${s.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(s.cashAtRiskDay0) : 'Rp 0'}</td>
-            <td class="py-3 px-3 text-right font-medium tnum text-rose-700 whitespace-nowrap">-${fmtRpShort(s.financingCost)}</td>
-            <td class="py-3 px-3 text-right font-semibold tnum ${s.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'} whitespace-nowrap">${fmtRpShort(s.realNetProfit)}</td>
-            <td class="py-3 px-4 text-right font-semibold tnum text-zinc-900 whitespace-nowrap">${s.totalDays} hari</td>
-          </tr>
-        `;
-      }).join('');
+      // Contextual Preset Comparison (shows presets matching activeVesselClass)
+      const matchingPresets = PREDEFINED_PRESETS.filter(p => p.vesselClass === activeVesselClass);
+      const compareSection = document.getElementById('scenario-compare-section');
+      if (matchingPresets.length <= 1) {
+        compareSection.classList.add('hidden');
+      } else {
+        compareSection.classList.remove('hidden');
+        document.getElementById('scenario-compare-title').textContent =
+          activeVesselClass === 'fishing-3gt'
+            ? 'Komparasi 3 Skenario Kapal Ikan 3 GT (Klik untuk Muat)'
+            : `Komparasi Preset ${vc ? vc.name : ''} (Klik untuk Muat)`;
+        document.getElementById('scenario-compare-body').innerHTML = matchingPresets.map(p => {
+          const s = computeSimulation(p.cards);
+          const isActive = activePresetId === p.id;
+          return `
+            <tr onclick="loadPresetById('${p.id}')" class="scenario-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-brand-700 bg-brand-700' : 'border-zinc-300 bg-white'}">
+                    ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}
+                  </span>
+                  <span class="font-semibold text-zinc-950">${p.name}</span>
+                </div>
+              </td>
+              <td class="py-3 px-3 text-right font-medium tnum text-zinc-700 whitespace-nowrap">${fmtRpShort(s.cogsUnit)}</td>
+              <td class="py-3 px-3 text-right font-medium tnum text-zinc-900 whitespace-nowrap">${fmtRpShort(s.valUnit)}</td>
+              <td class="py-3 px-3 text-right font-bold tnum text-brand-700 whitespace-nowrap">${fmtRpShort(s.projectValue)}</td>
+              <td class="py-3 px-3 text-right font-semibold tnum ${s.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">${s.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(s.cashAtRiskDay0) : 'Rp 0'}</td>
+              <td class="py-3 px-3 text-right font-medium tnum text-rose-700 whitespace-nowrap">-${fmtRpShort(s.financingCost)}</td>
+              <td class="py-3 px-3 text-right font-semibold tnum ${s.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'} whitespace-nowrap">${fmtRpShort(s.realNetProfit)}</td>
+              <td class="py-3 px-4 text-right font-semibold tnum text-zinc-900 whitespace-nowrap">${s.totalDays} hari</td>
+            </tr>
+          `;
+        }).join('');
+      }
 
       // CEO Walk-Away Box
       const plafonRp = sim.ceoPlafonM * 1e9;
@@ -2517,10 +2546,10 @@
 
     function renderCostAndCapacityPage(sim) {
       document.getElementById('cogs-breakdown-strip').innerHTML = `
-        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">1. COGS Komponen Fisik &amp; Kirim</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.baseComponentCOGS)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${fmtRpShort(sim.baseUnitCost)} / u × ${sim.units.toLocaleString('id-ID')}</div></div>
-        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">2. Overhead Waktu Produksi</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.overheadCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${sim.totalDays} hari × Rp ${sim.overheadPerDayJt} Jt/h</div></div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">1. HPP Komponen Fisik &amp; Kirim</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.baseComponentCOGS)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${fmtRpShort(sim.baseUnitCost)} / u × ${sim.units.toLocaleString('id-ID')}</div></div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">2. Overhead Waktu Produksi</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.overheadCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${sim.totalDays} hari × Rp ${sim.overheadPerDayJt} Jt/hr</div></div>
         <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">3. Biaya Akselerasi Lini (${sim.capacityMultiplier}×)</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.accelCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">Rp ${sim.accelCostJt} Jt / unit</div></div>
-        <div class="p-4 bg-brand-50/40"><div class="text-[11px] font-semibold text-brand-800">TOTAL COGS PROYEK</div><div class="text-base sm:text-lg font-bold tnum text-brand-700 mt-1">${fmtRpShort(sim.totalCOGS)}</div><div class="text-[11px] text-brand-800 tnum mt-0.5 font-medium">${fmtRpShort(sim.cogsUnit)} / unit (all-in)</div></div>
+        <div class="p-4 bg-brand-50/40"><div class="text-[11px] font-semibold text-brand-800">TOTAL HPP / COGS PROYEK</div><div class="text-base sm:text-lg font-bold tnum text-brand-700 mt-1">${fmtRpShort(sim.totalCOGS)}</div><div class="text-[11px] text-brand-800 tnum mt-0.5 font-medium">${fmtRpShort(sim.cogsUnit)} / unit (all-in)</div></div>
       `;
 
       const rows = CAPACITY_MODES.map(mode => {
@@ -2558,7 +2587,7 @@
 
       document.getElementById('active-wbs-table-body').innerHTML = WBS_CATEGORIES.map(cat => {
         const card = getCardById(selectedCards[cat.id]);
-        const leadTxt = cat.id === 'hull' ? `Prep ${card.prepDays}h · ${card.unitsPerDay} u/h` : `+${card.extraDays} hari`;
+        const leadTxt = cat.id === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} unit/hr` : `+${card.extraDays} hari`;
         return `
           <tr onclick="openInspectorModal('${card.id}')" class="hover:bg-zinc-50 cursor-pointer transition">
             <td class="py-3 px-4"><div class="text-[10px] text-zinc-400 font-semibold">${cat.code}</div><div class="font-semibold text-zinc-950">${card.name}</div></td>
@@ -2618,7 +2647,7 @@
       `;
 
       document.getElementById('timeline-subtitle').innerHTML =
-        `Total durasi <strong>${sim.units.toLocaleString('id-ID')} unit</strong> (${sim.spkCount} SPK): <strong class="tnum text-zinc-900">${sim.totalDays} hari (± ${(sim.totalDays / 30).toFixed(1)} bulan)</strong> · Delay SP2D +${sim.delayDays}h.`;
+        `Total durasi <strong>${sim.units.toLocaleString('id-ID')} unit</strong> (${sim.spkCount} SPK): <strong class="tnum text-zinc-900">${sim.totalDays} hari (± ${(sim.totalDays / 30).toFixed(1)} bulan)</strong> · Jeda SP2D +${sim.delayDays} hr.`;
 
       document.getElementById('table-unit-badge').textContent =
         `${sim.units.toLocaleString('id-ID')} Unit · ${sim.spkCount} SPK · Kas Masuk Bersih ${fmtRpShort(sim.netCashInTotal)}`;
