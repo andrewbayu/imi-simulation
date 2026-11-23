@@ -317,16 +317,20 @@
 
         <div class="flex flex-wrap items-center gap-2 shrink-0 no-print">
           <select id="preset-dropdown" onchange="onPresetDropdownChange(this.value)" aria-label="Pilih Preset Kapal"
-            class="min-w-[230px] text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
+            class="min-w-[220px] text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
             <!-- Populated dynamically -->
           </select>
           <button id="btn-delete-preset" type="button" onclick="deleteActiveSavedPreset()" title="Hapus konfigurasi tersimpan ini"
             class="hidden inline-flex items-center gap-1 px-2.5 py-2 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition whitespace-nowrap">
             <i class="ph ph-trash text-sm"></i>
           </button>
+          <button type="button" onclick="openMaterialDbModal()" title="Kelola database harga material & upah galangan"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-semibold transition whitespace-nowrap">
+            <i class="ph ph-database text-sm text-brand-700"></i> DB Material
+          </button>
           <button type="button" onclick="startBlankSpec()" title="Kosongkan semua slot untuk membuat spesifikasi baru dari nol"
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-semibold transition whitespace-nowrap">
-            <i class="ph ph-file-plus text-sm"></i> Buat Spec Baru
+            <i class="ph ph-file-plus text-sm"></i> Spec Baru
           </button>
           <button type="button" onclick="openSaveModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition whitespace-nowrap">
             <i class="ph ph-floppy-disk text-sm"></i> Simpan
@@ -433,13 +437,18 @@
         <!-- RIGHT: FOCUSED INVENTORY / ARMORY FOR SELECTED SLOT -->
         <div class="xl:col-span-5 panel overflow-hidden">
           <div class="px-4 py-3 border-b border-zinc-200 bg-zinc-50/70 flex items-center justify-between gap-2">
-            <div>
-              <div id="inventory-title" class="text-xs font-bold text-zinc-950">Gudang Opsi Komponen</div>
+            <div class="min-w-0">
+              <div id="inventory-title" class="text-xs font-bold text-zinc-950 truncate">Gudang Opsi Komponen</div>
               <div class="text-[11px] text-zinc-500">Klik <strong>(+) Pasang</strong> atau tarik kartu ke slot kapal</div>
             </div>
-            <button id="btn-reset-cards" type="button" onclick="resetCatalogEdits()" class="hidden no-print shrink-0 text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded transition">
-              Reset
-            </button>
+            <div class="flex items-center gap-1.5 shrink-0 no-print">
+              <button id="btn-reset-cards" type="button" onclick="resetCatalogEdits()" class="hidden text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded transition">
+                Reset
+              </button>
+              <button type="button" onclick="openCustomCardModal()" class="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md bg-brand-700 hover:bg-brand-800 text-white transition">
+                <i class="ph-bold ph-plus text-xs"></i> Kartu Custom
+              </button>
+            </div>
           </div>
 
           <div class="px-3.5 py-2 border-b border-zinc-200 flex items-center gap-1 overflow-x-auto bg-white no-print" id="catalog-filter-tabs">
@@ -737,24 +746,28 @@
         </div>
       </section>
 
-      <!-- Active WBS Summary Table (with quick inspect buttons) -->
+      <!-- Active WBS & Procurement Terms Table (Finance Persona: Make/Buy + Direct Cash / DP / Tempo) -->
       <section class="panel overflow-hidden">
-        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between">
+        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 class="text-sm font-bold text-zinc-950">Ringkasan 5 Komponen Terpasang (Klik Baris untuk Edit Harga / Lead Time / DP Supplier)</h3>
-            <p class="text-[11px] text-zinc-500">Nilai DP Supplier (%) per komponen langsung menentukan beban kas keluar di Fase Pengadaan (F2).</p>
+            <h3 class="text-sm font-bold text-zinc-950">Skema Pengadaan, Sumber (Bikin/Beli) &amp; Pembayaran Komponen</h3>
+            <p class="text-[11px] text-zinc-500">Atur skema bayar (Bayar Langsung Tunai, DP+Lunas, Produksi Internal, atau Tempo) serta Make-vs-Buy tanpa mengganggu tim perancang teknis.</p>
           </div>
+          <button type="button" onclick="openMaterialDbModal()" class="no-print text-[11px] font-semibold px-2.5 py-1 rounded-md border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700">
+            Update Harga Material
+          </button>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-zinc-50/50 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
                 <th class="py-2.5 px-4">WBS &amp; Komponen Aktif</th>
-                <th class="py-2.5 px-3">Spesifikasi Terkunci (OEM / PK / Bahan)</th>
-                <th class="py-2.5 px-3 text-right">Harga / Unit</th>
-                <th class="py-2.5 px-3 text-right">Total Komponen</th>
-                <th class="py-2.5 px-3 text-right">DP Supplier (F2)</th>
-                <th class="py-2.5 px-4 text-right">Lead Time</th>
+                <th class="py-2.5 px-3">Sumber (Bikin / Beli)</th>
+                <th class="py-2.5 px-3">Skema Bayar Pengadaan</th>
+                <th class="py-2.5 px-3 text-right">DP / Awal</th>
+                <th class="py-2.5 px-3 text-right">HPP / Unit</th>
+                <th class="py-2.5 px-3 text-right">Total Kontrak</th>
+                <th class="py-2.5 px-4 text-right">Detail</th>
               </tr>
             </thead>
             <tbody id="active-wbs-table-body" class="divide-y divide-zinc-200 text-xs"></tbody>
@@ -899,81 +912,128 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- CARD INSPECTOR MODAL (LOCKED SPECS VS EDITABLE COMMERCIAL/TIMELINE)   -->
+  <!-- CARD TECHNICAL & BOM INSPECTOR MODAL (PURE SHIP DESIGN, NO DP TERMS)  -->
   <!-- ===================================================================== -->
   <div id="inspector-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeInspectorModal()">
-    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
         <div>
           <span id="insp-wbs-tag" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700"></span>
-          <h3 id="insp-title" class="text-base font-bold text-zinc-950 mt-1">Atur Harga, Jadwal &amp; DP Supplier</h3>
+          <h3 id="insp-title" class="text-base font-bold text-zinc-950 mt-1">Spesifikasi Teknis &amp; Breakdown BoM</h3>
         </div>
         <button type="button" onclick="closeInspectorModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
           <i class="ph ph-x text-lg"></i>
         </button>
       </div>
 
-      <div class="p-5 space-y-4">
+      <div class="p-5 space-y-4 overflow-y-auto">
         <!-- Locked Immutable Engineering Specs -->
         <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
-          <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-            <i class="ph-bold ph-lock-key text-zinc-500"></i> Spesifikasi Teknis Terkunci
+          <div class="flex items-center justify-between gap-2">
+            <span class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+              <i class="ph-bold ph-lock-key text-zinc-500"></i> Spesifikasi Teknis Komponen
+            </span>
+            <span id="insp-source-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
           </div>
           <div id="insp-locked-grid" class="grid grid-cols-2 gap-2.5 text-xs">
             <!-- Populated by JS -->
           </div>
         </div>
 
-        <!-- Editable Commercial & Timeline Parameters -->
-        <div class="space-y-3">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-brand-700 flex items-center gap-1.5">
-            <i class="ph-bold ph-sliders-horizontal"></i> Parameter Komersial &amp; Jadwal (Bisa Diubah)
+        <!-- Make vs Buy Toggle (Shown when component supports in-house fabrication e.g. Coolbox/Outfitting/Hull) -->
+        <div id="insp-makebuy-wrap" class="hidden p-3.5 rounded-xl bg-brand-50/40 border border-brand-200 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-bold text-zinc-950">Metode Pengadaan: Bikin Sendiri vs Beli Jadi</div>
+            <div class="text-[11px] text-zinc-600">Pilih apakah komponen ini dirakit in-house dari BoM material atau dibeli jadi dari vendor.</div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-1 p-0.5 rounded-lg bg-zinc-200/80 shrink-0">
+            <button type="button" id="insp-mb-buy" onclick="switchInspectorSourceMode('buy')" class="seg-btn text-[11px] px-3 py-1.5 text-zinc-700">Beli Vendor</button>
+            <button type="button" id="insp-mb-make" onclick="switchInspectorSourceMode('make')" class="seg-btn text-[11px] px-3 py-1.5 text-zinc-700">Bikin Sendiri</button>
+          </div>
+        </div>
+
+        <!-- BoM Breakdown & Formula Table -->
+        <div class="rounded-xl border border-zinc-200 overflow-hidden">
+          <div class="px-3.5 py-2.5 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between gap-2">
             <div>
-              <label for="insp-cost" class="block text-xs font-semibold text-zinc-700 mb-1">Harga Satuan (Juta Rp / unit)</label>
-              <div class="input-shell flex items-center px-3 py-2">
-                <span class="text-xs text-zinc-400 pr-1">Rp</span>
-                <input id="insp-cost" type="number" min="0" step="0.1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">Jt</span>
-              </div>
+              <div class="text-xs font-bold text-zinc-950">Bill of Materials (BoM) &amp; Perhitungan Formula</div>
+              <div class="text-[10px] text-zinc-500">Harga satuan material mengambil dari <strong>DB Material</strong>. Ubah Qty untuk hitung ulang otomatis.</div>
             </div>
-            <div>
-              <label for="insp-dp-sup" class="block text-xs font-semibold text-zinc-700 mb-1">DP Supplier di Fase F2 (%)</label>
-              <div class="input-shell flex items-center px-3 py-2">
-                <input id="insp-dp-sup" type="number" min="0" max="100" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">%</span>
-              </div>
+            <button type="button" onclick="openMaterialDbModal()" class="text-[11px] font-semibold text-brand-700 hover:underline shrink-0">
+              Update Tarif Material →
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-zinc-50/60 border-b border-zinc-200 text-[10px] font-semibold text-zinc-500">
+                  <th class="py-2 px-3">Item Material / Paket</th>
+                  <th class="py-2 px-2">Formula / Referensi</th>
+                  <th class="py-2 px-2 text-right">Qty</th>
+                  <th class="py-2 px-2 text-right">Tarif/Satuan</th>
+                  <th class="py-2 px-3 text-right">Subtotal</th>
+                  <th class="py-2 px-2"></th>
+                </tr>
+              </thead>
+              <tbody id="insp-bom-tbody" class="divide-y divide-zinc-100"></tbody>
+            </table>
+          </div>
+          <div class="px-3.5 py-2 bg-zinc-50/70 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5">
+              <select id="insp-add-mat-select" class="text-[11px] border border-zinc-300 rounded px-2 py-1 bg-white"></select>
+              <button type="button" onclick="addBomRowToInspector()" class="text-[11px] font-semibold px-2.5 py-1 rounded bg-zinc-900 text-white hover:bg-zinc-800">
+                + Tambah Baris
+              </button>
             </div>
-            <div id="insp-extra-wrap">
-              <label for="insp-extra-days" class="block text-xs font-semibold text-zinc-700 mb-1">Tambahan Lead Time (Hari)</label>
-              <div class="input-shell flex items-center px-3 py-2">
-                <input id="insp-extra-days" type="number" min="0" max="365" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">hr</span>
-              </div>
+            <div class="text-xs font-bold text-brand-700 tnum">
+              Total BoM: <span id="insp-bom-total">Rp 0</span>
             </div>
-            <div id="insp-hull-prep-wrap" class="hidden">
-              <label for="insp-prep-days" class="block text-xs font-semibold text-zinc-700 mb-1">Siap Cetakan / Mould (Hari)</label>
-              <div class="input-shell flex items-center px-3 py-2">
-                <input id="insp-prep-days" type="number" min="1" max="180" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">hr</span>
-              </div>
+          </div>
+        </div>
+
+        <!-- Technical Duration & Manual Unit Override -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label for="insp-cost" class="block text-xs font-semibold text-zinc-700 mb-1">Harga Akhir / Unit (Jt Rp)</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <span class="text-xs text-zinc-400 pr-1">Rp</span>
+              <input id="insp-cost" type="number" min="0" step="0.1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+              <span class="text-xs text-zinc-400 pl-1">Jt</span>
             </div>
-            <div id="insp-hull-rate-wrap" class="hidden">
-              <label for="insp-rate" class="block text-xs font-semibold text-zinc-700 mb-1">Output Produksi (Unit / Hari)</label>
-              <div class="input-shell flex items-center px-3 py-2">
-                <input id="insp-rate" type="number" min="0.05" max="50" step="0.05" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
-                <span class="text-xs text-zinc-400 pl-1">unit/hr</span>
-              </div>
+          </div>
+          <div id="insp-extra-wrap">
+            <label for="insp-extra-days" class="block text-xs font-semibold text-zinc-700 mb-1">Waktu Pengerjaan / Kirim</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <input id="insp-extra-days" type="number" min="0" max="365" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+              <span class="text-xs text-zinc-400 pl-1">hr</span>
+            </div>
+          </div>
+          <div id="insp-hull-prep-wrap" class="hidden">
+            <label for="insp-prep-days" class="block text-xs font-semibold text-zinc-700 mb-1">Siap Cetakan / Mould</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <input id="insp-prep-days" type="number" min="1" max="180" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+              <span class="text-xs text-zinc-400 pl-1">hr</span>
+            </div>
+          </div>
+          <div id="insp-hull-rate-wrap" class="hidden">
+            <label for="insp-rate" class="block text-xs font-semibold text-zinc-700 mb-1">Output Produksi (u/hr)</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <input id="insp-rate" type="number" min="0.05" max="50" step="0.05" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+              <span class="text-xs text-zinc-400 pl-1">u/hr</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="px-5 py-3.5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-3">
-        <button type="button" onclick="resetSingleCardFromInspector()" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900">
-          Kembalikan ke Standar
-        </button>
+      <div class="px-5 py-3.5 border-t border-zinc-200 bg-zinc-50 flex flex-wrap items-center justify-between gap-3 shrink-0">
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="resetSingleCardFromInspector()" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900">
+            Kembalikan ke Standar
+          </button>
+          <button id="insp-btn-delete-custom" type="button" onclick="deleteCustomCardFromInspector()" class="hidden text-xs font-semibold text-rose-600 hover:text-rose-800">
+            Hapus Kartu Custom
+          </button>
+        </div>
         <div class="flex items-center gap-2">
           <button type="button" onclick="closeInspectorModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700 hover:bg-zinc-50">
             Batal
@@ -982,6 +1042,184 @@
             Terapkan &amp; Pasang
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 3 FINANCE PROCUREMENT TERMS MODAL (DP / COD / INHOUSE / TEMPO)   -->
+  <!-- ===================================================================== -->
+  <div id="procurement-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeProcurementModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-200 text-zinc-800">Kontrol Keuangan &amp; Pengadaan</span>
+          <h3 id="proc-modal-title" class="text-sm font-bold text-zinc-950 mt-1">Atur Skema Bayar &amp; DP Supplier</h3>
+        </div>
+        <button type="button" onclick="closeProcurementModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-base"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3.5 text-xs">
+        <div>
+          <label for="proc-pay-term" class="block font-semibold text-zinc-700 mb-1">Skema Pembayaran ke Vendor / Internal</label>
+          <select id="proc-pay-term" onchange="onProcPayTermChange(this.value)" class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white">
+            <option value="cod">Bayar Langsung (Tunai / Tanpa Jatuh Tempo)</option>
+            <option value="dp_deliver">DP Supplier (%) + Lunas Saat Barang Tiba</option>
+            <option value="inhouse">Produksi Internal / Bikin Sendiri (Bertahap)</option>
+            <option value="tempo">Tempo / Bayar Akhir Sebelum BAST</option>
+          </select>
+        </div>
+        <div id="proc-dp-wrap">
+          <label for="proc-dp-pct" class="block font-semibold text-zinc-700 mb-1">DP Awal Pengadaan (%)</label>
+          <div class="input-shell flex items-center px-3 py-2">
+            <input id="proc-dp-pct" type="number" min="0" max="100" step="5" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+            <span class="text-xs text-zinc-400 pl-1">%</span>
+          </div>
+          <p class="text-[10px] text-zinc-500 mt-1">Mengatur porsi uang muka pengadaan yang keluar di Fase F2.</p>
+        </div>
+        <div>
+          <label for="proc-lead-days" class="block font-semibold text-zinc-700 mb-1">Tambahan Lead Time Pengadaan (Hari)</label>
+          <div class="input-shell flex items-center px-3 py-2">
+            <input id="proc-lead-days" type="number" min="0" max="365" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+            <span class="text-xs text-zinc-400 pl-1">hari</span>
+          </div>
+        </div>
+      </div>
+      <div class="px-5 py-3 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-2">
+        <button type="button" onclick="closeProcurementModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
+        <button type="button" onclick="saveProcurementChanges()" class="px-4 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">Simpan Syarat Bayar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MATERIAL DATABASE MODAL (CEO / PROCUREMENT PERIODIC PRICE UPDATE)     -->
+  <!-- ===================================================================== -->
+  <div id="material-db-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeMaterialDbModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700">Master Data Harga Galangan</span>
+          <h3 class="text-base font-bold text-zinc-950 mt-1">Database Material &amp; Upah Tenaga Kerja</h3>
+          <p class="text-[11px] text-zinc-500">Update harga material secara berkala di sini. Seluruh kartu &amp; BoM yang memakai material terkait otomatis menghitung ulang harga kapal.</p>
+        </div>
+        <button type="button" onclick="closeMaterialDbModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-lg"></i>
+        </button>
+      </div>
+      <div class="overflow-y-auto flex-1">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-zinc-50 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500 sticky top-0">
+              <th class="py-2.5 px-4">Kategori</th>
+              <th class="py-2.5 px-3">Nama Material / Jasa</th>
+              <th class="py-2.5 px-3">Satuan</th>
+              <th class="py-2.5 px-4 text-right">Harga Satuan (Rp)</th>
+            </tr>
+          </thead>
+          <tbody id="material-db-tbody" class="divide-y divide-zinc-200"></tbody>
+        </table>
+      </div>
+      <div class="px-5 py-3.5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-2 shrink-0">
+        <button type="button" onclick="resetMaterialDb()" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900">
+          Reset Tarif Standar
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeMaterialDbModal()" class="px-4 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold">
+            Selesai &amp; Terapkan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- CREATE CUSTOM CARD MODAL (PARAMETRIC FORMULA + AUTO BOM & PRICE)      -->
+  <!-- ===================================================================== -->
+  <div id="custom-card-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeCustomCardModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700">Kartu Custom + Formula BoM</span>
+          <h3 class="text-base font-bold text-zinc-950 mt-1">Buat Kartu Komponen Custom</h3>
+          <p class="text-[11px] text-zinc-500">Masukkan spesifikasi teknis di bawah — formula otomatis menghitung BoM dan estimasi harga dari DB Material.</p>
+        </div>
+        <button type="button" onclick="closeCustomCardModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 overflow-y-auto text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="cc-cat" class="block font-semibold text-zinc-700 mb-1">Kategori Slot Kapal</label>
+            <select id="cc-cat" onchange="onCustomCardCatChange()" class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white">
+              <option value="hull">Body &amp; Lambung Kapal</option>
+              <option value="engine">Mesin &amp; Propulsi</option>
+              <option value="outfitting">Outfitting, Coolbox &amp; Deck</option>
+              <option value="nav_elec">Navigasi, Listrik &amp; Safety</option>
+              <option value="permit_delivery">Perizinan, BKI &amp; Pengiriman</option>
+            </select>
+          </div>
+          <div>
+            <label for="cc-name" class="block font-semibold text-zinc-700 mb-1">Nama Kartu / Komponen</label>
+            <div class="input-shell px-3 py-2">
+              <input id="cc-name" type="text" placeholder="Contoh: Coolbox PU Custom 500L (In-House)" class="w-full text-xs font-semibold bg-transparent focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label for="cc-brand" class="block font-semibold text-zinc-700 mb-1">Brand / Pembuat</label>
+            <div class="input-shell px-3 py-2">
+              <input id="cc-brand" type="text" value="IMI Custom" class="w-full text-xs font-semibold bg-transparent focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label for="cc-source" class="block font-semibold text-zinc-700 mb-1">Sumber Pengerjaan</label>
+            <select id="cc-source" onchange="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-xs font-semibold bg-white">
+              <option value="make">Bikin Sendiri (In-House Galangan)</option>
+              <option value="buy">Beli Vendor / OEM</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic Formula Inputs per Category -->
+        <div id="cc-formula-inputs" class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-3">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Compatible Vessel Classes -->
+        <div>
+          <span class="block font-semibold text-zinc-700 mb-1.5">Cocok Untuk Kelas Kapal</span>
+          <div id="cc-class-checks" class="flex flex-wrap gap-3"></div>
+        </div>
+
+        <!-- Live Computed BoM Breakdown Preview -->
+        <div class="rounded-xl border border-zinc-200 overflow-hidden">
+          <div class="px-3.5 py-2 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between">
+            <span class="font-bold text-zinc-950">Preview BoM &amp; Harga Terhitung (Editable Qty)</span>
+            <span id="cc-total-preview" class="text-sm font-bold text-brand-700 tnum">Rp 0</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-zinc-50/50 border-b border-zinc-200 text-[10px] font-semibold text-zinc-500">
+                  <th class="py-1.5 px-3">Material / Item</th>
+                  <th class="py-1.5 px-2">Formula</th>
+                  <th class="py-1.5 px-2 text-right">Qty</th>
+                  <th class="py-1.5 px-2 text-right">Tarif</th>
+                  <th class="py-1.5 px-3 text-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="cc-bom-preview-tbody" class="divide-y divide-zinc-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-2 shrink-0">
+        <button type="button" onclick="closeCustomCardModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
+        <button type="button" onclick="saveCustomCard()" class="px-4 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">Simpan &amp; Pasang Kartu</button>
       </div>
     </div>
   </div>
@@ -1336,6 +1574,44 @@
     ];
 
     const STORAGE_KEY = 'imi_saved_vessel_configs_v1';
+    const MATERIAL_STORAGE_KEY = 'imi_material_db_v1';
+    const CUSTOM_CARDS_STORAGE_KEY = 'imi_custom_cards_v1';
+
+    const DEFAULT_MATERIALS = [
+      { id: 'res-ortho',    cat: 'Komposit FRP',    name: 'Resin Orthophthalic Marine Grade',       unit: 'kg',    price: 45000 },
+      { id: 'mat-csm',      cat: 'Komposit FRP',    name: 'Fiberglass CSM 450 & WR 600',            unit: 'kg',    price: 38000 },
+      { id: 'gelcoat',      cat: 'Komposit FRP',    name: 'Gelcoat, Primer, Top Coat & Antifouling',unit: 'kg',    price: 68000 },
+      { id: 'alu-5083',     cat: 'Logam & Insulasi',name: 'Pelat & Profil Marine Aluminium 5083',   unit: 'kg',    price: 115000 },
+      { id: 'timber-kayu',  cat: 'Logam & Insulasi',name: 'Kayu Gading 6×8 & Triplek Marine',       unit: 'm³',    price: 9500000 },
+      { id: 'pu-foam',      cat: 'Logam & Insulasi',name: 'Polyurethane Foam 2-Komponen (Coolbox)', unit: 'kg',    price: 85000 },
+      { id: 'hardware-ss',  cat: 'Tambat & Deck',   name: 'Hardware SS316, Cleat, Bollard & Valve', unit: 'set',   price: 550000 },
+      { id: 'tali-nylon',   cat: 'Tambat & Deck',   name: 'Tali Jangkar & Tambat Nylon 14–20mm',    unit: 'meter', price: 14000 },
+      { id: 'bilge-pump',   cat: 'Tambat & Deck',   name: 'Pompa Bilga Otomatis DC 12V 1500 GPH',   unit: 'set',   price: 1500000 },
+      { id: 'seat-pax',     cat: 'Akomodasi',       name: 'Kursi Penumpang FRP High Density Foam',  unit: 'set',   price: 2000000 },
+      { id: 'obm-pk',       cat: 'Permesinan',      name: 'Estimasi Mesin Tempel OBM (per PK)',     unit: 'PK',    price: 1400000 },
+      { id: 'rigging-har',  cat: 'Permesinan',      name: 'Wire Harness, Controls & Racor Filter',  unit: 'set',   price: 5000000 },
+      { id: 'aki-marine',   cat: 'Permesinan',      name: 'Aki Marine Heavy Duty 100–120 Ah',       unit: 'unit',  price: 2500000 },
+      { id: 'steering-hyd', cat: 'Permesinan',      name: 'Hydraulic Steering Dual Cylinder',       unit: 'set',   price: 25000000 },
+      { id: 'nav-garmin',   cat: 'Navigasi & El.',  name: 'GPS Chartplotter & Sounder Garmin 585+', unit: 'unit',  price: 15500000 },
+      { id: 'vhf-marine',   cat: 'Navigasi & El.',  name: 'Radio Komunikasi VHF Marine + Antena',   unit: 'unit',  price: 6500000 },
+      { id: 'nav-lights',   cat: 'Navigasi & El.',  name: 'Lampu Navigasi LED / Ceiling / Switch',  unit: 'set',   price: 500000 },
+      { id: 'genset-3kva',  cat: 'Navigasi & El.',  name: 'Generator Industrial 3.0 kVA + Bracket', unit: 'unit',  price: 15000000 },
+      { id: 'ac-split',     cat: 'Navigasi & El.',  name: 'AC Split Marine / Kabin + Bracket',      unit: 'unit',  price: 6000000 },
+      { id: 'solas-vest',   cat: 'Safety SOLAS',    name: 'Life Jacket SOLAS Approved w/ Whistle',  unit: 'pcs',   price: 150000 },
+      { id: 'solas-buoy',   cat: 'Safety SOLAS',    name: 'Life Buoy + Tali 30m / APAR 3kg',        unit: 'pcs',   price: 500000 },
+      { id: 'labor-yard',   cat: 'Tenaga Kerja',    name: 'Tenaga Kerja Galangan & Teknisi',        unit: 'HOK',   price: 220000 },
+      { id: 'doc-survey',   cat: 'Izin & Kirim',    name: 'Jasa Dokumen Hubla / BKI / Launching',   unit: 'paket', price: 1000000 },
+      { id: 'vendor-unit',  cat: 'Vendor / Subkon', name: 'Item / Subkontrak Eksternal Vendor',     unit: 'unit',  price: 1000000 }
+    ];
+
+    const PAY_TERM_LABELS = {
+      cod: 'Bayar Langsung (Tunai/COD)',
+      dp_deliver: 'DP % + Lunas Tiba',
+      inhouse: 'Produksi Internal (Bertahap)',
+      tempo: 'Tempo / Bayar Akhir (BAST)'
+    };
+
+    let MATERIAL_DB = DEFAULT_MATERIALS.map(m => ({ ...m }));
 
     // Active Application State
     let currentPage = 'page-spec';
@@ -1356,7 +1632,397 @@
     let delayDays = 0;
     let capacityMultiplier = 1;
     let inspectingCardId = null;
+    let procEditingCatId = null;
+    let draftCustomBom = [];
     let cashflowChartInstance = null;
+
+    function getMaterialById(matId) {
+      return MATERIAL_DB.find(m => m.id === matId) || MATERIAL_DB[MATERIAL_DB.length - 1];
+    }
+
+    function getBomRowSubtotal(row) {
+      const mat = getMaterialById(row.matId);
+      const unitPrice = row.fixedPrice !== undefined ? row.fixedPrice : (mat ? mat.price : 0);
+      return Math.round((Number(row.qty) || 0) * unitPrice);
+    }
+
+    function calcBomTotal(bomRows) {
+      if (!Array.isArray(bomRows) || bomRows.length === 0) return 0;
+      return bomRows.reduce((sum, r) => sum + getBomRowSubtotal(r), 0);
+    }
+
+    function loadMaterialDbFromStorage() {
+      try {
+        const raw = localStorage.getItem(MATERIAL_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          MATERIAL_DB = DEFAULT_MATERIALS.map(def => {
+            const ov = parsed.find(x => x.id === def.id);
+            return ov && Number.isFinite(ov.price) ? { ...def, price: Math.max(0, ov.price) } : { ...def };
+          });
+        }
+      } catch (e) {}
+    }
+
+    function persistMaterialDb() {
+      try {
+        localStorage.setItem(MATERIAL_STORAGE_KEY, JSON.stringify(MATERIAL_DB.map(m => ({ id: m.id, price: m.price }))));
+      } catch (e) {}
+    }
+
+    function loadCustomCardsFromStorage() {
+      try {
+        const raw = localStorage.getItem(CUSTOM_CARDS_STORAGE_KEY);
+        const list = raw ? JSON.parse(raw) : [];
+        return Array.isArray(list) ? list : [];
+      } catch (e) { return []; }
+    }
+
+    function persistCustomCards(list) {
+      try {
+        localStorage.setItem(CUSTOM_CARDS_STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function buildDefaultRecipesForCard(c) {
+      const target = c.defaultCost;
+      const makeHullBom = (resKg, csmKg, gelKg, aluKg, woodM3, hwSet, hok, formulaNote = 'Luas kulit × lapis laminasi') => {
+        const rows = [
+          { matId: 'res-ortho', label: 'Resin Orthophthalic', formula: formulaNote, qty: resKg },
+          { matId: 'mat-csm', label: 'Fiberglass CSM/WR', formula: 'Berat serat × rasio resin', qty: csmKg },
+          { matId: 'gelcoat', label: 'Gelcoat + Cat Primer/Top/AF', formula: 'Sistem cat marine 3-layer', qty: gelKg }
+        ];
+        if (aluKg > 0) rows.push({ matId: 'alu-5083', label: 'Struktur Alu 5083', formula: 'Transom/gading/pelat', qty: aluKg });
+        if (woodM3 > 0) rows.push({ matId: 'timber-kayu', label: 'Kayu Gading / Marine', formula: 'Konstruksi kayu & deck', qty: woodM3 });
+        if (hwSet > 0) rows.push({ matId: 'hardware-ss', label: 'Fitting, Cat & Sealant', formula: 'Set perlengkapan lambung', qty: hwSet });
+        if (hok > 0) rows.push({ matId: 'labor-yard', label: 'Tenaga Kerja Galangan', formula: 'Laminasi, perakitan & QC', qty: hok });
+        const rawSum = calcBomTotal(rows);
+        const diff = target - rawSum;
+        if (diff !== 0) {
+          rows.push({ matId: 'vendor-unit', label: 'Consumables 2,5% & Cetakan/Jig', formula: 'Amortisasi cetakan & BHP bengkel', qty: 1, fixedPrice: diff });
+        }
+        return rows;
+      };
+
+      const specificHulls = {
+        'hull-3gt-frp': makeHullBom(280, 180, 35, 0, 0.30, 5, 42, '9,2m × 1,2m Open-Deck'),
+        'hull-3gt-hybrid': makeHullBom(360, 220, 42, 110, 0.25, 6, 56, '9,2m × 1,2m Hybrid Alu'),
+        'hull-3gt-alu': makeHullBom(180, 110, 28, 390, 0, 8, 92, '9,2m × 1,2m Alu 5083'),
+        'hull-patrol-85': makeHullBom(1450, 920, 150, 120, 0.9, 24, 620, '(8.5/13) × Basis Structural 13m'),
+        'hull-patrol-100': makeHullBom(1750, 1120, 185, 180, 1.0, 28, 720, '(10/13) × Basis Structural 13m'),
+        'hull-crew-130': makeHullBom(2350, 1500, 240, 260, 1.3, 38, 940, 'Basis 13m Step-Hull (205Jt+126.5Jt)'),
+        'hull-pass-125': makeHullBom(2200, 1400, 225, 220, 1.2, 34, 890, '(12.5/13) × Basis Structural 13m'),
+        'hull-pass-165': makeHullBom(3600, 2250, 340, 450, 1.8, 55, 1450, '(16.5/13) × Basis × 1.25 Flybridge')
+      };
+
+      if (c.category === 'hull') {
+        const bom = specificHulls[c.id] || makeHullBom(300, 180, 35, 0, 0.2, 5, 45);
+        return { sourceMode: 'make', payTerm: 'inhouse', bom, altMakeBom: null, altBuyBom: null };
+      }
+
+      if (c.category === 'engine') {
+        // Aligned to quotation-imi WBS III (ENGINES_DB + Rigging/Racor + Aki + Hydraulic Steering + Jasa)
+        const engineRecipes = {
+          'eng-yamaha-115x2': [
+            { matId: 'vendor-unit', label: '2× Yamaha OBM 115 HP 2-Tak (V4)', formula: 'ENGINES_DB: 2 × Rp 191 Jt', qty: 2, fixedPrice: 191000000 },
+            { matId: 'rigging-har', label: 'Wire Harness, Controls & Racor Filter', formula: '2 set × Rp 5 Jt', qty: 2 },
+            { matId: 'aki-marine', label: 'Aki Marine Heavy Duty 100-120 Ah', formula: '3 unit × Rp 2,5 Jt', qty: 3 },
+            { matId: 'steering-hyd', label: 'Hydraulic Steering Dual + Tie-Bar + Switch', formula: 'Steering + Tie-Bar + Wheel + Gauge', qty: 1, fixedPrice: 30500000 },
+            { matId: 'labor-yard', label: 'Jasa Instalasi & Alignment Propulsi', formula: 'Teknisi galangan tersertifikasi', qty: 22 }
+          ],
+          'eng-yamaha-200x2': [
+            { matId: 'vendor-unit', label: '2× Yamaha OBM 200 HP 4-Tak', formula: 'ENGINES_DB: 2 × Rp 275 Jt', qty: 2, fixedPrice: 275000000 },
+            { matId: 'rigging-har', label: 'Wire Harness, Controls & Racor Filter', formula: '2 set × Rp 5 Jt', qty: 2 },
+            { matId: 'aki-marine', label: 'Aki Marine Heavy Duty 100-120 Ah', formula: '3 unit × Rp 2,5 Jt', qty: 3 },
+            { matId: 'steering-hyd', label: 'Hydraulic Steering Dual Cylinder', formula: 'Sistem kemudi hidrolik ganda', qty: 1 },
+            { matId: 'labor-yard', label: 'Tie-Bar, Toolkit & Jasa Instalasi', formula: 'Sinkronisasi & uji propulsi', qty: 22 }
+          ],
+          'eng-yamaha-250x2': [
+            { matId: 'vendor-unit', label: '2× Yamaha OBM 250 HP 4-Tak (Counter)', formula: 'ENGINES_DB: 2 × Rp 323 Jt', qty: 2, fixedPrice: 323000000 },
+            { matId: 'rigging-har', label: 'Wire Harness, Controls & Racor Filter', formula: '2 set × Rp 5 Jt', qty: 2 },
+            { matId: 'aki-marine', label: 'Aki Marine Heavy Duty 100-120 Ah', formula: '3 unit × Rp 2,5 Jt', qty: 3 },
+            { matId: 'steering-hyd', label: 'Hydraulic Steering Dual + Tie-Bar', formula: 'Steering hidrolik + SS316 Tie-Bar', qty: 1 },
+            { matId: 'labor-yard', label: 'Wheel, Gauge, Switch & Instalasi', formula: 'Rigging penuh & alignment', qty: 22 }
+          ],
+          'eng-yamaha-300x4': [
+            { matId: 'vendor-unit', label: '4× Yamaha OBM 300 HP 4-Tak (Counter)', formula: 'ENGINES_DB: 4 × Rp 427,5 Jt', qty: 4, fixedPrice: 427500000 },
+            { matId: 'rigging-har', label: 'Quad Rigging Harness & Filter Racor', formula: '4 set × Rp 5 Jt', qty: 4 },
+            { matId: 'aki-marine', label: 'Aki Marine Heavy Duty 100-120 Ah', formula: '5 unit × Rp 2,5 Jt', qty: 5 },
+            { matId: 'steering-hyd', label: 'Hydraulic Steering Quad + Triple Tie-Bar', formula: 'Rp 35 Jt steering + Rp 10,5 Jt tie-bar', qty: 1, fixedPrice: 45500000 },
+            { matId: 'labor-yard', label: 'Jasa Instalasi & Uji Propulsi Quad', formula: 'Alignment quad engine', qty: 32 }
+          ]
+        };
+        let bom;
+        if (engineRecipes[c.id]) {
+          bom = engineRecipes[c.id];
+          const diff = target - calcBomTotal(bom);
+          if (diff !== 0) {
+            bom.push({ matId: 'vendor-unit', label: 'Aksesoris Rigging & Kalibrasi Tambahan', formula: 'Penyesuaian paket OEM', qty: 1, fixedPrice: diff });
+          }
+        } else {
+          const hp = c.totalHp || 15;
+          const laborHok = 3;
+          const unitEquip = Math.max(0, target - laborHok * 220000);
+          bom = [
+            { matId: 'vendor-unit', label: `Paket ${c.name} (${hp} HP)`, formula: 'Harga kontrak dealer resmi Yamaha + tangki', qty: 1, fixedPrice: unitEquip },
+            { matId: 'labor-yard', label: 'Jasa Pasang, Rigging & Uji Mesin', formula: `${laborHok} HOK teknisi mesin`, qty: laborHok }
+          ];
+        }
+        return { sourceMode: 'buy', payTerm: 'dp_deliver', bom, altMakeBom: null, altBuyBom: null };
+      }
+
+      if (c.category === 'outfitting') {
+        // Explicit Make-vs-Buy dual BoM! (e.g., Coolbox & Deck Outfitting + quotation-imi WBS II/IV/V)
+        const buyDefaults = {
+          'out-3gt-basic': [
+            { matId: 'vendor-unit', label: 'Coolbox Jadi 150L + Jangkar 7kg', formula: 'Beli jadi distributor', qty: 1, fixedPrice: 3920000 },
+            { matId: 'tali-nylon', label: 'Tali Jangkar & Tambat Nylon', formula: '50m × Rp 14.000/m', qty: 50 },
+            { matId: 'labor-yard', label: 'Jasa Fitting & Penambahan Kayu', formula: '4 HOK tukang outfitting', qty: 4 }
+          ],
+          'out-3gt-kkp': [
+            { matId: 'vendor-unit', label: 'Palka / Coolbox PU 300L (Beli Vendor)', formula: 'Unit coolbox jadi + tutup kedap', qty: 1, fixedPrice: 9800000 },
+            { matId: 'bilge-pump', label: 'Pompa Bilga DC 12V 1500 GPH', formula: '1 set pompa', qty: 1 },
+            { matId: 'hardware-ss', label: 'Cleat SS316 & Jangkar', formula: '2 set fitting tambat', qty: 2 },
+            { matId: 'tali-nylon', label: 'Tali Jangkar & Tambat Nylon', formula: '50m × Rp 14.000/m', qty: 50 },
+            { matId: 'labor-yard', label: 'Jasa Pasang & Uji Kedap', formula: '2 HOK perakitan', qty: 2 }
+          ],
+          'out-3gt-ss316': [
+            { matId: 'vendor-unit', label: '2× Palka + Kanopi Subkon + Jangkar', formula: 'Paket vendor heavy-duty', qty: 1, fixedPrice: 17300000 },
+            { matId: 'bilge-pump', label: 'Pompa Bilga Otomatis DC 12V', formula: '2 set × Rp 1,5 Jt', qty: 2 },
+            { matId: 'hardware-ss', label: 'Hardware SS316 & Railing', formula: '4 set × Rp 550 rb', qty: 4 },
+            { matId: 'tali-nylon', label: 'Tali Nylon 14-20mm', formula: '50m × Rp 14.000/m', qty: 50 },
+            { matId: 'labor-yard', label: 'Jasa Instalasi Railing & Kanopi', formula: '6 HOK fabrikasi', qty: 6 }
+          ],
+          'out-patrol-std': [
+            { matId: 'vendor-unit', label: 'Tangki FO/FW, Jendela Tempered & D-Fender', formula: 'Subkon FRP/Kaca/Fender Patrol 8-10m', qty: 1, fixedPrice: 82000000 },
+            { matId: 'seat-pax', label: 'Kursi Pilot & Kursi Pax Patrol (8 Pax)', formula: '10 set × Rp 2 Jt', qty: 10 },
+            { matId: 'bilge-pump', label: 'Pompa Bilga Otomatis 1500 GPH', formula: '3 set × Rp 1,5 Jt', qty: 3 },
+            { matId: 'hardware-ss', label: 'Cleat, Bollard & Thru-Hull SS316', formula: '14 set × Rp 550 rb', qty: 14 },
+            { matId: 'tali-nylon', label: 'Tali Tambat Nylon', formula: '150m × Rp 14.000/m', qty: 150 },
+            { matId: 'ac-split', label: 'Ventilasi & AC Bracket', formula: '1 unit × Rp 6 Jt', qty: 1 }
+          ],
+          'out-comm-cabin': [
+            { matId: 'vendor-unit', label: 'Tangki 1000L FO, Kaca Tempered, Galley & Fender', formula: 'Paket Outfitting 12.5–13m (quotation-imi)', qty: 1, fixedPrice: 148000000 },
+            { matId: 'seat-pax', label: 'Kursi Pilot + 16 Pax Commuter', formula: '20 set × Rp 2 Jt', qty: 20 },
+            { matId: 'bilge-pump', label: 'Pompa Bilga Otomatis 1500 GPH', formula: '4 set × Rp 1,5 Jt', qty: 4 },
+            { matId: 'hardware-ss', label: 'Cleat, Bollard, Roller & Valve SS316', formula: '20 set × Rp 550 rb', qty: 20 },
+            { matId: 'tali-nylon', label: 'Tali Jangkar & Tambat Nylon', formula: '200m × Rp 14.000/m', qty: 200 },
+            { matId: 'ac-split', label: 'AC Split Marine Kabin + Bracket', formula: '2 unit × Rp 6 Jt', qty: 2 }
+          ],
+          'out-flybridge-lux': [
+            { matId: 'vendor-unit', label: 'Tangki 6000L FO, Tempered Glass, Galley & Fender 16.5m', formula: 'Paket Outfitting Flybridge (quotation-imi)', qty: 1, fixedPrice: 295000000 },
+            { matId: 'seat-pax', label: 'Kursi Pilot & 20 Pax Luxury Seats', formula: '25 set × Rp 2 Jt', qty: 25 },
+            { matId: 'bilge-pump', label: 'Pompa Bilga Otomatis + Air Tawar', formula: '6 set × Rp 1,5 Jt', qty: 6 },
+            { matId: 'hardware-ss', label: 'Cleat, Bollard, Jangkar 60kg & SS316', formula: '26 set × Rp 550 rb', qty: 26 },
+            { matId: 'tali-nylon', label: 'Tali Tambat Nylon', formula: '200m × Rp 14.000/m', qty: 200 },
+            { matId: 'ac-split', label: 'AC Split Marine Dual + Exhaust', formula: '2 unit × Rp 6 Jt', qty: 2 }
+          ]
+        };
+        const buyBom = (buyDefaults[c.id] || [
+          { matId: 'vendor-unit', label: `Paket Vendor ${c.name}`, formula: 'Subkontrak outfitting', qty: 1, fixedPrice: target }
+        ]).map(r => ({ ...r }));
+        const diffBuy = target - calcBomTotal(buyBom);
+        if (diffBuy !== 0 && buyBom[0].fixedPrice !== undefined) buyBom[0].fixedPrice += diffBuy;
+
+        // In-house "Bikin Sendiri" BoM formula (lower cost, uses DB Material prices!)
+        const makeDefaults = {
+          'out-3gt-basic': [
+            { matId: 'res-ortho', label: 'Resin Box Ikan In-House (150L)', formula: 'Laminasi bodi & tutup coolbox', qty: 20 },
+            { matId: 'mat-csm', label: 'Fiberglass CSM 450', formula: '2-3 lapis shell insulasi', qty: 14 },
+            { matId: 'pu-foam', label: 'PU Foam Insulasi 2-Komponen', formula: 'Injeksi dinding insulasi', qty: 12 },
+            { matId: 'tali-nylon', label: 'Tali Jangkar Nylon', formula: '50m × Rp 14.000/m', qty: 50 },
+            { matId: 'labor-yard', label: 'Tenaga Kerja Bikin Coolbox Sendiri', formula: '6 HOK galangan', qty: 6 }
+          ],
+          'out-3gt-kkp': [
+            { matId: 'res-ortho', label: 'Resin Palka 300L (Bikin Sendiri)', formula: 'Laminasi palka + gelcoat dalam', qty: 40 },
+            { matId: 'mat-csm', label: 'Fiberglass CSM/WR', formula: 'Struktur dinding palka 300L', qty: 26 },
+            { matId: 'pu-foam', label: 'Polyurethane Foam 300L', formula: '22 kg insulasi rapat dingin', qty: 22 },
+            { matId: 'bilge-pump', label: 'Pompa Bilga DC 12V', formula: '1 set × Rp 1,5 Jt', qty: 1 },
+            { matId: 'tali-nylon', label: 'Tali Tambat Nylon', formula: '50m × Rp 14.000/m', qty: 50 },
+            { matId: 'labor-yard', label: 'Tenaga Kerja Bikin Palka & Pasang', formula: '10 HOK in-house', qty: 10 }
+          ],
+          'out-3gt-ss316': [
+            { matId: 'res-ortho', label: 'Resin 2× Palka In-House', formula: 'Cetakan & laminasi 2 palka', qty: 75 },
+            { matId: 'mat-csm', label: 'Fiberglass CSM/WR', formula: 'Reinforcement heavy-duty', qty: 50 },
+            { matId: 'pu-foam', label: 'PU Foam Insulasi 2× Palka', formula: 'Injeksi insulasi ganda', qty: 40 },
+            { matId: 'alu-5083', label: 'Rangka Kanopi & Fender Aluminium', formula: 'Fabrikasi pipa/pelat kanopi', qty: 32 },
+            { matId: 'bilge-pump', label: 'Pompa Bilga Otomatis 12V', formula: '2 set × Rp 1,5 Jt', qty: 2 },
+            { matId: 'labor-yard', label: 'Tenaga Kerja Fabrikasi In-House', formula: '22 HOK galangan', qty: 22 }
+          ]
+        };
+        const makeBom = makeDefaults[c.id] || [
+          { matId: 'res-ortho', label: 'Resin & Tangki BB/Air In-House', formula: 'Fabrikasi tangki, konsol & box di galangan', qty: Math.round((target * 0.20) / 45000) },
+          { matId: 'alu-5083', label: 'Rangka Kursi, Rail & Hatch Alu', formula: 'Fabrikasi logam internal', qty: Math.round((target * 0.18) / 115000) },
+          { matId: 'hardware-ss', label: 'Cleat, Bollard, Valve & Engsel SS316', formula: 'Hardware dek', qty: Math.round((target * 0.16) / 550000) },
+          { matId: 'tali-nylon', label: 'Tali Tambat Nylon', formula: '150m × Rp 14.000/m', qty: 150 },
+          { matId: 'labor-yard', label: 'Tenaga Kerja Outfitting Internal', formula: 'Tukang FRP/las/kayu galangan', qty: Math.round((target * 0.24) / 220000) }
+        ];
+
+        const defaultPay = c.id === 'out-3gt-basic' ? 'cod' : 'dp_deliver';
+        return {
+          sourceMode: 'buy',
+          payTerm: defaultPay,
+          bom: buyBom.map(r => ({ ...r })),
+          altBuyBom: buyBom.map(r => ({ ...r })),
+          altMakeBom: makeBom.map(r => ({ ...r }))
+        };
+      }
+
+      if (c.category === 'nav_elec') {
+        const navRecipes = {
+          'nav-3gt-basic': [
+            { matId: 'solas-vest', label: 'Life Jacket SOLAS w/ Whistle', formula: '2 pcs × Rp 150 rb', qty: 2 },
+            { matId: 'solas-buoy', label: 'Life Buoy + Tali 30m + Kompas Saku', formula: '2 pcs × Rp 500 rb', qty: 2 },
+            { matId: 'nav-lights', label: 'Senter & P3K Kelautan Dasar', formula: '1 set', qty: 1 }
+          ],
+          'nav-3gt-ff': [
+            { matId: 'aki-marine', label: 'Aki 12V & Kelistrikan Dasar', formula: '1 unit × Rp 2,5 Jt', qty: 1 },
+            { matId: 'nav-lights', label: 'Lampu Nav LED, Panel Switch & Fishfinder 4"', formula: '7 set × Rp 500 rb', qty: 7 },
+            { matId: 'solas-vest', label: 'Life Jacket SOLAS', formula: '4 pcs × Rp 150 rb', qty: 4 },
+            { matId: 'solas-buoy', label: 'Life Buoy + APAR Portable', formula: '3 pcs × Rp 500 rb', qty: 3 },
+            { matId: 'labor-yard', label: 'Instalasi Kabel & Lampu DC', formula: '6 HOK elektrikal', qty: 6 }
+          ],
+          'nav-3gt-garmin': [
+            { matId: 'nav-garmin', label: 'GPS / Fishfinder Plotter Garmin', formula: '1 unit × Rp 12,5 Jt (compact)', qty: 1, fixedPrice: 12500000 },
+            { matId: 'vhf-marine', label: 'Radio Komunikasi VHF Marine + Antena', formula: '1 unit × Rp 6,5 Jt', qty: 1 },
+            { matId: 'solas-buoy', label: 'Solar Panel 12V + SOLAS Lengkap', formula: '4 set', qty: 4 }
+          ],
+          'nav-cabin-3kva': [
+            { matId: 'nav-garmin', label: 'GPS Chartplotter Garmin 585+', formula: 'quotation-imi WBS VI', qty: 1 },
+            { matId: 'vhf-marine', label: 'Radio VHF ICOM + Antena', formula: 'quotation-imi WBS VI', qty: 1 },
+            { matId: 'genset-3kva', label: 'Generator Marine 3.0 kVA + Bracket', formula: 'GENSETS_DB 3 kVA', qty: 1 },
+            { matId: 'ac-split', label: 'AC Split Marine Kabin + Shore Switch', formula: '2 unit × Rp 6 Jt', qty: 2 },
+            { matId: 'nav-lights', label: 'Lampu Nav LED, Wiper, Panel & Kabel Marine', formula: '30 set eq', qty: 30 },
+            { matId: 'solas-vest', label: 'Life Jacket SOLAS', formula: '18 pcs × Rp 150 rb', qty: 18 },
+            { matId: 'labor-yard', label: 'Jasa Instalasi & Commissioning Nav/Listrik', formula: 'Teknisi nav/el', qty: 32 }
+          ],
+          'nav-flybridge-7kva': [
+            { matId: 'nav-garmin', label: 'GPS Chartplotter Garmin 585+ & Radar', formula: 'Radar + Garmin 585+', qty: 2 },
+            { matId: 'vhf-marine', label: 'Radio VHF ICOM Dual', formula: '1 unit × Rp 6,5 Jt', qty: 1 },
+            { matId: 'genset-3kva', label: 'Generator Silent Marine 7.0 kVA + Bracket', formula: 'GENSETS_DB 7 kVA', qty: 1, fixedPrice: 25000000 },
+            { matId: 'ac-split', label: 'Dual AC Split Marine Kabin', formula: '4 unit × Rp 6 Jt', qty: 4 },
+            { matId: 'nav-lights', label: 'Sistem Kabel Marine, Switch & Lampu', formula: '65 set eq', qty: 65 },
+            { matId: 'solas-vest', label: 'Life Jacket SOLAS 22 Pax + Buoy + APAR', formula: '30 pcs', qty: 30 },
+            { matId: 'labor-yard', label: 'Jasa Instalasi & Commissioning Listrik', formula: 'Teknisi nav/el', qty: 45 }
+          ]
+        };
+        const bom = (navRecipes[c.id] || [
+          { matId: 'nav-lights', label: c.name, formula: 'Paket Navigasi & Listrik', qty: 1, fixedPrice: target }
+        ]).map(r => ({ ...r }));
+        const diff = target - calcBomTotal(bom);
+        if (diff !== 0) {
+          bom.push({ matId: 'nav-lights', label: 'Kabel Tinned Copper, Switch & Spotlight', formula: 'Penyesuaian panel & kelengkapan SOLAS', qty: 1, fixedPrice: diff });
+        }
+        const pay = c.id === 'nav-3gt-basic' ? 'cod' : 'dp_deliver';
+        return { sourceMode: 'buy', payTerm: pay, bom, altMakeBom: null, altBuyBom: null };
+      }
+
+      // permit_delivery (aligned to quotation-imi WBS IX-X)
+      const permRecipes = {
+        'perm-class-full': [
+          { matId: 'doc-survey', label: 'Peluncuran Kapal (Hauling & Launching)', formula: 'quotation-imi WBS IX', qty: 10 },
+          { matId: 'doc-survey', label: 'Dokumen Legal Hubla (Pas Besar, Akta)', formula: 'quotation-imi WBS IX (≥12m)', qty: 35 },
+          { matId: 'doc-survey', label: 'Sertifikasi Klasifikasi (BKI / RINA)', formula: 'Class Survey & Certification', qty: 30 },
+          { matId: 'doc-survey', label: 'Sea Trial, Commissioning & BAST', formula: 'Uji berlayar 5 Jt + BAST 2 Jt', qty: 7 }
+        ]
+      };
+      let bom;
+      if (permRecipes[c.id]) {
+        bom = permRecipes[c.id];
+      } else {
+        const docLabor = 4;
+        const docCost = Math.max(0, target - docLabor * 220000);
+        bom = [
+          { matId: 'doc-survey', label: `Biaya Resmi & Logistik (${c.name})`, formula: 'PNBP, survei, pengawalan & kirim', qty: 1, fixedPrice: docCost },
+          { matId: 'labor-yard', label: 'Tim Uji Apung / Sea Trial & BAST', formula: `${docLabor} HOK lapangan`, qty: docLabor }
+        ];
+      }
+      return {
+        sourceMode: 'buy',
+        payTerm: c.id === 'perm-3gt-exyard' ? 'cod' : 'dp_deliver',
+        bom,
+        altMakeBom: null,
+        altBuyBom: null
+      };
+    }
+
+    function hydrateCatalogAndCustomCards() {
+      loadMaterialDbFromStorage();
+      COMPONENT_CATALOG.forEach(c => {
+        if (!c._hydrated) {
+          const rec = buildDefaultRecipesForCard(c);
+          c.sourceMode = rec.sourceMode;
+          c.defaultSourceMode = rec.sourceMode;
+          c.payTerm = rec.payTerm;
+          c.defaultPayTerm = rec.payTerm;
+          c.bom = rec.bom;
+          c.defaultBom = rec.bom.map(r => ({ ...r }));
+          c.altMakeBom = rec.altMakeBom;
+          c.altBuyBom = rec.altBuyBom;
+          c.manualCostOverride = false;
+          c._hydrated = true;
+        }
+      });
+      const savedCustom = loadCustomCardsFromStorage();
+      savedCustom.forEach(cc => {
+        if (!COMPONENT_CATALOG.some(x => x.id === cc.id)) {
+          cc.isCustom = true;
+          COMPONENT_CATALOG.push(cc);
+        }
+      });
+      recomputeAllBomCards();
+    }
+
+    function recomputeAllBomCards() {
+      COMPONENT_CATALOG.forEach(c => {
+        if (c.bom && c.bom.length > 0 && !c.manualCostOverride) {
+          c.cost = calcBomTotal(c.bom);
+        }
+      });
+    }
+
+    // Ensure catalog BoMs are hydrated immediately on script parse
+    hydrateCatalogAndCustomCards();
+
+    function allocCategoryCash(totalAmt, cardObj, spkProcFactor, isHull) {
+      if (totalAmt <= 0) return [0, 0, 0, 0, 0, 0];
+      const term = cardObj.payTerm || (cardObj.sourceMode === 'make' ? 'inhouse' : 'dp_deliver');
+      let p1 = 0, p2 = 0, p3 = 0, p4 = 0, p5 = 0, p6 = 0;
+
+      if (term === 'cod') {
+        // Bayar Langsung (Tunai / tanpa jatuh tempo): kas keluar di pengadaan awal per SPK batch
+        p2 = Math.round(totalAmt * spkProcFactor);
+        const rem = totalAmt - p2;
+        p3 = Math.round(rem * 0.45);
+        p4 = Math.round(rem * 0.35);
+        p5 = rem - p3 - p4;
+      } else if (term === 'inhouse') {
+        // Bikin Sendiri / Produksi Internal: material awal + upah & bahan mengalir sepanjang batch
+        p1 = isHull ? Math.round(totalAmt * 0.10) : Math.round(totalAmt * 0.05);
+        p2 = Math.round(totalAmt * 0.20 * spkProcFactor);
+        const rem = totalAmt - p1 - p2;
+        p3 = Math.round(rem * 0.28);
+        p4 = Math.round(rem * 0.28);
+        p5 = Math.round(rem * 0.26);
+        p6 = rem - p3 - p4 - p5;
+      } else if (term === 'tempo') {
+        // Tempo / dibayar di tahap akhir sebelum BAST
+        p5 = Math.round(totalAmt * 0.25);
+        p6 = totalAmt - p5;
+      } else {
+        // dp_deliver: DP Supplier % di F2, sisanya saat barang/tahap pengiriman
+        const dpRate = Math.min(0.95, Math.max(0, (cardObj.dpSupplierPct || 0) / 100));
+        p1 = isHull ? Math.round(totalAmt * 0.10) : 0;
+        p2 = Math.round(totalAmt * dpRate * spkProcFactor);
+        const rem = totalAmt - p1 - p2;
+        p3 = Math.round(rem * 0.30);
+        p4 = Math.round(rem * 0.30);
+        p5 = Math.round(rem * 0.25);
+        p6 = rem - p3 - p4 - p5;
+      }
+      return [p1, p2, p3, p4, p5, p6];
+    }
 
     // =========================================================================
     // 2. ONTOLOGY & CORRELATION ENGINE
@@ -1700,7 +2366,7 @@
       }
     }
 
-    // Card Inspector Modal (Locked vs Editable)
+    // Card Inspector Modal (Pure Technical & BoM Breakdown — No DP/Finance Clutter)
     function openInspectorModal(cardId) {
       const card = getCardById(cardId);
       if (!card) return;
@@ -1709,6 +2375,12 @@
 
       document.getElementById('insp-wbs-tag').textContent = `${cat ? cat.code : ''} · ${cat ? cat.title : ''}`;
       document.getElementById('insp-title').textContent = card.name;
+
+      const srcBadge = document.getElementById('insp-source-badge');
+      if (srcBadge) {
+        srcBadge.textContent = card.sourceMode === 'make' ? 'Bikin Sendiri (In-House)' : 'Beli Vendor (OEM)';
+        srcBadge.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${card.sourceMode === 'make' ? 'bg-emerald-100 text-emerald-800' : 'bg-zinc-200 text-zinc-700'}`;
+      }
 
       const lk = card.locked;
       document.getElementById('insp-locked-grid').innerHTML = `
@@ -1730,8 +2402,28 @@
         </div>
       `;
 
+      // Show Make vs Buy toggle if dual BoM exists (e.g. Coolbox / Outfitting)
+      const hasMakeBuy = Boolean(card.altMakeBom && card.altBuyBom);
+      const mbWrap = document.getElementById('insp-makebuy-wrap');
+      if (mbWrap) {
+        mbWrap.classList.toggle('hidden', !hasMakeBuy);
+        if (hasMakeBuy) {
+          document.getElementById('insp-mb-buy').classList.toggle('active', card.sourceMode === 'buy');
+          document.getElementById('insp-mb-make').classList.toggle('active', card.sourceMode === 'make');
+        }
+      }
+
+      // Material select options for adding rows
+      const addMatSel = document.getElementById('insp-add-mat-select');
+      if (addMatSel) {
+        addMatSel.innerHTML = MATERIAL_DB.map(m =>
+          `<option value="${m.id}">${m.name} (${fmtRpShort(m.price)}/${m.unit})</option>`
+        ).join('');
+      }
+
+      renderInspectorBomTable(card);
+
       document.getElementById('insp-cost').value = (card.cost / 1e6).toFixed(2).replace(/\.00$/, '');
-      document.getElementById('insp-dp-sup').value = card.dpSupplierPct;
       document.getElementById('insp-extra-days').value = card.extraDays;
 
       const isHull = card.category === 'hull';
@@ -1742,7 +2434,97 @@
         document.getElementById('insp-rate').value = card.unitsPerDay;
       }
 
+      const delCustomBtn = document.getElementById('insp-btn-delete-custom');
+      if (delCustomBtn) delCustomBtn.classList.toggle('hidden', !card.isCustom);
+
       document.getElementById('inspector-modal').classList.remove('hidden');
+    }
+
+    function renderInspectorBomTable(card) {
+      const tbody = document.getElementById('insp-bom-tbody');
+      const totalEl = document.getElementById('insp-bom-total');
+      const rows = card.bom || [];
+      if (!tbody) return;
+      tbody.innerHTML = rows.map((row, idx) => {
+        const mat = getMaterialById(row.matId);
+        const unitPrice = row.fixedPrice !== undefined ? row.fixedPrice : (mat ? mat.price : 0);
+        const sub = getBomRowSubtotal(row);
+        return `
+          <tr>
+            <td class="py-1.5 px-3 font-medium text-zinc-900">${row.label}</td>
+            <td class="py-1.5 px-2 text-[11px] text-zinc-500">${row.formula || '-'}</td>
+            <td class="py-1.5 px-2 text-right">
+              <input type="number" min="0" step="0.1" value="${row.qty}"
+                onchange="updateInspectorBomQty(${idx}, this.value)"
+                class="w-16 text-right border border-zinc-300 rounded px-1.5 py-0.5 text-xs font-semibold tnum bg-white" />
+              <span class="text-[10px] text-zinc-400 ml-0.5">${mat ? mat.unit : ''}</span>
+            </td>
+            <td class="py-1.5 px-2 text-right tnum text-zinc-600">Rp ${Math.round(unitPrice).toLocaleString('id-ID')}</td>
+            <td class="py-1.5 px-3 text-right font-semibold tnum text-zinc-950">${fmtRpShort(sub)}</td>
+            <td class="py-1.5 px-2 text-right">
+              <button type="button" onclick="removeInspectorBomRow(${idx})" title="Hapus baris" class="text-zinc-400 hover:text-rose-600 p-0.5">
+                <i class="ph ph-trash text-xs"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('') || `<tr><td colspan="6" class="py-3 px-3 text-center text-zinc-400 italic">Belum ada baris BoM</td></tr>`;
+
+      const total = calcBomTotal(rows);
+      if (totalEl) totalEl.textContent = fmtRpShort(total);
+    }
+
+    function syncInspectorCostFromBom(card) {
+      const total = calcBomTotal(card.bom);
+      card.manualCostOverride = false;
+      card.cost = total;
+      const costInput = document.getElementById('insp-cost');
+      if (costInput) costInput.value = (total / 1e6).toFixed(2).replace(/\.00$/, '');
+      renderInspectorBomTable(card);
+    }
+
+    function updateInspectorBomQty(idx, val) {
+      const card = getCardById(inspectingCardId);
+      if (!card || !card.bom || !card.bom[idx]) return;
+      const q = parseFloat(val);
+      if (isNaN(q) || q < 0) return;
+      card.bom[idx].qty = q;
+      syncInspectorCostFromBom(card);
+    }
+
+    function addBomRowToInspector() {
+      const card = getCardById(inspectingCardId);
+      const sel = document.getElementById('insp-add-mat-select');
+      if (!card || !sel) return;
+      const mat = getMaterialById(sel.value);
+      if (!mat) return;
+      if (!card.bom) card.bom = [];
+      card.bom.push({ matId: mat.id, label: mat.name, formula: 'Tambahan manual BoM', qty: 1 });
+      syncInspectorCostFromBom(card);
+    }
+
+    function removeInspectorBomRow(idx) {
+      const card = getCardById(inspectingCardId);
+      if (!card || !card.bom) return;
+      card.bom.splice(idx, 1);
+      syncInspectorCostFromBom(card);
+    }
+
+    function switchInspectorSourceMode(mode) {
+      const card = getCardById(inspectingCardId);
+      if (!card) return;
+      applyCardSourceMode(card, mode);
+      openInspectorModal(card.id);
+      recalculateAll();
+    }
+
+    function applyCardSourceMode(card, mode) {
+      if (!card || !card.altMakeBom || !card.altBuyBom) return;
+      card.sourceMode = mode;
+      card.bom = (mode === 'make' ? card.altMakeBom : card.altBuyBom).map(r => ({ ...r }));
+      card.payTerm = mode === 'make' ? 'inhouse' : (card.defaultPayTerm === 'cod' ? 'cod' : 'dp_deliver');
+      card.manualCostOverride = false;
+      card.cost = calcBomTotal(card.bom);
     }
 
     function closeInspectorModal() {
@@ -1754,11 +2536,14 @@
       const card = getCardById(inspectingCardId);
       if (!card) return;
       const costJt = parseFloat(document.getElementById('insp-cost').value);
-      const dpSup = parseFloat(document.getElementById('insp-dp-sup').value);
       const extraD = parseFloat(document.getElementById('insp-extra-days').value);
 
-      if (!isNaN(costJt) && costJt >= 0) card.cost = Math.round(costJt * 1e6);
-      if (!isNaN(dpSup) && dpSup >= 0 && dpSup <= 100) card.dpSupplierPct = dpSup;
+      if (!isNaN(costJt) && costJt >= 0) {
+        const enteredRp = Math.round(costJt * 1e6);
+        const bomRp = calcBomTotal(card.bom);
+        card.manualCostOverride = Math.abs(enteredRp - bomRp) > 50000;
+        card.cost = enteredRp;
+      }
       if (!isNaN(extraD) && extraD >= 0) card.extraDays = Math.round(extraD);
 
       if (card.category === 'hull') {
@@ -1766,6 +2551,11 @@
         const rate = parseFloat(document.getElementById('insp-rate').value);
         if (!isNaN(prep) && prep >= 1) card.prepDays = Math.round(prep);
         if (!isNaN(rate) && rate >= 0.05) card.unitsPerDay = rate;
+      }
+
+      if (card.isCustom) {
+        const customs = loadCustomCardsFromStorage().map(c => c.id === card.id ? card : c);
+        persistCustomCards(customs);
       }
 
       selectedCards[card.category] = card.id;
@@ -1776,7 +2566,11 @@
     function resetSingleCardFromInspector() {
       const card = getCardById(inspectingCardId);
       if (!card) return;
-      card.cost = card.defaultCost;
+      card.sourceMode = card.defaultSourceMode || 'buy';
+      card.payTerm = card.defaultPayTerm || 'dp_deliver';
+      if (card.defaultBom) card.bom = card.defaultBom.map(r => ({ ...r }));
+      card.manualCostOverride = false;
+      card.cost = card.bom ? calcBomTotal(card.bom) : card.defaultCost;
       card.dpSupplierPct = card.defaultDpSupplierPct;
       card.extraDays = card.defaultExtraDays;
       if (card.category === 'hull') {
@@ -1785,6 +2579,18 @@
       }
       openInspectorModal(card.id);
       recalculateAll();
+    }
+
+    function deleteCustomCardFromInspector() {
+      const card = getCardById(inspectingCardId);
+      if (!card || !card.isCustom) return;
+      const idx = COMPONENT_CATALOG.findIndex(c => c.id === card.id);
+      if (idx > -1) COMPONENT_CATALOG.splice(idx, 1);
+      persistCustomCards(loadCustomCardsFromStorage().filter(c => c.id !== card.id));
+      if (selectedCards[card.category] === card.id) selectedCards[card.category] = null;
+      closeInspectorModal();
+      recalculateAll();
+      showToast(`Kartu custom "${card.name}" dihapus.`);
     }
 
     function showToast(msg) {
@@ -1799,7 +2605,11 @@
 
     function resetCatalogEdits() {
       COMPONENT_CATALOG.forEach(c => {
-        c.cost = c.defaultCost;
+        c.sourceMode = c.defaultSourceMode || 'buy';
+        c.payTerm = c.defaultPayTerm || 'dp_deliver';
+        if (c.defaultBom) c.bom = c.defaultBom.map(r => ({ ...r }));
+        c.manualCostOverride = false;
+        c.cost = c.bom ? calcBomTotal(c.bom) : c.defaultCost;
         c.dpSupplierPct = c.defaultDpSupplierPct;
         c.extraDays = c.defaultExtraDays;
         if (c.category === 'hull') {
@@ -1808,7 +2618,433 @@
         }
       });
       recalculateAll();
-      showToast('Nilai kartu dikembalikan ke harga dan jadwal standar.');
+      showToast('Nilai kartu, BoM & syarat bayar dikembalikan ke standar.');
+    }
+
+    // Page 3 Finance Procurement Controls
+    function setSlotPayTerm(catId, payTerm) {
+      const card = getCardById(selectedCards[catId]);
+      if (!card) return;
+      card.payTerm = payTerm;
+      if (payTerm === 'cod') card.dpSupplierPct = 100;
+      else if (payTerm === 'tempo') card.dpSupplierPct = 0;
+      else if (payTerm === 'dp_deliver' && card.dpSupplierPct === 0) card.dpSupplierPct = card.defaultDpSupplierPct || 30;
+      recalculateAll();
+    }
+
+    function toggleSlotSourceMode(catId, mode) {
+      const card = getCardById(selectedCards[catId]);
+      if (!card || !card.altMakeBom || !card.altBuyBom) return;
+      applyCardSourceMode(card, mode);
+      recalculateAll();
+      showToast(`${card.name} diubah ke mode ${mode === 'make' ? 'Bikin Sendiri (In-House)' : 'Beli Vendor'}.`);
+    }
+
+    function openProcurementModal(catId) {
+      const card = getCardById(selectedCards[catId]);
+      if (!card) return;
+      procEditingCatId = catId;
+      document.getElementById('proc-modal-title').textContent = card.name;
+      const term = card.payTerm || (card.sourceMode === 'make' ? 'inhouse' : 'dp_deliver');
+      document.getElementById('proc-pay-term').value = term;
+      document.getElementById('proc-dp-pct').value = card.dpSupplierPct || 0;
+      document.getElementById('proc-lead-days').value = card.extraDays || 0;
+      onProcPayTermChange(term);
+      document.getElementById('procurement-modal').classList.remove('hidden');
+    }
+
+    function onProcPayTermChange(term) {
+      const dpWrap = document.getElementById('proc-dp-wrap');
+      if (dpWrap) dpWrap.classList.toggle('hidden', term !== 'dp_deliver');
+    }
+
+    function closeProcurementModal() {
+      procEditingCatId = null;
+      document.getElementById('procurement-modal').classList.add('hidden');
+    }
+
+    function saveProcurementChanges() {
+      const card = getCardById(selectedCards[procEditingCatId]);
+      if (!card) return;
+      const term = document.getElementById('proc-pay-term').value;
+      const dpPct = parseFloat(document.getElementById('proc-dp-pct').value);
+      const leadD = parseFloat(document.getElementById('proc-lead-days').value);
+      card.payTerm = term;
+      if (term === 'cod') card.dpSupplierPct = 100;
+      else if (term === 'tempo') card.dpSupplierPct = 0;
+      else if (!isNaN(dpPct) && dpPct >= 0 && dpPct <= 100) card.dpSupplierPct = dpPct;
+      if (!isNaN(leadD) && leadD >= 0) card.extraDays = Math.round(leadD);
+      closeProcurementModal();
+      recalculateAll();
+    }
+
+    // Material DB Modal
+    function openMaterialDbModal() {
+      renderMaterialDbTable();
+      document.getElementById('material-db-modal').classList.remove('hidden');
+    }
+
+    function closeMaterialDbModal() {
+      document.getElementById('material-db-modal').classList.add('hidden');
+      recalculateAll();
+    }
+
+    function renderMaterialDbTable() {
+      const tbody = document.getElementById('material-db-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = MATERIAL_DB.map(m => `
+        <tr>
+          <td class="py-2 px-4 text-[11px] font-semibold text-zinc-500">${m.cat}</td>
+          <td class="py-2 px-3 font-medium text-zinc-950">${m.name}</td>
+          <td class="py-2 px-3 text-zinc-500">${m.unit}</td>
+          <td class="py-2 px-4 text-right">
+            <input type="number" min="0" step="1000" value="${m.price}"
+              onchange="updateMaterialPrice('${m.id}', this.value)"
+              class="w-36 text-right border border-zinc-300 rounded-md px-2.5 py-1 text-xs font-bold tnum bg-white focus:outline-none focus:border-brand-700" />
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateMaterialPrice(matId, newPrice) {
+      const val = parseFloat(newPrice);
+      if (isNaN(val) || val < 0) return;
+      const m = MATERIAL_DB.find(x => x.id === matId);
+      if (!m) return;
+      m.price = Math.round(val);
+      persistMaterialDb();
+      recomputeAllBomCards();
+      recalculateAll();
+      showToast(`Tarif ${m.name} diperbarui ke Rp ${m.price.toLocaleString('id-ID')}/${m.unit}.`);
+    }
+
+    function resetMaterialDb() {
+      MATERIAL_DB = DEFAULT_MATERIALS.map(m => ({ ...m }));
+      persistMaterialDb();
+      recomputeAllBomCards();
+      renderMaterialDbTable();
+      recalculateAll();
+      showToast('Harga DB Material dikembalikan ke tarif standar IMI.');
+    }
+
+    // Create Custom Card with Auto-Formula Calculator
+    function openCustomCardModal(defaultCat = null) {
+      const cat = defaultCat || (catalogCategoryFilter !== 'all' ? catalogCategoryFilter : 'hull');
+      document.getElementById('cc-cat').value = cat;
+      document.getElementById('cc-name').value = '';
+      document.getElementById('cc-brand').value = 'IMI Custom';
+      document.getElementById('cc-source').value = (cat === 'hull' || cat === 'outfitting') ? 'make' : 'buy';
+      document.getElementById('cc-class-checks').innerHTML = VESSEL_CLASSES.map(vc => `
+        <label class="inline-flex items-center gap-1.5 text-xs text-zinc-700 cursor-pointer">
+          <input type="checkbox" name="cc-vc" value="${vc.id}" ${vc.id === activeVesselClass ? 'checked' : ''} class="rounded border-zinc-300 text-brand-700" />
+          <span>${vc.name}</span>
+        </label>
+      `).join('');
+      onCustomCardCatChange();
+      document.getElementById('custom-card-modal').classList.remove('hidden');
+    }
+
+    function closeCustomCardModal() {
+      document.getElementById('custom-card-modal').classList.add('hidden');
+    }
+
+    function onCustomCardCatChange() {
+      const cat = document.getElementById('cc-cat').value;
+      const box = document.getElementById('cc-formula-inputs');
+      if (cat === 'hull') {
+        document.getElementById('cc-source').value = 'make';
+        box.innerHTML = `
+          <div class="text-[11px] font-bold text-zinc-700">Parameter Geometri &amp; Konstruksi Lambung</div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">LOA (m)</label><input id="cc-loa" type="number" step="0.1" value="9.2" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Beam / Lebar (m)</label><input id="cc-beam" type="number" step="0.1" value="1.5" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Depth / Tinggi (m)</label><input id="cc-depth" type="number" step="0.05" value="0.85" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Material Lambung</label>
+              <select id="cc-hull-mat" onchange="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2 py-1.5 text-xs font-semibold bg-white">
+                <option value="frp">FRP Hand Lay-Up</option>
+                <option value="hybrid">Hybrid FRP + Alu</option>
+                <option value="alu">Marine Aluminium 5083</option>
+              </select>
+            </div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Rumah Geladak / Kabin</label>
+              <select id="cc-hull-cabin" onchange="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2 py-1.5 text-xs font-semibold bg-white">
+                <option value="0">Open-Deck (Tanpa Kabin)</option>
+                <option value="1">Dengan Kabin / Wheelhouse</option>
+              </select>
+            </div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Output Lini (Unit/Hr)</label><input id="cc-hull-rate" type="number" step="0.1" value="2.5" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+          </div>
+        `;
+      } else if (cat === 'engine') {
+        document.getElementById('cc-source').value = 'buy';
+        box.innerHTML = `
+          <div class="text-[11px] font-bold text-zinc-700">Spesifikasi Mesin &amp; Daya Propulsi</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Jumlah Mesin</label><input id="cc-eng-count" type="number" min="1" max="4" value="1" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Daya per Mesin (PK)</label><input id="cc-eng-pk" type="number" min="5" max="600" value="40" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Tipe Siklus</label>
+              <select id="cc-eng-cycle" onchange="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2 py-1.5 text-xs font-semibold bg-white">
+                <option value="2t">2-Tak OBM (×0,90)</option>
+                <option value="4t">4-Tak EFI (×1,35)</option>
+                <option value="inboard">Inboard Diesel (×1,55)</option>
+              </select>
+            </div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Lead Time (Hari)</label><input id="cc-lead" type="number" min="0" value="14" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+          </div>
+        `;
+      } else if (cat === 'outfitting') {
+        box.innerHTML = `
+          <div class="text-[11px] font-bold text-zinc-700">Spesifikasi Outfitting / Coolbox / Interior</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Volume Palka/Coolbox (L)</label><input id="cc-out-vol" type="number" min="50" step="50" value="500" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Set Hardware &amp; Tambat</label><input id="cc-out-hw" type="number" min="2" value="12" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Butuh Kabin?</label>
+              <select id="cc-out-cabin" class="w-full border border-zinc-300 rounded px-2 py-1.5 text-xs font-semibold bg-white">
+                <option value="0">Tidak (Open-Deck)</option>
+                <option value="1">Ya (Butuh Kabin)</option>
+              </select>
+            </div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Waktu Kerja (Hari)</label><input id="cc-lead" type="number" min="0" value="10" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+          </div>
+        `;
+      } else if (cat === 'nav_elec') {
+        box.innerHTML = `
+          <div class="text-[11px] font-bold text-zinc-700">Spesifikasi Navigasi, Genset &amp; Safety</div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Paket Elektronika</label><input id="cc-nav-packs" type="number" min="1" value="8" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Genset AC (kVA, 0=DC)</label><input id="cc-nav-kva" type="number" min="0" step="1" value="0" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">HOK Instalasi</label><input id="cc-nav-hok" type="number" min="1" value="6" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Lead Time (Hari)</label><input id="cc-lead" type="number" min="0" value="7" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="text-[11px] font-bold text-zinc-700">Spesifikasi Perizinan &amp; Logistik</div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Paket Dokumen/Survei</label><input id="cc-perm-packs" type="number" min="1" value="8" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Klasifikasi BKI/RINA?</label>
+              <select id="cc-perm-bki" class="w-full border border-zinc-300 rounded px-2 py-1.5 text-xs font-semibold bg-white">
+                <option value="0">Hubla / Pas Kecil</option>
+                <option value="1">Wajib Supervisi BKI/RINA</option>
+              </select>
+            </div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Waktu Proses (Hari)</label><input id="cc-lead" type="number" min="0" value="15" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+          </div>
+        `;
+      }
+      recomputeCustomCardFormula();
+    }
+
+    function generateFormulaBom(cat) {
+      const source = document.getElementById('cc-source').value;
+      const gVal = (id, fb) => {
+        const el = document.getElementById(id);
+        const v = el ? parseFloat(el.value) : NaN;
+        return isNaN(v) ? fb : v;
+      };
+      if (cat === 'hull') {
+        const loa = Math.max(3, gVal('cc-loa', 9.2));
+        const beam = Math.max(0.8, gVal('cc-beam', 1.5));
+        const depth = Math.max(0.4, gVal('cc-depth', 0.85));
+        const matType = (document.getElementById('cc-hull-mat') || {}).value || 'frp';
+        const hasCab = ((document.getElementById('cc-hull-cabin') || {}).value || '0') === '1';
+        const area = Number((loa * (beam + 1.8 * depth) * (hasCab ? 1.15 : 0.85)).toFixed(1));
+        if (matType === 'alu') {
+          return [
+            { matId: 'alu-5083', label: 'Pelat & Profil Marine Alu 5083', formula: `${area} m² × 22 kg/m²`, qty: Math.round(area * 22) },
+            { matId: 'res-ortho', label: 'Resin & Insulasi Internal', formula: `${area} m² × 3 kg/m²`, qty: Math.round(area * 3) },
+            { matId: 'hardware-ss', label: 'Anode Zn, Cat Marine & Fitting', formula: `LOA × 2.5 set`, qty: Math.round(loa * 2.5) },
+            { matId: 'labor-yard', label: 'Tenaga Kerja Las & Konstruksi Alu', formula: `${area} m² × 3.2 HOK/m²`, qty: Math.round(area * 3.2) }
+          ];
+        }
+        const rows = [
+          { matId: 'res-ortho', label: 'Resin Orthophthalic', formula: `${area} m² × 13 kg/m²`, qty: Math.round(area * 13) },
+          { matId: 'mat-csm', label: 'Fiberglass CSM & WR', formula: `${area} m² × 8.2 kg/m²`, qty: Math.round(area * 8.2) },
+          { matId: 'gelcoat', label: 'Gelcoat & Katalis', formula: `${area} m² × 1.5 kg/m²`, qty: Math.round(area * 1.5) },
+          { matId: 'hardware-ss', label: 'Fitting, Cleat & Cat', formula: `LOA × 1.6 set`, qty: Math.round(loa * 1.6) },
+          { matId: 'labor-yard', label: 'Tenaga Kerja Laminasi', formula: `${area} m² × 2.0 HOK/m²`, qty: Math.round(area * 2.0) }
+        ];
+        if (matType === 'hybrid') rows.push({ matId: 'alu-5083', label: 'Transom & Rib Aluminium 5083', formula: `LOA × 12 kg/m`, qty: Math.round(loa * 12) });
+        return rows;
+      }
+      if (cat === 'engine') {
+        const cnt = Math.max(1, Math.round(gVal('cc-eng-count', 1)));
+        const pk = Math.max(5, Math.round(gVal('cc-eng-pk', 40)));
+        const cyc = (document.getElementById('cc-eng-cycle') || {}).value || '2t';
+        const mult = cyc === '4t' ? 1.35 : (cyc === 'inboard' ? 1.55 : 0.90);
+        const effPk = Math.round(cnt * pk * mult);
+        const hok = cnt * pk >= 150 ? 14 : 4;
+        return [
+          { matId: 'obm-pk', label: `${cnt}× Unit Mesin ${pk} PK (${cyc.toUpperCase()})`, formula: `${cnt}×${pk} PK × faktor ${mult}`, qty: effPk },
+          { matId: 'hardware-ss', label: 'Rigging, Filter & Kabel Kontrol', formula: `${cnt * 4} set instalasi`, qty: cnt * 4 },
+          { matId: 'labor-yard', label: 'Tenaga Kerja Pasang & Uji', formula: `${hok} HOK teknisi`, qty: hok }
+        ];
+      }
+      if (cat === 'outfitting') {
+        const vol = Math.max(50, gVal('cc-out-vol', 500));
+        const hw = Math.max(2, Math.round(gVal('cc-out-hw', 12)));
+        if (source === 'make') {
+          const resQty = Math.round(vol * 0.13);
+          const csmQty = Math.round(vol * 0.085);
+          const puQty = Math.round(vol * 0.075);
+          const hokQty = Math.max(4, Math.round(vol * 0.032));
+          return [
+            { matId: 'res-ortho', label: `Resin Shell Coolbox/Palka ${vol}L`, formula: `${vol}L × 0,13 kg/L`, qty: resQty },
+            { matId: 'mat-csm', label: 'Fiberglass CSM/WR', formula: `${vol}L × 0,085 kg/L`, qty: csmQty },
+            { matId: 'pu-foam', label: 'PU Foam Insulasi 2-Komponen', formula: `${vol}L × 0,075 kg/L`, qty: puQty },
+            { matId: 'hardware-ss', label: 'Engsel SS, Drain & Tambat', formula: `${hw} set hardware`, qty: hw },
+            { matId: 'labor-yard', label: 'Tenaga Kerja Bikin Sendiri', formula: `${hokQty} HOK galangan`, qty: hokQty }
+          ];
+        }
+        const vendorUnits = Number((vol / 300).toFixed(2));
+        return [
+          { matId: 'vendor-unit', label: `Coolbox/Palka Jadi ${vol}L (Vendor)`, formula: `${vol}L / 300L × Rp 9,8 Jt`, qty: vendorUnits, fixedPrice: 9800000 },
+          { matId: 'hardware-ss', label: 'Perlengkapan Tambat & Bilga', formula: `${hw} set`, qty: hw },
+          { matId: 'labor-yard', label: 'Jasa Pasang di Galangan', formula: '4 HOK pasang', qty: 4 }
+        ];
+      }
+      if (cat === 'nav_elec') {
+        const packs = Math.max(1, gVal('cc-nav-packs', 8));
+        const kva = Math.max(0, gVal('cc-nav-kva', 0));
+        const hok = Math.max(1, Math.round(gVal('cc-nav-hok', 6)));
+        const rows = [
+          { matId: 'nav-lights', label: 'Lampu Nav LED, Switch & Kabel Marine', formula: `${packs} set kelistrikan`, qty: packs },
+          { matId: 'solas-vest', label: 'Perlengkapan Safety SOLAS', formula: `6 pcs × Rp 150 rb`, qty: 6 },
+          { matId: 'labor-yard', label: 'Instalasi Kelistrikan', formula: `${hok} HOK elektrik`, qty: hok }
+        ];
+        if (kva > 0) {
+          rows.push({ matId: 'genset-3kva', label: `Genset Marine (${kva} kVA)`, formula: `${Math.ceil(kva/3)} unit genset`, qty: Math.max(1, Math.round(kva / 3)) });
+          rows.push({ matId: 'ac-split', label: 'AC Split Marine Kabin', formula: '1 unit × Rp 6 Jt', qty: 1 });
+        }
+        return rows;
+      }
+      const pks = Math.max(1, gVal('cc-perm-packs', 8));
+      return [
+        { matId: 'doc-survey', label: 'Paket Dokumen, Survei & Kirim', formula: `${pks} paket layanan`, qty: pks },
+        { matId: 'labor-yard', label: 'Tim Uji Apung & BAST', formula: '4 HOK lapangan', qty: 4 }
+      ];
+    }
+
+    function recomputeCustomCardFormula() {
+      const cat = document.getElementById('cc-cat').value;
+      draftCustomBom = generateFormulaBom(cat);
+      renderCustomCardBomPreview();
+    }
+
+    function renderCustomCardBomPreview() {
+      const tbody = document.getElementById('cc-bom-preview-tbody');
+      const totalEl = document.getElementById('cc-total-preview');
+      if (!tbody) return;
+      tbody.innerHTML = draftCustomBom.map((r, i) => {
+        const mat = getMaterialById(r.matId);
+        const unitPrice = r.fixedPrice !== undefined ? r.fixedPrice : (mat ? mat.price : 0);
+        return `
+          <tr>
+            <td class="py-1.5 px-3 font-medium text-zinc-900">${r.label}</td>
+            <td class="py-1.5 px-2 text-[11px] text-zinc-500">${r.formula || '-'}</td>
+            <td class="py-1.5 px-2 text-right">
+              <input type="number" min="0" step="0.1" value="${r.qty}" onchange="draftCustomBom[${i}].qty = Math.max(0, parseFloat(this.value)||0); renderCustomCardBomPreview();"
+                class="w-16 text-right border border-zinc-300 rounded px-1.5 py-0.5 text-xs font-semibold tnum bg-white" />
+              <span class="text-[10px] text-zinc-400 ml-0.5">${mat ? mat.unit : ''}</span>
+            </td>
+            <td class="py-1.5 px-2 text-right tnum text-zinc-600">Rp ${Math.round(unitPrice).toLocaleString('id-ID')}</td>
+            <td class="py-1.5 px-3 text-right font-semibold tnum text-zinc-950">${fmtRpShort(getBomRowSubtotal(r))}</td>
+          </tr>
+        `;
+      }).join('');
+      if (totalEl) totalEl.textContent = fmtRpShort(calcBomTotal(draftCustomBom));
+    }
+
+    function saveCustomCard() {
+      const cat = document.getElementById('cc-cat').value;
+      const rawName = (document.getElementById('cc-name').value || '').trim();
+      const brand = (document.getElementById('cc-brand').value || 'IMI Custom').trim();
+      const sourceMode = document.getElementById('cc-source').value;
+      const checkedClasses = Array.from(document.querySelectorAll('input[name="cc-vc"]:checked')).map(el => el.value);
+      const compat = checkedClasses.length > 0 ? checkedClasses : [activeVesselClass];
+      const cost = calcBomTotal(draftCustomBom);
+      const gVal = (id, fb) => { const el = document.getElementById(id); const v = el ? parseFloat(el.value) : NaN; return isNaN(v) ? fb : v; };
+
+      let name = rawName;
+      let powerLabel = sourceMode === 'make' ? 'In-House BoM' : 'Vendor Custom';
+      let materialOrCycle = 'Custom Spec';
+      let dimensionsOrSpec = `BoM ${draftCustomBom.length} item`;
+      let extraProps = {};
+
+      if (cat === 'hull') {
+        const loa = gVal('cc-loa', 9.2), beam = gVal('cc-beam', 1.5), depth = gVal('cc-depth', 0.85);
+        const matT = (document.getElementById('cc-hull-mat') || {}).value || 'frp';
+        const hasCab = ((document.getElementById('cc-hull-cabin') || {}).value || '0') === '1';
+        const rate = Math.max(0.05, gVal('cc-hull-rate', 2.5));
+        if (!name) name = `Lambung Custom ${loa}m × ${beam}m (${matT.toUpperCase()})`;
+        powerLabel = `LOA ${loa}m × B ${beam}m`;
+        materialOrCycle = matT.toUpperCase() + (hasCab ? ' + Kabin' : ' Open-Deck');
+        dimensionsOrSpec = `H ${depth}m · Output ${rate} u/hr`;
+        extraProps = { prepDays: 25, defaultPrepDays: 25, unitsPerDay: rate, defaultUnitsPerDay: rate, extraDays: 0, defaultExtraDays: 0, hullGrade: 'standard', hasCabin: hasCab };
+      } else if (cat === 'engine') {
+        const cnt = Math.max(1, Math.round(gVal('cc-eng-count', 1)));
+        const pk = Math.max(5, Math.round(gVal('cc-eng-pk', 40)));
+        const cyc = (document.getElementById('cc-eng-cycle') || {}).value || '2t';
+        const lead = Math.max(0, Math.round(gVal('cc-lead', 14)));
+        const totalHp = cnt * pk;
+        if (!name) name = `${cnt}× Mesin Custom ${pk} PK (${cyc.toUpperCase()})`;
+        powerLabel = `${totalHp} HP (${cnt}× ${pk} HP)`;
+        materialOrCycle = cyc.toUpperCase();
+        extraProps = { totalHp, isYamaha15Pk: (totalHp === 15 && brand.toUpperCase().includes('YAMAHA')), extraDays: lead, defaultExtraDays: lead };
+      } else if (cat === 'outfitting') {
+        const vol = Math.max(50, gVal('cc-out-vol', 500));
+        const hasCab = ((document.getElementById('cc-out-cabin') || {}).value || '0') === '1';
+        const lead = Math.max(0, Math.round(gVal('cc-lead', 10)));
+        if (!name) name = `Outfitting / Coolbox ${vol}L (${sourceMode === 'make' ? 'Bikin Sendiri' : 'Vendor'})`;
+        powerLabel = `Palka ${vol}L`;
+        materialOrCycle = sourceMode === 'make' ? 'FRP + PU In-House' : 'Paket Vendor';
+        extraProps = { requiresCabin: hasCab, extraDays: lead, defaultExtraDays: lead };
+      } else if (cat === 'nav_elec') {
+        const kva = Math.max(0, gVal('cc-nav-kva', 0));
+        const lead = Math.max(0, Math.round(gVal('cc-lead', 7)));
+        if (!name) name = kva > 0 ? `Nav + Genset Custom ${kva} kVA` : 'Paket Navigasi DC Custom';
+        powerLabel = kva > 0 ? `AC ${kva} kVA + DC` : '12V/24V DC';
+        extraProps = { requiresCabin: kva > 0, hasHeavyAcOrGenset: kva > 0, extraDays: lead, defaultExtraDays: lead };
+      } else {
+        const bki = ((document.getElementById('cc-perm-bki') || {}).value || '0') === '1';
+        const lead = Math.max(0, Math.round(gVal('cc-lead', 15)));
+        if (!name) name = bki ? 'Paket Klasifikasi BKI Custom' : 'Paket Dokumen & Kirim Custom';
+        powerLabel = bki ? 'BKI/RINA' : 'Hubla / Pas';
+        extraProps = { requiresBkiOrRina: bki, extraDays: lead, defaultExtraDays: lead };
+      }
+
+      const card = {
+        id: 'custom-' + Date.now(),
+        isCustom: true,
+        category: cat,
+        name,
+        compatibleClasses: compat,
+        locked: { brand, powerLabel, materialOrCycle, dimensionsOrSpec },
+        cost,
+        defaultCost: cost,
+        dpSupplierPct: sourceMode === 'make' ? 20 : 30,
+        defaultDpSupplierPct: sourceMode === 'make' ? 20 : 30,
+        sourceMode,
+        defaultSourceMode: sourceMode,
+        payTerm: sourceMode === 'make' ? 'inhouse' : 'dp_deliver',
+        defaultPayTerm: sourceMode === 'make' ? 'inhouse' : 'dp_deliver',
+        bom: draftCustomBom.map(r => ({ ...r })),
+        defaultBom: draftCustomBom.map(r => ({ ...r })),
+        manualCostOverride: false,
+        ...extraProps
+      };
+
+      COMPONENT_CATALOG.unshift(card);
+      const list = loadCustomCardsFromStorage();
+      list.unshift(card);
+      persistCustomCards(list);
+
+      catalogCategoryFilter = cat;
+      selectedCards[cat] = card.id;
+      activePresetId = '';
+      closeCustomCardModal();
+      recalculateAll();
+      showToast(`Kartu custom "${card.name}" disimpan & dipasang.`);
     }
 
     // Preset Dropdown + Save to LocalStorage
@@ -2193,40 +3429,27 @@
         f7Fee = totalFee - (f1Fee + f3Fee + f4Fee + f5Fee + f6Fee);
       }
 
-      // 5. Ontology-Linked Supplier DP & Phase Outflows (Exact Sum === totalCOGS)
-      // Each card's dpSupplierPct directly drives F2 procurement outlay (capped safely so F1..F5 never exceed totalCOGS)
+      // 5. Ontology-Linked Payment Terms & Phase Outflows (Exact Sum === totalCOGS)
       const timeAndAccelTotal = overheadCostTotal + accelCostTotal;
       const spkProcFactor = effSpkCount === 1 ? 1.0 : Math.max(0.28, (1 + (effSpkCount - 1) * 0.12) / effSpkCount);
 
-      const hullDpRate = Math.min(0.6, Math.max(0, hull.dpSupplierPct / 100));
-      const engDpRate = Math.min(0.7, Math.max(0, engine.dpSupplierPct / 100));
-      const outDpRate = Math.min(0.6, Math.max(0, outfitting.dpSupplierPct / 100));
-      const navDpRate = Math.min(0.6, Math.max(0, nav.dpSupplierPct / 100));
-      const permDpRate = Math.min(0.5, Math.max(0, permit.dpSupplierPct / 100));
+      const hCash = allocCategoryCash(costHullTotal, hull, spkProcFactor, true);
+      const eCash = allocCategoryCash(costEngineTotal, engine, spkProcFactor, false);
+      const oCash = allocCategoryCash(outfitting.cost * inp.units, outfitting, spkProcFactor, false);
+      const nCash = allocCategoryCash(nav.cost * inp.units, nav, spkProcFactor, false);
+      const pCash = allocCategoryCash(costPermitTotal, permit, spkProcFactor, false);
 
-      const p1ProdOut = Math.round(costHullTotal * 0.10 + costPermitTotal * (permDpRate * 0.5) + timeAndAccelTotal * 0.10);
-      const rawP2Comp = Math.round(
-        costHullTotal * hullDpRate +
-        costEngineTotal * engDpRate +
-        (outfitting.cost * inp.units) * outDpRate +
-        (nav.cost * inp.units) * navDpRate +
-        timeAndAccelTotal * 0.10
-      );
-      const p2ProdOut = Math.round(rawP2Comp * spkProcFactor);
+      const t1 = Math.round(timeAndAccelTotal * 0.10);
+      const t2 = Math.round(timeAndAccelTotal * 0.10 * spkProcFactor);
+      const tRem = timeAndAccelTotal - t1 - t2;
+      const t3 = Math.round(tRem * 0.25), t4 = Math.round(tRem * 0.25), t5 = Math.round(tRem * 0.25), t6 = tRem - t3 - t4 - t5;
 
-      // Remaining pool per category distributed cleanly across F3, F4, F5, and F6
-      const remHull = costHullTotal - Math.round(costHullTotal * 0.10) - Math.round(costHullTotal * hullDpRate * spkProcFactor);
-      const remEng = costEngineTotal - Math.round(costEngineTotal * engDpRate * spkProcFactor);
-      const remOut = (outfitting.cost * inp.units) - Math.round((outfitting.cost * inp.units) * outDpRate * spkProcFactor);
-      const remNav = (nav.cost * inp.units) - Math.round((nav.cost * inp.units) * navDpRate * spkProcFactor);
-      const remPerm = costPermitTotal - Math.round(costPermitTotal * (permDpRate * 0.5));
-      const remTimeAccel = timeAndAccelTotal - Math.round(timeAndAccelTotal * 0.10) - Math.round(timeAndAccelTotal * 0.10 * spkProcFactor);
-
-      const p3ProdOut = Math.round(remHull * 0.28 + remEng * 0.28 + (remOut + remNav) * 0.30 + remPerm * 0.25 + remTimeAccel * 0.25);
-      const p4ProdOut = Math.round(remHull * 0.28 + remEng * 0.30 + (remOut + remNav) * 0.30 + remPerm * 0.25 + remTimeAccel * 0.25);
-      const p5ProdOut = Math.round(remHull * 0.26 + remEng * 0.28 + (remOut + remNav) * 0.25 + remPerm * 0.25 + remTimeAccel * 0.25);
-      const usedProd = p1ProdOut + p2ProdOut + p3ProdOut + p4ProdOut + p5ProdOut;
-      const p6ProdOut = Math.max(0, totalCOGS - usedProd);
+      const p1ProdOut = hCash[0] + eCash[0] + oCash[0] + nCash[0] + pCash[0] + t1;
+      const p2ProdOut = hCash[1] + eCash[1] + oCash[1] + nCash[1] + pCash[1] + t2;
+      const p3ProdOut = hCash[2] + eCash[2] + oCash[2] + nCash[2] + pCash[2] + t3;
+      const p4ProdOut = hCash[3] + eCash[3] + oCash[3] + nCash[3] + pCash[3] + t4;
+      const p5ProdOut = hCash[4] + eCash[4] + oCash[4] + nCash[4] + pCash[4] + t5;
+      const p6ProdOut = hCash[5] + eCash[5] + oCash[5] + nCash[5] + pCash[5] + t6;
 
       const b1Units = Math.max(1, Math.round(inp.units * 0.25));
       const b2Units = Math.max(1, Math.round(inp.units * 0.25));
@@ -2416,6 +3639,7 @@
     function renderCatalogCards() {
       const anyModified = COMPONENT_CATALOG.some(c =>
         c.cost !== c.defaultCost || c.extraDays !== c.defaultExtraDays || c.dpSupplierPct !== c.defaultDpSupplierPct ||
+        c.sourceMode !== c.defaultSourceMode || c.payTerm !== c.defaultPayTerm || c.manualCostOverride ||
         (c.category === 'hull' && (c.prepDays !== c.defaultPrepDays || c.unitsPerDay !== c.defaultUnitsPerDay))
       );
       document.getElementById('btn-reset-cards').classList.toggle('hidden', !anyModified);
@@ -2459,14 +3683,22 @@
               ${cards.map(card => {
                 const isEquipped = selectedCards[card.category] === card.id;
                 const isCompatible = card.compatibleClasses.includes(activeVesselClass);
-                const leadTxt = card.category === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} u/hr` : (card.extraDays > 0 ? `+${card.extraDays} hr` : '+0 hr');
+                const leadTxt = card.category === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} u/hr` : (card.extraDays > 0 ? `+${card.extraDays} hr` : 'Standar');
+                const bomCount = (card.bom || []).length;
+                const srcTag = card.sourceMode === 'make'
+                  ? '<span class="shrink-0 text-[9px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/80">In-House</span>'
+                  : '<span class="shrink-0 text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600">Vendor</span>';
                 return `
                   <div draggable="true" ondragstart="onCardDragStart(event, '${card.id}')"
                     class="catalog-card p-3 border bg-white ${isEquipped ? 'is-equipped' : 'border-zinc-200 hover:border-zinc-300'} flex flex-col justify-between gap-2">
                     <div>
                       <div class="flex items-start justify-between gap-2">
                         <span class="text-xs font-semibold text-zinc-950 leading-snug">${card.name}</span>
-                        ${!isCompatible ? '<span class="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Tidak Cocok</span>' : ''}
+                        <div class="flex items-center gap-1 shrink-0">
+                          ${card.isCustom ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-brand-100 text-brand-800">Custom</span>' : ''}
+                          ${srcTag}
+                          ${!isCompatible ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Tidak Cocok</span>' : ''}
+                        </div>
                       </div>
                       <div class="mt-1 text-[11px] text-zinc-500 flex items-center gap-1 truncate" title="${card.locked.brand} · ${card.locked.powerLabel} · ${card.locked.materialOrCycle}">
                         <i class="ph-fill ph-lock-simple text-[10px] text-zinc-400 shrink-0"></i>
@@ -2477,12 +3709,12 @@
                     <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
                       <div class="tnum">
                         <div class="text-xs font-bold text-zinc-950">${fmtRpShort(card.cost)}<span class="text-[10px] font-normal text-zinc-400">/u</span></div>
-                        <div class="text-[10px] text-zinc-400">${leadTxt} · DP ${card.dpSupplierPct}%</div>
+                        <div class="text-[10px] text-zinc-400">BoM ${bomCount} item · ${leadTxt}</div>
                       </div>
                       <div class="flex items-center gap-1">
-                        <button type="button" onclick="openInspectorModal('${card.id}')" title="Ubah Harga, Lead Time & DP Supplier"
-                          class="p-1.5 rounded-md text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 text-xs transition">
-                          <i class="ph ph-sliders-horizontal"></i>
+                        <button type="button" onclick="openInspectorModal('${card.id}')" title="Lihat / Edit BoM, Sumber & Spesifikasi"
+                          class="px-2 py-1 rounded-md border border-zinc-200 text-[10px] font-semibold text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50 transition">
+                          BoM
                         </button>
                         ${isEquipped ? `
                           <button type="button" onclick="unequipSlot('${card.category}')" title="Lepas komponen ini dari slot"
@@ -2729,7 +3961,7 @@
                   ${badgeHtml}
                 </div>
                 <div class="text-xs font-bold text-zinc-950 truncate">${card.name}</div>
-                <div class="text-[10px] text-zinc-500 truncate tnum">${card.locked.brand} · ${card.locked.powerLabel} · DP ${card.dpSupplierPct}%</div>
+                <div class="text-[10px] text-zinc-500 truncate tnum">${card.locked.brand} · ${card.sourceMode === 'make' ? 'In-House' : 'Eksternal'} · BoM ${(card.bom || []).length} item</div>
               </div>
             </div>
             <div class="flex items-center gap-2 shrink-0 tnum">
@@ -2739,7 +3971,7 @@
               </div>
               <button type="button" onclick="event.stopPropagation(); openInspectorModal('${card.id}')"
                 class="px-2.5 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition">
-                Ubah
+                BoM
               </button>
               <button type="button" onclick="event.stopPropagation(); unequipSlot('${catId}')" title="Lepas komponen dari slot"
                 class="px-2 py-1 rounded-md border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white text-[11px] font-semibold transition">
@@ -2762,13 +3994,13 @@
             ${badgeHtml}
           </div>
           <div class="text-xs font-bold text-zinc-950 leading-snug line-clamp-2" title="${card.name}">${card.name}</div>
-          <div class="text-[10px] text-zinc-500 truncate tnum">${card.locked.brand} · ${card.locked.powerLabel}</div>
+          <div class="text-[10px] text-zinc-500 truncate tnum">${card.sourceMode === 'make' ? 'In-House' : card.locked.brand} · BoM ${(card.bom || []).length}</div>
           <div class="pt-1.5 border-t border-zinc-100 flex items-center justify-between gap-2 tnum">
             <span class="text-[11px] font-bold text-brand-700">${fmtRpShort(card.cost)}</span>
             <div class="flex items-center gap-2">
               <button type="button" onclick="event.stopPropagation(); openInspectorModal('${card.id}')"
                 class="text-[10px] font-semibold text-zinc-600 hover:text-zinc-950 underline underline-offset-2">
-                Ubah
+                BoM
               </button>
               <button type="button" onclick="event.stopPropagation(); unequipSlot('${catId}')" title="Lepas komponen dari slot"
                 class="text-[10px] font-semibold text-rose-600 hover:text-rose-800">
@@ -3108,22 +4340,67 @@
             <tr onclick="focusSlot('${cat.id}'); switchPage('page-spec')" class="hover:bg-zinc-50 cursor-pointer transition text-zinc-400">
               <td class="py-3 px-4"><div class="text-[10px] text-zinc-400 font-semibold">${cat.code}</div><div class="font-medium italic">Slot Kosong (Belum dipasang)</div></td>
               <td class="py-3 px-3">—</td>
-              <td class="py-3 px-3 text-right tnum">Rp 0</td>
-              <td class="py-3 px-3 text-right tnum">Rp 0</td>
+              <td class="py-3 px-3">—</td>
               <td class="py-3 px-3 text-right tnum">0%</td>
+              <td class="py-3 px-3 text-right tnum">Rp 0</td>
+              <td class="py-3 px-3 text-right tnum">Rp 0</td>
               <td class="py-3 px-4 text-right text-brand-700 font-semibold">+ Pilih di Langkah 1</td>
             </tr>
           `;
         }
-        const leadTxt = cat.id === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} unit/hr` : `+${card.extraDays} hari`;
+        const hasMakeBuy = Boolean(card.altMakeBom && card.altBuyBom);
+        const term = card.payTerm || (card.sourceMode === 'make' ? 'inhouse' : 'dp_deliver');
+        const dpLabel = term === 'cod'
+          ? '<span class="text-rose-700 font-bold">100% Tunai</span>'
+          : (term === 'tempo'
+            ? '<span class="text-emerald-700 font-semibold">0% (Tempo)</span>'
+            : (term === 'inhouse'
+              ? '<span class="text-zinc-600">±20% Bahan</span>'
+              : `<span class="font-semibold">${card.dpSupplierPct}% DP</span>`));
+        const leadTxt = cat.id === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} u/hr` : `+${card.extraDays} hr`;
         return `
-          <tr onclick="openInspectorModal('${card.id}')" class="hover:bg-zinc-50 cursor-pointer transition">
-            <td class="py-3 px-4"><div class="text-[10px] text-zinc-400 font-semibold">${cat.code}</div><div class="font-semibold text-zinc-950">${card.name}</div></td>
-            <td class="py-3 px-3 text-zinc-600"><i class="ph-fill ph-lock-simple text-zinc-400"></i> ${card.locked.brand} · ${card.locked.powerLabel} · ${card.locked.materialOrCycle}</td>
+          <tr class="hover:bg-zinc-50/70 transition">
+            <td class="py-3 px-4">
+              <div class="text-[10px] text-zinc-400 font-semibold">${cat.code} · BoM ${(card.bom || []).length} item · ${leadTxt}</div>
+              <div class="font-semibold text-zinc-950">${card.name}</div>
+            </td>
+            <td class="py-3 px-3">
+              ${hasMakeBuy ? `
+                <div class="inline-flex rounded-md border border-zinc-200 overflow-hidden text-[11px] font-semibold">
+                  <button type="button" onclick="toggleSlotSourceMode('${cat.id}', 'buy')"
+                    class="px-2 py-1 ${card.sourceMode === 'buy' ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-600 hover:bg-zinc-50'}">
+                    Beli Vendor
+                  </button>
+                  <button type="button" onclick="toggleSlotSourceMode('${cat.id}', 'make')"
+                    class="px-2 py-1 ${card.sourceMode === 'make' ? 'bg-emerald-700 text-white' : 'bg-white text-zinc-600 hover:bg-zinc-50'}">
+                    Bikin Sendiri
+                  </button>
+                </div>
+              ` : `
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded ${card.sourceMode === 'make' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-zinc-100 text-zinc-700'}">
+                  ${card.sourceMode === 'make' ? 'In-House Galangan' : 'Beli Vendor / OEM'}
+                </span>
+              `}
+            </td>
+            <td class="py-3 px-3">
+              <select onchange="setSlotPayTerm('${cat.id}', this.value)" class="border border-zinc-300 rounded-md px-2 py-1 text-[11px] font-semibold bg-white text-zinc-800 focus:outline-none focus:border-brand-700">
+                <option value="cod" ${term === 'cod' ? 'selected' : ''}>Bayar Langsung (Tunai/COD)</option>
+                <option value="dp_deliver" ${term === 'dp_deliver' ? 'selected' : ''}>DP % + Lunas Saat Tiba</option>
+                <option value="inhouse" ${term === 'inhouse' ? 'selected' : ''}>Produksi Internal (Bertahap)</option>
+                <option value="tempo" ${term === 'tempo' ? 'selected' : ''}>Tempo / Akhir (BAST)</option>
+              </select>
+            </td>
+            <td class="py-3 px-3 text-right tnum whitespace-nowrap">${dpLabel}</td>
             <td class="py-3 px-3 text-right tnum font-semibold text-zinc-900 whitespace-nowrap">${fmtRpShort(card.cost)}</td>
             <td class="py-3 px-3 text-right tnum font-bold text-brand-700 whitespace-nowrap">${fmtRpShort(card.cost * sim.units)}</td>
-            <td class="py-3 px-3 text-right tnum text-zinc-700 whitespace-nowrap">${card.dpSupplierPct}%</td>
-            <td class="py-3 px-4 text-right tnum text-zinc-700 whitespace-nowrap">${leadTxt}</td>
+            <td class="py-3 px-4 text-right whitespace-nowrap space-x-2">
+              <button type="button" onclick="openProcurementModal('${cat.id}')" class="text-[11px] font-semibold text-brand-700 hover:underline">
+                Syarat &amp; DP
+              </button>
+              <button type="button" onclick="openInspectorModal('${card.id}')" class="text-[11px] font-semibold text-zinc-600 hover:text-zinc-950">
+                BoM
+              </button>
+            </td>
           </tr>
         `;
       }).join('');
