@@ -382,11 +382,15 @@
                 </div>
 
                 <!-- Center Boat Schematic + Character Stats -->
-                <div class="md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center space-y-2.5">
+                <div class="md:col-span-4 order-1 md:order-2 flex flex-col items-center justify-center space-y-2">
                   <div id="vessel-schematic-box" class="w-full rounded-xl bg-white/90 border border-zinc-200/90 p-3 flex flex-col items-center justify-center shadow-sm">
                     <!-- Dynamic SVG Schematic + Hotspots populated by JS -->
                   </div>
-                  <!-- Vessel RPG Stats Strip -->
+                  <!-- 1-Line Principal Dimensions Strip (LOA, LWL, B, H, T, GT) -->
+                  <div id="vessel-dim-strip" class="w-full text-center text-[10px] font-semibold text-zinc-600 bg-white border border-zinc-200 rounded-lg px-2 py-1 tnum truncate">
+                    <!-- Populated by JS -->
+                  </div>
+                  <!-- Vessel RPG Stats Strip (Armor Ply, Propulsion, Production Rate, HPP) -->
                   <div id="vessel-stats-grid" class="w-full grid grid-cols-2 gap-1.5 text-[11px] tnum">
                     <!-- Populated by JS -->
                   </div>
@@ -490,9 +494,10 @@
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
               <span class="text-xs font-medium text-zinc-400 pl-2 shrink-0">unit</span>
             </div>
-            <div class="flex items-center gap-1.5 pt-0.5">
+            <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
               <button type="button" onclick="setInputVal('ctrl-units', 1)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">1</button>
               <button type="button" onclick="setInputVal('ctrl-units', 100)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">100</button>
+              <button type="button" onclick="setInputVal('ctrl-units', 200)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">200</button>
               <button type="button" onclick="setInputVal('ctrl-units', 500)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">500</button>
               <button type="button" onclick="setInputVal('ctrl-units', 1000)" class="chip-btn text-[11px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 tnum">1.000</button>
             </div>
@@ -565,12 +570,69 @@
           </div>
         </div>
 
-        <div class="px-4 sm:px-5 py-2.5 bg-zinc-50 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+        <!-- Row 2 on Page 2: Direct Contract, SPK, Fee Base, Bunga Talangan & Gov Delay Controls -->
+        <div class="px-4 sm:px-5 py-3.5 bg-zinc-50/80 border-t border-zinc-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-center">
+          <div class="lg:col-span-3 space-y-1">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-semibold text-zinc-700">Pemecahan Kontrak SPK</span>
+              <span id="lbl-spk-units-p1" class="text-zinc-500 tnum">1 SPK</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1 p-0.5 rounded-lg bg-zinc-200/70">
+              <button type="button" id="spk-p1-1" onclick="setSpkCount(1)" class="seg-btn active text-[11px] py-1 text-zinc-600 tnum">1 SPK</button>
+              <button type="button" id="spk-p1-2" onclick="setSpkCount(2)" class="seg-btn text-[11px] py-1 text-zinc-600 tnum">2 SPK</button>
+              <button type="button" id="spk-p1-4" onclick="setSpkCount(4)" class="seg-btn text-[11px] py-1 text-zinc-600 tnum">4 SPK</button>
+              <button type="button" id="spk-p1-5" onclick="setSpkCount(5)" class="seg-btn text-[11px] py-1 text-zinc-600 tnum">5 SPK</button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-3 space-y-1">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-semibold text-zinc-700">Dasar Hitung Fee</span>
+              <span id="lbl-fee-base-delta-p1" class="text-brand-700 font-medium tnum"></span>
+            </div>
+            <div class="grid grid-cols-2 gap-1 p-0.5 rounded-lg bg-zinc-200/70">
+              <button type="button" id="fbase-p1-netto" onclick="setFeeBase('netto')" class="seg-btn active text-[11px] py-1 text-zinc-600 truncate">Netto (DPP)</button>
+              <button type="button" id="fbase-p1-bruto" onclick="setFeeBase('bruto')" class="seg-btn text-[11px] py-1 text-zinc-600 truncate">Bruto (+PPN 11%)</button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 space-y-1">
+            <label for="ctrl-coc" class="block text-[11px] font-semibold text-zinc-700">Bunga Talangan (/thn)</label>
+            <div class="input-shell flex items-center px-2.5 py-1 bg-white">
+              <input id="ctrl-coc" type="number" min="0" max="36" step="0.5" value="14"
+                oninput="syncSharedInput('coc', this.value)"
+                class="w-full text-xs font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">%</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 space-y-1">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="font-semibold text-zinc-700">Jeda Cair SP2D</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1 p-0.5 rounded-lg bg-zinc-200/70">
+              <button type="button" id="delay-p1-0" onclick="setDelayDays(0)" class="seg-btn active text-[11px] py-1 text-zinc-600 tnum">0 hr</button>
+              <button type="button" id="delay-p1-15" onclick="setDelayDays(15)" class="seg-btn text-[11px] py-1 text-zinc-600 tnum">+15</button>
+              <button type="button" id="delay-p1-30" onclick="setDelayDays(30)" class="seg-btn text-[11px] py-1 text-zinc-600 tnum">+30</button>
+              <button type="button" id="delay-p1-45" onclick="setDelayDays(45)" class="seg-btn text-[11px] py-1 text-zinc-600 tnum">+45</button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 space-y-1">
+            <label for="ctrl-wapu" title="Potongan pajak bendahara (PPh 22 1,5%) & provisi jaminan bank (~1%)" class="block text-[11px] font-semibold text-zinc-700">PPh 22 &amp; Bank Garansi</label>
+            <div class="input-shell flex items-center px-2.5 py-1 bg-white">
+              <input id="ctrl-wapu" type="number" min="0" max="15" step="0.5" value="2.5"
+                oninput="syncSharedInput('wapu', this.value)"
+                class="w-full text-xs font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-4 sm:px-5 py-2 bg-zinc-100/70 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-2 text-[11px]">
           <div id="p1-assumption-pill" class="text-zinc-600 tnum"></div>
           <div class="flex items-center gap-3 shrink-0">
-            <button type="button" onclick="switchPage('page-2')" class="font-semibold text-brand-700 hover:text-brand-800">Overhead &amp; Kapasitas →</button>
-            <span class="text-zinc-300">|</span>
-            <button type="button" onclick="switchPage('page-3')" class="font-semibold text-brand-700 hover:text-brand-800">SPK, PPh 22 &amp; Telat Cair →</button>
+            <button type="button" onclick="switchPage('page-2')" class="font-semibold text-brand-700 hover:text-brand-800">Atur Overhead, Kapasitas Lini &amp; Skema Bayar Vendor →</button>
           </div>
         </div>
       </section>
@@ -696,7 +758,7 @@
             <p class="text-[11px] text-zinc-500">Sewa slipway, listrik, keamanan &amp; tim tetap per hari kalender.</p>
           </div>
 
-          <div class="md:col-span-5 space-y-1.5">
+          <div class="md:col-span-4 space-y-1.5">
             <label class="block text-xs font-semibold text-zinc-700">Kapasitas Lini Galangan</label>
             <div class="grid grid-cols-3 gap-1.5 p-1 rounded-lg bg-zinc-200/70">
               <button type="button" id="cap-1" onclick="setCapacity(1)" class="seg-btn active text-xs py-2 px-2 text-zinc-700 tnum">1× Standar</button>
@@ -706,8 +768,8 @@
             <p id="capacity-note" class="text-[11px] text-zinc-500 tnum"></p>
           </div>
 
-          <div class="md:col-span-4 space-y-1.5">
-            <label for="ctrl-accel-cost" class="block text-xs font-semibold text-zinc-700">Biaya Akselerasi Lini (Mould / Lembur / Subkon)</label>
+          <div class="md:col-span-3 space-y-1.5">
+            <label for="ctrl-accel-cost" class="block text-xs font-semibold text-zinc-700">Biaya Akselerasi Lini</label>
             <div class="input-shell flex items-center px-3 py-2 bg-white">
               <span class="text-xs text-zinc-400 pr-1.5">Rp</span>
               <input id="ctrl-accel-cost" type="number" min="0" max="100" step="0.5" value="0"
@@ -715,7 +777,18 @@
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
               <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">Jt / unit</span>
             </div>
-            <p class="text-[11px] text-zinc-500">Default 0 Jt (1×), 2,5 Jt (1,5×), 5,5 Jt (2×) — bebas diedit.</p>
+            <p class="text-[11px] text-zinc-500">Default 0 Jt (1×), 2,5 Jt (1,5×), 5,5 Jt (2×).</p>
+          </div>
+
+          <div class="md:col-span-2 space-y-1.5">
+            <label for="ctrl-coc-p2" class="block text-xs font-semibold text-zinc-700">Bunga Talangan</label>
+            <div class="input-shell flex items-center px-3 py-2 bg-white">
+              <input id="ctrl-coc-p2" type="number" min="0" max="36" step="0.5" value="14"
+                oninput="syncSharedInput('coc', this.value)"
+                class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-xs font-medium text-zinc-400 pl-1 shrink-0">%/thn</span>
+            </div>
+            <p class="text-[11px] text-zinc-500">Basis bunga defisit kas.</p>
           </div>
         </div>
         <div id="cogs-breakdown-strip" class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 bg-white"></div>
@@ -818,10 +891,10 @@
         </div>
 
         <div class="lg:col-span-2 space-y-1">
-          <label for="ctrl-wapu" title="Potongan pajak bendahara (PPh 22 1,5%) & provisi jaminan bank (~1%)" class="block text-[11px] font-semibold text-zinc-700">PPh 22 &amp; Bank Garansi</label>
+          <label for="ctrl-wapu-p3" title="Potongan pajak bendahara (PPh 22 1,5%) & provisi jaminan bank (~1%)" class="block text-[11px] font-semibold text-zinc-700">PPh 22 &amp; Bank Garansi</label>
           <div class="input-shell flex items-center px-2.5 py-1.5 bg-white">
-            <input id="ctrl-wapu" type="number" min="0" max="15" step="0.5" value="2.5"
-              oninput="recalculateAll()"
+            <input id="ctrl-wapu-p3" type="number" min="0" max="15" step="0.5" value="2.5"
+              oninput="syncSharedInput('wapu', this.value)"
               class="w-full text-xs font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
             <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">%</span>
           </div>
@@ -840,10 +913,10 @@
         </div>
 
         <div class="lg:col-span-2 space-y-1">
-          <label for="ctrl-coc" class="block text-[11px] font-semibold text-zinc-700">Bunga Modal (/tahun)</label>
+          <label for="ctrl-coc-p3" class="block text-[11px] font-semibold text-zinc-700">Bunga Modal (/tahun)</label>
           <div class="input-shell flex items-center px-2.5 py-1.5 bg-white">
-            <input id="ctrl-coc" type="number" min="0" max="36" step="0.5" value="14"
-              oninput="recalculateAll()"
+            <input id="ctrl-coc-p3" type="number" min="0" max="36" step="0.5" value="14"
+              oninput="syncSharedInput('coc', this.value)"
               class="w-full text-xs font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
             <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">%</span>
           </div>
@@ -938,6 +1011,8 @@
           <div id="insp-locked-grid" class="grid grid-cols-2 gap-2.5 text-xs">
             <!-- Populated by JS -->
           </div>
+          <!-- Naval Architect Dimensions & Laminate Ply Schedule (Populated for Hull cards) -->
+          <div id="insp-naval-arch-box" class="hidden pt-2 border-t border-zinc-200/80 space-y-2 text-xs"></div>
         </div>
 
         <!-- Make vs Buy Toggle (Shown when component supports in-house fabrication e.g. Coolbox/Outfitting/Hull) -->
@@ -1295,83 +1370,91 @@
     ];
 
     const COMPONENT_CATALOG = [
-      // HULLS (WBS I)
+      // HULLS (WBS I + IV Production Operator)
       {
-        id: 'hull-3gt-frp', category: 'hull', name: 'Open-Hull 3 GT Full FRP + Kayu 6×8',
+        id: 'hull-3gt-frp', category: 'hull', name: 'Hull 3 GT Standar Budget Plan (FRP + Frame Kayu & Alu)',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'IMI Custom', powerLabel: 'LOA 9,2m × B 1,2m', materialOrCycle: 'FRP Hand Lay-Up', dimensionsOrSpec: 'Open-Deck · H 0,75m · T 0,4m' },
-        cost: 36500000, defaultCost: 36500000, prepDays: 20, defaultPrepDays: 20, unitsPerDay: 10.0, defaultUnitsPerDay: 10.0, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
-        hullGrade: 'economy', hasCabin: false
+        locked: { brand: 'IMI Budget Plan', powerLabel: 'LOA 9,20m × B 1,20m', materialOrCycle: 'FRP 7/6/5 Ply + Frame Kayu/Alu', dimensionsOrSpec: 'LWL 8,70m · H 0,75m · T 0,40m · Frame 1.000mm' },
+        navalSpecs: { loa: 9.20, lwl: 8.70, beam: 1.20, height: 0.75, draft: 0.40, gt: 3, keelPly: 7, bottomPly: 6, sidePly: 5, deckPly: 5, framePly: 3, frameSpaceMm: 1000, mouldUnitRp: 394680, operatorRp: 3500000 },
+        cost: 19671480, defaultCost: 19671480, prepDays: 20, defaultPrepDays: 20, unitsPerDay: 10.0, defaultUnitsPerDay: 10.0, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        hullGrade: 'standard', hasCabin: false
       },
       {
-        id: 'hull-3gt-hybrid', category: 'hull', name: 'Open-Hull 3 GT Hybrid Fiber-Aluminium',
+        id: 'hull-3gt-hybrid', category: 'hull', name: 'Open-Hull 3 GT Reinforced Hybrid + Antifouling',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'IMI Custom', powerLabel: 'LOA 9,2m × B 1,2m', materialOrCycle: 'FRP + Transom/Rib Alu', dimensionsOrSpec: 'Open-Deck · Kayu 6×8 + AF Coat' },
-        cost: 58500000, defaultCost: 58500000, prepDays: 30, defaultPrepDays: 30, unitsPerDay: 7.5, defaultUnitsPerDay: 7.5, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        locked: { brand: 'IMI Custom', powerLabel: 'LOA 9,20m × B 1,20m', materialOrCycle: 'FRP 8/7/6 Ply + Rib Alu + AF', dimensionsOrSpec: 'LWL 8,70m · H 0,75m · T 0,40m · Frame 800mm' },
+        navalSpecs: { loa: 9.20, lwl: 8.70, beam: 1.20, height: 0.75, draft: 0.40, gt: 3, keelPly: 8, bottomPly: 7, sidePly: 6, deckPly: 6, framePly: 4, frameSpaceMm: 800, mouldUnitRp: 550000, operatorRp: 4500000 },
+        cost: 28500000, defaultCost: 28500000, prepDays: 28, defaultPrepDays: 28, unitsPerDay: 7.5, defaultUnitsPerDay: 7.5, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
         hullGrade: 'standard', hasCabin: false
       },
       {
         id: 'hull-3gt-alu', category: 'hull', name: 'Open-Hull 3 GT Heavy Alu-Composite 5083',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'IMI Marine Alu', powerLabel: 'LOA 9,2m × B 1,2m', materialOrCycle: 'Marine Alu 5083 + FRP', dimensionsOrSpec: 'Anti-Slip Deck · 3-Layer Coat' },
-        cost: 88000000, defaultCost: 88000000, prepDays: 40, defaultPrepDays: 40, unitsPerDay: 5.5, defaultUnitsPerDay: 5.5, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        locked: { brand: 'IMI Marine Alu', powerLabel: 'LOA 9,20m × B 1,20m', materialOrCycle: 'Marine Alu 5083 + FRP 9/8/6 Ply', dimensionsOrSpec: 'LWL 8,70m · H 0,75m · T 0,42m · Frame 600mm' },
+        navalSpecs: { loa: 9.20, lwl: 8.70, beam: 1.20, height: 0.75, draft: 0.42, gt: 3, keelPly: 9, bottomPly: 8, sidePly: 6, deckPly: 6, framePly: 5, frameSpaceMm: 600, mouldUnitRp: 850000, operatorRp: 6500000 },
+        cost: 48000000, defaultCost: 48000000, prepDays: 35, defaultPrepDays: 35, unitsPerDay: 5.5, defaultUnitsPerDay: 5.5, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
         hullGrade: 'heavy', hasCabin: false
       },
       {
         id: 'hull-patrol-85', category: 'hull', name: 'Patrol Deep-V FRP 8,5m (8 Pax)',
         compatibleClasses: ['patrol-fast'],
-        locked: { brand: 'IMI GA001', powerLabel: 'LOA 8,5m × B 2,5m', materialOrCycle: 'FRP Deep-V + Cabin', dimensionsOrSpec: 'Superstructure Kabin · Draft 0,4m' },
+        locked: { brand: 'IMI GA001', powerLabel: 'LOA 8,50m × B 2,50m', materialOrCycle: 'FRP Deep-V 10/8/7 Ply + Cabin', dimensionsOrSpec: 'LWL 7,80m · H 1,45m · T 0,40m · 6 GT' },
+        navalSpecs: { loa: 8.50, lwl: 7.80, beam: 2.50, height: 1.45, draft: 0.40, gt: 6, keelPly: 10, bottomPly: 8, sidePly: 7, deckPly: 6, framePly: 5, frameSpaceMm: 600, mouldUnitRp: 4500000, operatorRp: 40000000 },
         cost: 315000000, defaultCost: 315000000, prepDays: 25, defaultPrepDays: 25, unitsPerDay: 0.25, defaultUnitsPerDay: 0.25, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
         hullGrade: 'standard', hasCabin: true
       },
       {
         id: 'hull-patrol-100', category: 'hull', name: 'Patrol High-Speed ALS 10,0m',
         compatibleClasses: ['patrol-fast'],
-        locked: { brand: 'IMI ALS-10', powerLabel: 'LOA 10,0m × B 2,6m', materialOrCycle: 'Heavy FRP Deep-V', dimensionsOrSpec: 'Cabin Wheelhouse · Draft 0,5m' },
+        locked: { brand: 'IMI ALS-10', powerLabel: 'LOA 10,00m × B 2,60m', materialOrCycle: 'Heavy FRP 11/9/7 Ply + Wheelhouse', dimensionsOrSpec: 'LWL 9,15m · H 1,55m · T 0,50m · 8 GT' },
+        navalSpecs: { loa: 10.00, lwl: 9.15, beam: 2.60, height: 1.55, draft: 0.50, gt: 8, keelPly: 11, bottomPly: 9, sidePly: 7, deckPly: 7, framePly: 5, frameSpaceMm: 500, mouldUnitRp: 6000000, operatorRp: 43750000 },
         cost: 375000000, defaultCost: 375000000, prepDays: 30, defaultPrepDays: 30, unitsPerDay: 0.20, defaultUnitsPerDay: 0.20, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
         hullGrade: 'heavy', hasCabin: true
       },
       {
         id: 'hull-crew-130', category: 'hull', name: 'Crew Boat Step-Hull FRP 13,0m',
         compatibleClasses: ['crew-workboat'],
-        locked: { brand: 'IMI Qtt #004', powerLabel: 'LOA 13,0m × B 3,1m', materialOrCycle: 'FRP Step-Hull + Kabin', dimensionsOrSpec: '13 Pax Cabin + Toilet · Draft 0,65m' },
+        locked: { brand: 'IMI Qtt #004', powerLabel: 'LOA 13,00m × B 3,10m', materialOrCycle: 'FRP Step-Hull 12/10/8 Ply + Kabin', dimensionsOrSpec: 'LWL 11,80m · H 1,75m · T 0,65m · 14 GT' },
+        navalSpecs: { loa: 13.00, lwl: 11.80, beam: 3.10, height: 1.75, draft: 0.65, gt: 14, keelPly: 12, bottomPly: 10, sidePly: 8, deckPly: 8, framePly: 6, frameSpaceMm: 500, mouldUnitRp: 8500000, operatorRp: 51250000 },
         cost: 495000000, defaultCost: 495000000, prepDays: 35, defaultPrepDays: 35, unitsPerDay: 0.15, defaultUnitsPerDay: 0.15, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
         hullGrade: 'heavy', hasCabin: true
       },
       {
         id: 'hull-pass-125', category: 'hull', name: 'VAJRA Commuter FRP 12,5m (16 Pax)',
         compatibleClasses: ['passenger-ferry', 'crew-workboat'],
-        locked: { brand: 'IMI VAJRA-04C', powerLabel: 'LOA 12,5m × B 3,0m', materialOrCycle: 'FRP Single-Deck', dimensionsOrSpec: '16 Pax Commuter Cabin · Draft 0,55m' },
+        locked: { brand: 'IMI VAJRA-04C', powerLabel: 'LOA 12,50m × B 3,00m', materialOrCycle: 'FRP Single-Deck 12/10/8 Ply', dimensionsOrSpec: 'LWL 11,40m · H 1,70m · T 0,55m · 13 GT' },
+        navalSpecs: { loa: 12.50, lwl: 11.40, beam: 3.00, height: 1.70, draft: 0.55, gt: 13, keelPly: 12, bottomPly: 10, sidePly: 8, deckPly: 7, framePly: 6, frameSpaceMm: 500, mouldUnitRp: 8000000, operatorRp: 50000000 },
         cost: 465000000, defaultCost: 465000000, prepDays: 35, defaultPrepDays: 35, unitsPerDay: 0.16, defaultUnitsPerDay: 0.16, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
         hullGrade: 'heavy', hasCabin: true
       },
       {
         id: 'hull-pass-165', category: 'hull', name: 'Passenger Flybridge FRP 16,5m (20 Pax)',
         compatibleClasses: ['passenger-ferry'],
-        locked: { brand: 'IMI Qtt #005', powerLabel: 'LOA 16,5m × B 3,8m', materialOrCycle: 'FRP Double-Deck Flybridge', dimensionsOrSpec: '20 Pax + Upper Deck · Draft 0,75m' },
+        locked: { brand: 'IMI Qtt #005', powerLabel: 'LOA 16,50m × B 3,80m', materialOrCycle: 'FRP Flybridge 14/12/9 Ply', dimensionsOrSpec: 'LWL 15,10m · H 2,15m · T 0,75m · 24 GT' },
+        navalSpecs: { loa: 16.50, lwl: 15.10, beam: 3.80, height: 2.15, draft: 0.75, gt: 24, keelPly: 14, bottomPly: 12, sidePly: 9, deckPly: 9, framePly: 7, frameSpaceMm: 500, mouldUnitRp: 12500000, operatorRp: 60000000 },
         cost: 760000000, defaultCost: 760000000, prepDays: 45, defaultPrepDays: 45, unitsPerDay: 0.10, defaultUnitsPerDay: 0.10, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
         hullGrade: 'heavy', hasCabin: true
       },
 
       // ENGINES (WBS III)
       {
-        id: 'eng-yamaha-15-fleet', category: 'engine', name: 'Yamaha 15 PK 2-Tak Fleet (E15DMHS)',
+        id: 'eng-yamaha-15-fleet', category: 'engine', name: 'Yamaha OBM E15DMHL 15 HP 2-Tak + 2× Aki 40AH (Budget Plan)',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'YAMAHA', powerLabel: '15 PK (1× 15 HP)', materialOrCycle: '2-Tak Bulk Fleet', dimensionsOrSpec: 'Tangki 24L · Rigging Standar' },
-        cost: 30500000, defaultCost: 30500000, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        locked: { brand: 'YAMAHA + GS Astra', powerLabel: '15 HP (1× 15 PK)', materialOrCycle: '2-Tak E15DMHL + Fuel Tank', dimensionsOrSpec: 'Mesin Rp 31,9 Jt + 2× Battery 40 AH Rp 2,2 Jt' },
+        cost: 34100000, defaultCost: 34100000, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
         totalHp: 15, isYamaha15Pk: true
       },
       {
-        id: 'eng-yamaha-15-dealer', category: 'engine', name: 'Yamaha 15 PK 2-Tak Dealer + Kit (15FMHS)',
+        id: 'eng-yamaha-15-dealer', category: 'engine', name: 'Yamaha 15 PK 2-Tak + 2× Aki 40AH + Filter Racor',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'YAMAHA', powerLabel: '15 PK (1× 15 HP)', materialOrCycle: '2-Tak Dealer Resmi', dimensionsOrSpec: 'Tangki 24L + Filter Racor + Sparekit' },
-        cost: 35000000, defaultCost: 35000000, extraDays: 10, defaultExtraDays: 10, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        locked: { brand: 'YAMAHA Resmi', powerLabel: '15 HP (1× 15 PK)', materialOrCycle: '2-Tak + Water Separator', dimensionsOrSpec: 'Tangki 24L + 2× Aki 40AH + Filter Racor + Sparekit' },
+        cost: 35600000, defaultCost: 35600000, extraDays: 10, defaultExtraDays: 10, dpSupplierPct: 30, defaultDpSupplierPct: 30,
         totalHp: 15, isYamaha15Pk: true
       },
       {
-        id: 'eng-yamaha-15-4t', category: 'engine', name: 'Yamaha 15 PK 4-Tak Low Emission (F15CMH)',
+        id: 'eng-yamaha-15-4t', category: 'engine', name: 'Yamaha 15 PK 4-Tak Low Emission (F15CMH) + 2× Aki',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'YAMAHA', powerLabel: '15 PK (1× 15 HP)', materialOrCycle: '4-Tak EFI / Low Emission', dimensionsOrSpec: 'Tangki 24L + Racor + Garansi Ekstra' },
+        locked: { brand: 'YAMAHA', powerLabel: '15 HP (1× 15 PK)', materialOrCycle: '4-Tak EFI / Low Emission', dimensionsOrSpec: 'Tangki 24L + 2× Aki + Racor + Garansi Ekstra' },
         cost: 46500000, defaultCost: 46500000, extraDays: 25, defaultExtraDays: 25, dpSupplierPct: 35, defaultDpSupplierPct: 35,
         totalHp: 15, isYamaha15Pk: true
       },
@@ -1406,24 +1489,24 @@
 
       // OUTFITTING (WBS II, IV, V)
       {
-        id: 'out-3gt-basic', category: 'outfitting', name: 'Outfitting Minimal Nelayan (Coolbox + Kayu)',
+        id: 'out-3gt-basic', category: 'outfitting', name: 'Body & Accommodation Eq. (Bolder FRP, Sticker, Gelcoat)',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'IMI Std', powerLabel: 'Open-Deck Basic', materialOrCycle: 'Coolbox + Papan Kayu', dimensionsOrSpec: 'Jangkar 7kg + Tali 50m + Fender Dasar' },
-        cost: 5500000, defaultCost: 5500000, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 20, defaultDpSupplierPct: 20,
+        locked: { brand: 'IMI Budget Plan', powerLabel: 'Standar Bodi & Cat', materialOrCycle: 'Bolder FRP + Gelcoat Marine', dimensionsOrSpec: 'Bolder Rp 250rb + 2× Sticker Rp 400rb + Cat Rp 1 Jt' },
+        cost: 1650000, defaultCost: 1650000, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 20, defaultDpSupplierPct: 20,
         requiresCabin: false
       },
       {
-        id: 'out-3gt-kkp', category: 'outfitting', name: 'Outfitting Standard KKP (Palka PU 300L)',
+        id: 'out-3gt-kkp', category: 'outfitting', name: 'Outfitting KKP + Coolbox Palka PU 300L + Tambat',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'IMI KKP-Spec', powerLabel: 'Palka Insulasi PU', materialOrCycle: 'FRP + Karet + Cleat SS', dimensionsOrSpec: 'Palka 300L + Pompa Bilga + Jangkar 10kg' },
-        cost: 13500000, defaultCost: 13500000, extraDays: 12, defaultExtraDays: 12, dpSupplierPct: 20, defaultDpSupplierPct: 20,
+        locked: { brand: 'IMI KKP-Spec', powerLabel: 'Palka Insulasi PU 300L', materialOrCycle: 'Bolder + Cat + Coolbox + Tambat', dimensionsOrSpec: 'Palka 300L + Pompa Bilga + Jangkar + Tali 50m' },
+        cost: 13500000, defaultCost: 13500000, extraDays: 10, defaultExtraDays: 10, dpSupplierPct: 20, defaultDpSupplierPct: 20,
         requiresCabin: false
       },
       {
-        id: 'out-3gt-ss316', category: 'outfitting', name: 'Outfitting Heavy-Duty SS316 + Kanopi',
+        id: 'out-3gt-ss316', category: 'outfitting', name: 'Outfitting Heavy-Duty 2× Palka + SS316 + Kanopi',
         compatibleClasses: ['fishing-3gt'],
         locked: { brand: 'IMI Heavy', powerLabel: '2× Palka + Kanopi', materialOrCycle: 'SS316 + Alu D-Fender', dimensionsOrSpec: 'Bilga Otomatis 12V + Loker Kedap + Railing' },
-        cost: 24500000, defaultCost: 24500000, extraDays: 22, defaultExtraDays: 22, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        cost: 24500000, defaultCost: 24500000, extraDays: 20, defaultExtraDays: 20, dpSupplierPct: 25, defaultDpSupplierPct: 25,
         requiresCabin: false
       },
       {
@@ -1450,6 +1533,13 @@
 
       // NAVIGATION, ELECTRICAL & SAFETY (WBS VI-VIII)
       {
+        id: 'nav-3gt-budget', category: 'nav_elec', name: 'Standar Budget Plan (DC 2× Aki 40AH Included di Mesin)',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'Budget Plan Std', powerLabel: 'DC 2× 40 AH Included', materialOrCycle: 'Starter & Aki Terintegrasi', dimensionsOrSpec: 'Tanpa tambahan perangkat navigasi eksternal' },
+        cost: 0, defaultCost: 0, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 0, defaultDpSupplierPct: 0,
+        requiresCabin: false, hasHeavyAcOrGenset: false
+      },
+      {
         id: 'nav-3gt-basic', category: 'nav_elec', name: 'Safety Dasar SOLAS + Kompas Saku',
         compatibleClasses: ['fishing-3gt'],
         locked: { brand: 'SOLAS Std', powerLabel: 'Non-Electric / Senter', materialOrCycle: '2× Life Jacket + Ring', dimensionsOrSpec: 'Kompas Saku + P3K Dasar' },
@@ -1457,9 +1547,9 @@
         requiresCabin: false, hasHeavyAcOrGenset: false
       },
       {
-        id: 'nav-3gt-ff', category: 'nav_elec', name: 'DC 12V + Lampu Nav LED + Fishfinder 4"',
+        id: 'nav-3gt-ff', category: 'nav_elec', name: 'DC 12V + Lampu Nav LED + Fishfinder 4" + SOLAS',
         compatibleClasses: ['fishing-3gt'],
-        locked: { brand: 'Marine DC', powerLabel: '12V Aki + Fishfinder', materialOrCycle: 'LED Nav + Panel Switch', dimensionsOrSpec: '3× Life Jacket + Life Buoy + APAR 1kg' },
+        locked: { brand: 'Marine DC', powerLabel: '12V Panel + Fishfinder', materialOrCycle: 'LED Nav + Panel Switch', dimensionsOrSpec: '3× Life Jacket + Life Buoy + APAR 1kg' },
         cost: 9500000, defaultCost: 9500000, extraDays: 8, defaultExtraDays: 8, dpSupplierPct: 20, defaultDpSupplierPct: 20,
         requiresCabin: false, hasHeavyAcOrGenset: false
       },
@@ -1487,7 +1577,14 @@
 
       // PERMIT, QC & DELIVERY (WBS IX-X)
       {
-        id: 'perm-3gt-exyard', category: 'permit_delivery', name: 'Ex-Yard + Uji Apung + Pas Kecil Kolektif',
+        id: 'perm-3gt-exyard', category: 'permit_delivery', name: 'Trial & Handover Budget Plan (Builder Cert + Engine Trial)',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'IMI Handover', powerLabel: 'Ex-Yard Galangan', materialOrCycle: 'Builder Cert + Engine Trial', dimensionsOrSpec: 'Builder Cert Rp 300rb + Engine Trial Rp 100rb (Excl. Ongkir)' },
+        cost: 400000, defaultCost: 400000, extraDays: 5, defaultExtraDays: 5, dpSupplierPct: 0, defaultDpSupplierPct: 0,
+        requiresBkiOrRina: false
+      },
+      {
+        id: 'perm-3gt-paskecil', category: 'permit_delivery', name: 'Ex-Yard + Uji Apung + Pas Kecil Kolektif',
         compatibleClasses: ['fishing-3gt'],
         locked: { brand: 'Hubla Pas Kecil', powerLabel: 'Serah Terima Galangan', materialOrCycle: 'Uji Apung Sampling', dimensionsOrSpec: 'Pas Kecil + Surat Ukur + BAST Galangan' },
         cost: 4200000, defaultCost: 4200000, extraDays: 10, defaultExtraDays: 10, dpSupplierPct: 10, defaultDpSupplierPct: 10,
@@ -1519,19 +1616,19 @@
     const PREDEFINED_PRESETS = [
       {
         id: 'preset-3gt-1', group: 'Kapal Ikan 3 GT (Proyek 1.000 Unit)',
-        name: '3 GT · Skenario 1 (Termurah — Full FRP)',
+        name: '3 GT · Skenario 1 (Acuan Budget Plan Resmi — Rp 55,82 Jt Ex-Yard)',
         vesselClass: 'fishing-3gt', units: 1000,
-        cards: { hull: 'hull-3gt-frp', engine: 'eng-yamaha-15-fleet', outfitting: 'out-3gt-basic', nav_elec: 'nav-3gt-basic', permit_delivery: 'perm-3gt-exyard' }
+        cards: { hull: 'hull-3gt-frp', engine: 'eng-yamaha-15-fleet', outfitting: 'out-3gt-basic', nav_elec: 'nav-3gt-budget', permit_delivery: 'perm-3gt-exyard' }
       },
       {
         id: 'preset-3gt-2', group: 'Kapal Ikan 3 GT (Proyek 1.000 Unit)',
-        name: '3 GT · Skenario 2 (Sedang — Hybrid Fiber-Alu)',
+        name: '3 GT · Skenario 2 (Turnkey KKP + Palka 300L + Nav + Kirim)',
         vesselClass: 'fishing-3gt', units: 1000,
         cards: { hull: 'hull-3gt-hybrid', engine: 'eng-yamaha-15-dealer', outfitting: 'out-3gt-kkp', nav_elec: 'nav-3gt-ff', permit_delivery: 'perm-3gt-reg' }
       },
       {
         id: 'preset-3gt-3', group: 'Kapal Ikan 3 GT (Proyek 1.000 Unit)',
-        name: '3 GT · Skenario 3 (Termahal — Heavy Alu 5083 + BKI)',
+        name: '3 GT · Skenario 3 (Heavy Alu-FRP 5083 + 4-Tak + Garmin + BKI)',
         vesselClass: 'fishing-3gt', units: 1000,
         cards: { hull: 'hull-3gt-alu', engine: 'eng-yamaha-15-4t', outfitting: 'out-3gt-ss316', nav_elec: 'nav-3gt-garmin', permit_delivery: 'perm-3gt-bki' }
       },
@@ -1613,19 +1710,19 @@
 
     let MATERIAL_DB = DEFAULT_MATERIALS.map(m => ({ ...m }));
 
-    // Active Application State
+    // Active Application State (Default: 3 GT Official Budget Plan Rp 55.821.480 Ex-Yard)
     let currentPage = 'page-spec';
     let activeVesselClass = 'fishing-3gt';
     let selectedCards = {
-      hull: 'hull-3gt-hybrid',
-      engine: 'eng-yamaha-15-dealer',
-      outfitting: 'out-3gt-kkp',
-      nav_elec: 'nav-3gt-ff',
-      permit_delivery: 'perm-3gt-reg'
+      hull: 'hull-3gt-frp',
+      engine: 'eng-yamaha-15-fleet',
+      outfitting: 'out-3gt-basic',
+      nav_elec: 'nav-3gt-budget',
+      permit_delivery: 'perm-3gt-exyard'
     };
     let catalogCategoryFilter = 'hull'; // 'all' | WBS category
     let showIncompatibleCards = false;
-    let activePresetId = 'preset-3gt-2';
+    let activePresetId = 'preset-3gt-1';
     let activeFeeMode = 'requested';
     let spkCount = 1;
     let feeBase = 'netto';
@@ -1640,10 +1737,21 @@
       return MATERIAL_DB.find(m => m.id === matId) || MATERIAL_DB[MATERIAL_DB.length - 1];
     }
 
-    function getBomRowSubtotal(row) {
+    function getBomUnitPrice(row) {
       const mat = getMaterialById(row.matId);
-      const unitPrice = row.fixedPrice !== undefined ? row.fixedPrice : (mat ? mat.price : 0);
-      return Math.round((Number(row.qty) || 0) * unitPrice);
+      if (row.fixedPrice !== undefined) {
+        if (row.scaleWithMat && mat) {
+          const defMat = DEFAULT_MATERIALS.find(d => d.id === row.matId);
+          const ratio = defMat && defMat.price > 0 ? (mat.price / defMat.price) : 1;
+          return Math.round(row.fixedPrice * ratio);
+        }
+        return row.fixedPrice;
+      }
+      return mat ? mat.price : 0;
+    }
+
+    function getBomRowSubtotal(row) {
+      return Math.round((Number(row.qty) || 0) * getBomUnitPrice(row));
     }
 
     function calcBomTotal(bomRows) {
@@ -1706,9 +1814,17 @@
       };
 
       const specificHulls = {
-        'hull-3gt-frp': makeHullBom(280, 180, 35, 0, 0.30, 5, 42, '9,2m × 1,2m Open-Deck'),
-        'hull-3gt-hybrid': makeHullBom(360, 220, 42, 110, 0.25, 6, 56, '9,2m × 1,2m Hybrid Alu'),
-        'hull-3gt-alu': makeHullBom(180, 110, 28, 390, 0, 8, 92, '9,2m × 1,2m Alu 5083'),
+        'hull-3gt-frp': [
+          { matId: 'vendor-unit', label: 'Cetakan bodi kasko / hull moulding (per unit cost)', formula: 'I.1 Budget Plan · FRP Marine Gd.', qty: 1, fixedPrice: 394680 },
+          { matId: 'res-ortho', label: 'Lambung / hull (FRP Marine Gd. · Keel 7 / Btm 6 / Side 5 ply)', formula: 'I.2 Budget Plan · 1 lot', qty: 1, fixedPrice: 8500800, scaleWithMat: true },
+          { matId: 'mat-csm', label: 'Lantai / deck (FRP Marine Gd. · 5 ply)', formula: 'I.3 Budget Plan · 1 lot', qty: 1, fixedPrice: 1276000, scaleWithMat: true },
+          { matId: 'timber-kayu', label: 'Konstruksi tulangan kayu (Wooden transversal frame 3 ply)', formula: 'I.4 Budget Plan · Frame Space 1.000mm', qty: 1, fixedPrice: 2500000, scaleWithMat: true },
+          { matId: 'alu-5083', label: 'Konstruksi tulangan aluminium (Alu transversal frame)', formula: 'I.5 Budget Plan · Aluminum std.', qty: 1, fixedPrice: 1500000, scaleWithMat: true },
+          { matId: 'vendor-unit', label: 'Consumables & bahan lainnya', formula: 'I.6 Budget Plan · 1 lot', qty: 1, fixedPrice: 2000000 },
+          { matId: 'labor-yard', label: 'Production Operator (Bodi Kasko Rp 2,5Jt + Frame Rp 500rb + Alu Rp 500rb)', formula: 'IV.1–3 Budget Plan · Upah Produksi', qty: 1, fixedPrice: 3500000, scaleWithMat: true }
+        ],
+        'hull-3gt-hybrid': makeHullBom(210, 130, 32, 35, 0.25, 3, 22, '9,2m × 1,2m Reinforced 8/7/6 Ply'),
+        'hull-3gt-alu': makeHullBom(140, 90, 25, 220, 0, 5, 45, '9,2m × 1,2m Heavy Alu 5083 9/8/6 Ply'),
         'hull-patrol-85': makeHullBom(1450, 920, 150, 120, 0.9, 24, 620, '(8.5/13) × Basis Structural 13m'),
         'hull-patrol-100': makeHullBom(1750, 1120, 185, 180, 1.0, 28, 720, '(10/13) × Basis Structural 13m'),
         'hull-crew-130': makeHullBom(2350, 1500, 240, 260, 1.3, 38, 940, 'Basis 13m Step-Hull (205Jt+126.5Jt)'),
@@ -1722,8 +1838,16 @@
       }
 
       if (c.category === 'engine') {
-        // Aligned to quotation-imi WBS III (ENGINES_DB + Rigging/Racor + Aki + Hydraulic Steering + Jasa)
         const engineRecipes = {
+          'eng-yamaha-15-fleet': [
+            { matId: 'obm-pk', label: 'Mesin OBM E15DMHL 15 HP 2-stroke + fuel tank (Yamaha)', formula: 'III.1 Budget Plan · 1 set', qty: 1, fixedPrice: 31900000, scaleWithMat: true },
+            { matId: 'aki-marine', label: 'Battery / ACU 40 AH (GS Astra)', formula: 'III.2 Budget Plan · 2 set @ Rp 1,1 Jt', qty: 2, fixedPrice: 1100000, scaleWithMat: true }
+          ],
+          'eng-yamaha-15-dealer': [
+            { matId: 'obm-pk', label: 'Mesin OBM Yamaha 15 HP 2-Tak + Fuel Tank 24L', formula: 'Dealer Resmi Yamaha · 1 set', qty: 1, fixedPrice: 31900000, scaleWithMat: true },
+            { matId: 'aki-marine', label: 'Battery / ACU 40 AH (GS Astra)', formula: '2 set @ Rp 1,1 Jt', qty: 2, fixedPrice: 1100000, scaleWithMat: true },
+            { matId: 'rigging-har', label: 'Filter Racor Water Separator & Sparekit', formula: '1 set proteksi BBM', qty: 1, fixedPrice: 1500000 }
+          ],
           'eng-yamaha-115x2': [
             { matId: 'vendor-unit', label: '2× Yamaha OBM 115 HP 2-Tak (V4)', formula: 'ENGINES_DB: 2 × Rp 191 Jt', qty: 2, fixedPrice: 191000000 },
             { matId: 'rigging-har', label: 'Wire Harness, Controls & Racor Filter', formula: '2 set × Rp 5 Jt', qty: 2 },
@@ -1773,17 +1897,16 @@
       }
 
       if (c.category === 'outfitting') {
-        // Explicit Make-vs-Buy dual BoM! (e.g., Coolbox & Deck Outfitting + quotation-imi WBS II/IV/V)
         const buyDefaults = {
           'out-3gt-basic': [
-            { matId: 'vendor-unit', label: 'Coolbox Jadi 150L + Jangkar 7kg', formula: 'Beli jadi distributor', qty: 1, fixedPrice: 3920000 },
-            { matId: 'tali-nylon', label: 'Tali Jangkar & Tambat Nylon', formula: '50m × Rp 14.000/m', qty: 50 },
-            { matId: 'labor-yard', label: 'Jasa Fitting & Penambahan Kayu', formula: '4 HOK tukang outfitting', qty: 4 }
+            { matId: 'hardware-ss', label: 'Bolder / Bollard (Wooden laminated FRP)', formula: 'II.1 Budget Plan · 1 pcs', qty: 1, fixedPrice: 250000, scaleWithMat: true },
+            { matId: 'vendor-unit', label: 'Sticker Nama Kapal (Sticker Tahan Cuaca)', formula: 'II.2 Budget Plan · 2 pcs @ Rp 200.000', qty: 2, fixedPrice: 200000 },
+            { matId: 'gelcoat', label: 'Cat kapal / Gelcoat (Marine Gd.)', formula: 'II.3 Budget Plan · 1 lot', qty: 1, fixedPrice: 1000000, scaleWithMat: true }
           ],
           'out-3gt-kkp': [
             { matId: 'vendor-unit', label: 'Palka / Coolbox PU 300L (Beli Vendor)', formula: 'Unit coolbox jadi + tutup kedap', qty: 1, fixedPrice: 9800000 },
             { matId: 'bilge-pump', label: 'Pompa Bilga DC 12V 1500 GPH', formula: '1 set pompa', qty: 1 },
-            { matId: 'hardware-ss', label: 'Cleat SS316 & Jangkar', formula: '2 set fitting tambat', qty: 2 },
+            { matId: 'hardware-ss', label: 'Bolder, Cleat SS316 & Cat Gelcoat', formula: '2 set fitting tambat', qty: 2 },
             { matId: 'tali-nylon', label: 'Tali Jangkar & Tambat Nylon', formula: '50m × Rp 14.000/m', qty: 50 },
             { matId: 'labor-yard', label: 'Jasa Pasang & Uji Kedap', formula: '2 HOK perakitan', qty: 2 }
           ],
@@ -1828,11 +1951,9 @@
         // In-house "Bikin Sendiri" BoM formula (lower cost, uses DB Material prices!)
         const makeDefaults = {
           'out-3gt-basic': [
-            { matId: 'res-ortho', label: 'Resin Box Ikan In-House (150L)', formula: 'Laminasi bodi & tutup coolbox', qty: 20 },
-            { matId: 'mat-csm', label: 'Fiberglass CSM 450', formula: '2-3 lapis shell insulasi', qty: 14 },
-            { matId: 'pu-foam', label: 'PU Foam Insulasi 2-Komponen', formula: 'Injeksi dinding insulasi', qty: 12 },
-            { matId: 'tali-nylon', label: 'Tali Jangkar Nylon', formula: '50m × Rp 14.000/m', qty: 50 },
-            { matId: 'labor-yard', label: 'Tenaga Kerja Bikin Coolbox Sendiri', formula: '6 HOK galangan', qty: 6 }
+            { matId: 'res-ortho', label: 'Bolder Laminated FRP In-House', formula: 'Laminasi bolder kayu-FRP', qty: 4 },
+            { matId: 'gelcoat', label: 'Gelcoat & Cat Kapal In-House', formula: '12 kg topcoat/gelcoat', qty: 12 },
+            { matId: 'labor-yard', label: 'Tenaga Kerja Finishing & Cat', formula: '1 HOK aplikasi', qty: 1 }
           ],
           'out-3gt-kkp': [
             { matId: 'res-ortho', label: 'Resin Palka 300L (Bikin Sendiri)', formula: 'Laminasi palka + gelcoat dalam', qty: 40 },
@@ -1871,6 +1992,9 @@
 
       if (c.category === 'nav_elec') {
         const navRecipes = {
+          'nav-3gt-budget': [
+            { matId: 'aki-marine', label: 'Kelistrikan Starter & DC 2× Aki 40AH (Included di Paket Mesin)', formula: 'III.2 Budget Plan · Tanpa tambahan biaya', qty: 0 }
+          ],
           'nav-3gt-basic': [
             { matId: 'solas-vest', label: 'Life Jacket SOLAS w/ Whistle', formula: '2 pcs × Rp 150 rb', qty: 2 },
             { matId: 'solas-buoy', label: 'Life Buoy + Tali 30m + Kompas Saku', formula: '2 pcs × Rp 500 rb', qty: 2 },
@@ -1918,8 +2042,12 @@
         return { sourceMode: 'buy', payTerm: pay, bom, altMakeBom: null, altBuyBom: null };
       }
 
-      // permit_delivery (aligned to quotation-imi WBS IX-X)
+      // permit_delivery (aligned to Budget Plan V & quotation-imi WBS IX-X)
       const permRecipes = {
+        'perm-3gt-exyard': [
+          { matId: 'doc-survey', label: 'Builder Certificate (Sertifikat Galangan)', formula: 'V.1 Budget Plan · 1 lot', qty: 1, fixedPrice: 300000 },
+          { matId: 'labor-yard', label: 'Engine Trial (Uji Mesin di Galangan)', formula: 'V.2 Budget Plan · 1 lot', qty: 1, fixedPrice: 100000, scaleWithMat: true }
+        ],
         'perm-class-full': [
           { matId: 'doc-survey', label: 'Peluncuran Kapal (Hauling & Launching)', formula: 'quotation-imi WBS IX', qty: 10 },
           { matId: 'doc-survey', label: 'Dokumen Legal Hubla (Pas Besar, Akta)', formula: 'quotation-imi WBS IX (≥12m)', qty: 35 },
@@ -2402,6 +2530,39 @@
         </div>
       `;
 
+      // Naval Architect Schedule (Main Dimensions + Laminate Thickness Ply)
+      const navBox = document.getElementById('insp-naval-arch-box');
+      if (navBox) {
+        if (card.navalSpecs) {
+          const ns = card.navalSpecs;
+          navBox.classList.remove('hidden');
+          navBox.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-brand-700">Naval Architect · Principal Dimensions &amp; Laminate Schedule (Ply)</span>
+              <span class="text-[10px] font-semibold text-zinc-500 tnum">Frame Space: ${ns.frameSpaceMm || 1000} mm</span>
+            </div>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center tnum">
+              <div class="p-1.5 rounded bg-white border border-zinc-200"><div class="text-[9px] text-zinc-400">LOA</div><div class="font-bold text-zinc-900">${ns.loa.toFixed(2)} m</div></div>
+              <div class="p-1.5 rounded bg-white border border-zinc-200"><div class="text-[9px] text-zinc-400">LWL</div><div class="font-bold text-zinc-900">${ns.lwl.toFixed(2)} m</div></div>
+              <div class="p-1.5 rounded bg-white border border-zinc-200"><div class="text-[9px] text-zinc-400">Breadth (B)</div><div class="font-bold text-zinc-900">${ns.beam.toFixed(2)} m</div></div>
+              <div class="p-1.5 rounded bg-white border border-zinc-200"><div class="text-[9px] text-zinc-400">Height (H)</div><div class="font-bold text-zinc-900">${ns.height.toFixed(2)} m</div></div>
+              <div class="p-1.5 rounded bg-white border border-zinc-200"><div class="text-[9px] text-zinc-400">Draft (T)</div><div class="font-bold text-zinc-900">${ns.draft.toFixed(2)} m</div></div>
+              <div class="p-1.5 rounded bg-white border border-zinc-200"><div class="text-[9px] text-zinc-400">Tonnage</div><div class="font-bold text-zinc-900">${ns.gt} GT</div></div>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5 text-center tnum">
+              <div class="p-1.5 rounded bg-brand-50/60 border border-brand-200/80"><div class="text-[9px] text-brand-700">Keel</div><div class="font-bold text-brand-900">${ns.keelPly} ply</div></div>
+              <div class="p-1.5 rounded bg-brand-50/60 border border-brand-200/80"><div class="text-[9px] text-brand-700">Bottom Hull</div><div class="font-bold text-brand-900">${ns.bottomPly} ply</div></div>
+              <div class="p-1.5 rounded bg-brand-50/60 border border-brand-200/80"><div class="text-[9px] text-brand-700">Side Hull</div><div class="font-bold text-brand-900">${ns.sidePly} ply</div></div>
+              <div class="p-1.5 rounded bg-brand-50/60 border border-brand-200/80"><div class="text-[9px] text-brand-700">Frame/Girder</div><div class="font-bold text-brand-900">${ns.framePly} ply</div></div>
+              <div class="p-1.5 rounded bg-brand-50/60 border border-brand-200/80"><div class="text-[9px] text-brand-700">Deck</div><div class="font-bold text-brand-900">${ns.deckPly} ply</div></div>
+            </div>
+          `;
+        } else {
+          navBox.classList.add('hidden');
+          navBox.innerHTML = '';
+        }
+      }
+
       // Show Make vs Buy toggle if dual BoM exists (e.g. Coolbox / Outfitting)
       const hasMakeBuy = Boolean(card.altMakeBom && card.altBuyBom);
       const mbWrap = document.getElementById('insp-makebuy-wrap');
@@ -2447,7 +2608,7 @@
       if (!tbody) return;
       tbody.innerHTML = rows.map((row, idx) => {
         const mat = getMaterialById(row.matId);
-        const unitPrice = row.fixedPrice !== undefined ? row.fixedPrice : (mat ? mat.price : 0);
+        const unitPrice = getBomUnitPrice(row);
         const sub = getBomRowSubtotal(row);
         return `
           <tr>
@@ -2754,11 +2915,12 @@
       if (cat === 'hull') {
         document.getElementById('cc-source').value = 'make';
         box.innerHTML = `
-          <div class="text-[11px] font-bold text-zinc-700">Parameter Geometri &amp; Konstruksi Lambung</div>
+          <div class="text-[11px] font-bold text-zinc-700">Parameter Geometri, Laminate Ply &amp; Konstruksi Lambung</div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <div><label class="block text-[10px] text-zinc-500 mb-0.5">LOA (m)</label><input id="cc-loa" type="number" step="0.1" value="9.2" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
-            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Beam / Lebar (m)</label><input id="cc-beam" type="number" step="0.1" value="1.5" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
-            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Depth / Tinggi (m)</label><input id="cc-depth" type="number" step="0.05" value="0.85" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Beam / Lebar (m)</label><input id="cc-beam" type="number" step="0.1" value="1.2" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Depth / Tinggi (m)</label><input id="cc-depth" type="number" step="0.05" value="0.75" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Ketebalan Keel (Ply)</label><input id="cc-hull-ply" type="number" min="4" max="18" step="1" value="7" oninput="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
             <div><label class="block text-[10px] text-zinc-500 mb-0.5">Material Lambung</label>
               <select id="cc-hull-mat" onchange="recomputeCustomCardFormula()" class="w-full border border-zinc-300 rounded px-2 py-1.5 text-xs font-semibold bg-white">
                 <option value="frp">FRP Hand Lay-Up</option>
@@ -2772,7 +2934,7 @@
                 <option value="1">Dengan Kabin / Wheelhouse</option>
               </select>
             </div>
-            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Output Lini (Unit/Hr)</label><input id="cc-hull-rate" type="number" step="0.1" value="2.5" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
+            <div><label class="block text-[10px] text-zinc-500 mb-0.5">Output Lini (Unit/Hr)</label><input id="cc-hull-rate" type="number" step="0.1" value="7.5" class="w-full border border-zinc-300 rounded px-2.5 py-1.5 text-xs font-bold tnum bg-white"/></div>
           </div>
         `;
       } else if (cat === 'engine') {
@@ -2844,27 +3006,28 @@
       };
       if (cat === 'hull') {
         const loa = Math.max(3, gVal('cc-loa', 9.2));
-        const beam = Math.max(0.8, gVal('cc-beam', 1.5));
-        const depth = Math.max(0.4, gVal('cc-depth', 0.85));
+        const beam = Math.max(0.8, gVal('cc-beam', 1.2));
+        const depth = Math.max(0.4, gVal('cc-depth', 0.75));
+        const keelPly = Math.max(4, Math.round(gVal('cc-hull-ply', 7)));
+        const plyFactor = keelPly / 7.0;
         const matType = (document.getElementById('cc-hull-mat') || {}).value || 'frp';
         const hasCab = ((document.getElementById('cc-hull-cabin') || {}).value || '0') === '1';
         const area = Number((loa * (beam + 1.8 * depth) * (hasCab ? 1.15 : 0.85)).toFixed(1));
         if (matType === 'alu') {
           return [
-            { matId: 'alu-5083', label: 'Pelat & Profil Marine Alu 5083', formula: `${area} m² × 22 kg/m²`, qty: Math.round(area * 22) },
+            { matId: 'alu-5083', label: 'Pelat & Profil Marine Alu 5083', formula: `${area} m² × ${Math.round(14 * plyFactor)} kg/m²`, qty: Math.round(area * 14 * plyFactor) },
             { matId: 'res-ortho', label: 'Resin & Insulasi Internal', formula: `${area} m² × 3 kg/m²`, qty: Math.round(area * 3) },
-            { matId: 'hardware-ss', label: 'Anode Zn, Cat Marine & Fitting', formula: `LOA × 2.5 set`, qty: Math.round(loa * 2.5) },
-            { matId: 'labor-yard', label: 'Tenaga Kerja Las & Konstruksi Alu', formula: `${area} m² × 3.2 HOK/m²`, qty: Math.round(area * 3.2) }
+            { matId: 'hardware-ss', label: 'Anode Zn, Cat Marine & Fitting', formula: `LOA × 0.8 set`, qty: Math.max(2, Math.round(loa * 0.8)) },
+            { matId: 'labor-yard', label: 'Production Operator Las & Konstruksi Alu', formula: `${area} m² × 1.8 HOK/m²`, qty: Math.round(area * 1.8 * plyFactor) }
           ];
         }
         const rows = [
-          { matId: 'res-ortho', label: 'Resin Orthophthalic', formula: `${area} m² × 13 kg/m²`, qty: Math.round(area * 13) },
-          { matId: 'mat-csm', label: 'Fiberglass CSM & WR', formula: `${area} m² × 8.2 kg/m²`, qty: Math.round(area * 8.2) },
-          { matId: 'gelcoat', label: 'Gelcoat & Katalis', formula: `${area} m² × 1.5 kg/m²`, qty: Math.round(area * 1.5) },
-          { matId: 'hardware-ss', label: 'Fitting, Cleat & Cat', formula: `LOA × 1.6 set`, qty: Math.round(loa * 1.6) },
-          { matId: 'labor-yard', label: 'Tenaga Kerja Laminasi', formula: `${area} m² × 2.0 HOK/m²`, qty: Math.round(area * 2.0) }
+          { matId: 'res-ortho', label: `Resin Lambung & Deck (${keelPly}/${keelPly-1}/${keelPly-2} Ply)`, formula: `${area} m² × ${(7.5 * plyFactor).toFixed(1)} kg/m²`, qty: Math.round(area * 7.5 * plyFactor) },
+          { matId: 'mat-csm', label: 'Fiberglass CSM 450 & WR 600', formula: `${area} m² × ${(5.2 * plyFactor).toFixed(1)} kg/m²`, qty: Math.round(area * 5.2 * plyFactor) },
+          { matId: 'timber-kayu', label: 'Konstruksi Tulangan Kayu (Transversal Frame)', formula: 'Gading & balok kayu marine', qty: Number((area * 0.012).toFixed(2)) },
+          { matId: 'labor-yard', label: 'Production Operator (Cetak Kasko & Frame)', formula: `${Math.round(area * 0.85 * plyFactor)} HOK produksi`, qty: Math.round(area * 0.85 * plyFactor) }
         ];
-        if (matType === 'hybrid') rows.push({ matId: 'alu-5083', label: 'Transom & Rib Aluminium 5083', formula: `LOA × 12 kg/m`, qty: Math.round(loa * 12) });
+        if (matType === 'hybrid') rows.push({ matId: 'alu-5083', label: 'Konstruksi Tulangan Aluminium Frame', formula: `LOA × 2.5 kg/m`, qty: Math.round(loa * 2.5) });
         return rows;
       }
       if (cat === 'engine') {
@@ -2972,15 +3135,27 @@
       let extraProps = {};
 
       if (cat === 'hull') {
-        const loa = gVal('cc-loa', 9.2), beam = gVal('cc-beam', 1.5), depth = gVal('cc-depth', 0.85);
+        const loa = gVal('cc-loa', 9.2), beam = gVal('cc-beam', 1.2), depth = gVal('cc-depth', 0.75);
+        const keelPly = Math.max(4, Math.round(gVal('cc-hull-ply', 7)));
         const matT = (document.getElementById('cc-hull-mat') || {}).value || 'frp';
         const hasCab = ((document.getElementById('cc-hull-cabin') || {}).value || '0') === '1';
-        const rate = Math.max(0.05, gVal('cc-hull-rate', 2.5));
-        if (!name) name = `Lambung Custom ${loa}m × ${beam}m (${matT.toUpperCase()})`;
+        const rate = Math.max(0.05, gVal('cc-hull-rate', 7.5));
+        const lwl = Number((loa * 0.945).toFixed(2));
+        const draft = Number((depth * 0.53).toFixed(2));
+        const gt = Math.max(2, Math.round(loa * beam * depth * 0.36));
+        if (!name) name = `Lambung Custom ${loa}m × ${beam}m (${keelPly}/${keelPly-1}/${keelPly-2} Ply ${matT.toUpperCase()})`;
         powerLabel = `LOA ${loa}m × B ${beam}m`;
-        materialOrCycle = matT.toUpperCase() + (hasCab ? ' + Kabin' : ' Open-Deck');
-        dimensionsOrSpec = `H ${depth}m · Output ${rate} u/hr`;
-        extraProps = { prepDays: 25, defaultPrepDays: 25, unitsPerDay: rate, defaultUnitsPerDay: rate, extraDays: 0, defaultExtraDays: 0, hullGrade: 'standard', hasCabin: hasCab };
+        materialOrCycle = `${matT.toUpperCase()} ${keelPly}/${keelPly-1}/${keelPly-2} Ply` + (hasCab ? ' + Kabin' : ' Open-Deck');
+        dimensionsOrSpec = `LWL ${lwl}m · H ${depth}m · T ${draft}m · ${gt} GT`;
+        extraProps = {
+          prepDays: 25, defaultPrepDays: 25, unitsPerDay: rate, defaultUnitsPerDay: rate,
+          extraDays: 0, defaultExtraDays: 0, hullGrade: 'standard', hasCabin: hasCab,
+          navalSpecs: {
+            loa, lwl, beam, height: depth, draft, gt,
+            keelPly, bottomPly: Math.max(3, keelPly - 1), sidePly: Math.max(3, keelPly - 2),
+            deckPly: Math.max(3, keelPly - 2), framePly: Math.max(2, keelPly - 4), frameSpaceMm: 1000
+          }
+        };
       } else if (cat === 'engine') {
         const cnt = Math.max(1, Math.round(gVal('cc-eng-count', 1)));
         const pk = Math.max(5, Math.round(gVal('cc-eng-pk', 40)));
@@ -3169,8 +3344,22 @@
       const abs = Math.abs(num);
       if (abs >= 1e12) return sign + 'Rp ' + (abs / 1e12).toFixed(2).replace('.', ',') + ' T';
       if (abs >= 1e9)  return sign + 'Rp ' + (abs / 1e9).toFixed(2).replace('.', ',') + ' M';
-      if (abs >= 1e6)  return sign + 'Rp ' + (abs / 1e6).toFixed(1).replace('.', ',') + ' Jt';
+      if (abs >= 1e6) {
+        const dec = (abs < 1e8 && Math.round(abs) % 100000 !== 0) ? 2 : 1;
+        return sign + 'Rp ' + (abs / 1e6).toFixed(dec).replace('.', ',') + ' Jt';
+      }
       return sign + 'Rp ' + Math.round(abs).toLocaleString('id-ID');
+    }
+
+    function syncSharedInput(kind, val) {
+      const ids = kind === 'coc'
+        ? ['ctrl-coc', 'ctrl-coc-p2', 'ctrl-coc-p3']
+        : ['ctrl-wapu', 'ctrl-wapu-p3'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && String(el.value) !== String(val)) el.value = val;
+      });
+      recalculateAll();
     }
 
     function readInputs() {
@@ -3229,18 +3418,21 @@
     function setSpkCount(n) {
       spkCount = n;
       updateSegGroup(['spk-1', 'spk-2', 'spk-4', 'spk-5'], `spk-${n}`);
+      updateSegGroup(['spk-p1-1', 'spk-p1-2', 'spk-p1-4', 'spk-p1-5'], `spk-p1-${n}`);
       recalculateAll();
     }
 
     function setFeeBase(base) {
       feeBase = base;
       updateSegGroup(['fbase-netto', 'fbase-bruto'], `fbase-${base}`);
+      updateSegGroup(['fbase-p1-netto', 'fbase-p1-bruto'], `fbase-p1-${base}`);
       recalculateAll();
     }
 
     function setDelayDays(d) {
       delayDays = d;
       updateSegGroup(['delay-0', 'delay-15', 'delay-30', 'delay-45'], `delay-${d}`);
+      updateSegGroup(['delay-p1-0', 'delay-p1-15', 'delay-p1-30', 'delay-p1-45'], `delay-p1-${d}`);
       recalculateAll();
     }
 
@@ -4065,7 +4257,24 @@
       document.getElementById('vessel-schematic-box').innerHTML =
         buildVesselSchematicSvg(activeVesselClass, ontology.slotIssues, catalogCategoryFilter);
 
-      // 5. Vessel Character Stats Grid
+      // 4B. 1-Line Principal Dimensions Strip (Naval Architect At-a-Glance)
+      const ns = sim.hull.navalSpecs || {
+        loa: activeVesselClass === 'fishing-3gt' ? 9.20 : 12.50,
+        lwl: activeVesselClass === 'fishing-3gt' ? 8.70 : 11.40,
+        beam: activeVesselClass === 'fishing-3gt' ? 1.20 : 3.00,
+        height: activeVesselClass === 'fishing-3gt' ? 0.75 : 1.70,
+        draft: activeVesselClass === 'fishing-3gt' ? 0.40 : 0.55,
+        gt: activeVesselClass === 'fishing-3gt' ? 3 : 13,
+        keelPly: 7, bottomPly: 6, sidePly: 5, deckPly: 5, framePly: 3, frameSpaceMm: 1000
+      };
+      const dimStripEl = document.getElementById('vessel-dim-strip');
+      if (dimStripEl) {
+        dimStripEl.innerHTML = sim.hull.isEmpty
+          ? `Kelas <strong>${vcName}</strong> (${vc.badge}) · Pilih Body &amp; Lambung`
+          : `LOA <strong>${ns.loa.toFixed(2)}m</strong> (LWL ${ns.lwl.toFixed(2)}m) × B <strong>${ns.beam.toFixed(2)}m</strong> × H ${ns.height.toFixed(2)}m · T ${ns.draft.toFixed(2)}m · <strong>${ns.gt} GT</strong>`;
+      }
+
+      // 5. Vessel Character Stats Grid (Armor Ply, Propulsion, Production Rate, HPP)
       const statusTxt = ontology.status === 'critical'
         ? `${ontology.criticalCount} Kritis`
         : (ontology.status === 'warning' ? `${eqCount}/5 · Cek` : `${eqCount}/5 Valid`);
@@ -4074,23 +4283,29 @@
         : (ontology.status === 'warning' ? 'text-amber-700' : 'text-emerald-700');
 
       const rateDisplay = sim.hull.isEmpty ? '0 u/hr' : `${sim.hull.unitsPerDay} u/hr`;
+      const plyText = sim.hull.isEmpty ? '—' : `${ns.keelPly}/${ns.bottomPly}/${ns.sidePly} Ply`;
+      const plySub = sim.hull.isEmpty ? 'Belum dipilih' : `Deck ${ns.deckPly} · Frame ${ns.framePly}`;
 
       document.getElementById('vessel-stats-grid').innerHTML = `
+        <div onclick="if(selectedCards.hull) openInspectorModal(selectedCards.hull)" title="Klik untuk detail Laminate Thickness (Ply) & Dimensi"
+          class="cursor-pointer rounded-lg bg-white border border-zinc-200 hover:border-brand-400 px-2.5 py-1.5 transition">
+          <div class="text-[9px] font-medium text-zinc-400">Laminasi (Armor)</div>
+          <div class="text-xs font-bold text-zinc-950">${plyText} <span class="text-[9px] font-normal text-zinc-400">(${plySub})</span></div>
+        </div>
         <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
-          <div class="text-[9px] font-medium text-zinc-400">Tenaga Mesin</div>
+          <div class="text-[9px] font-medium text-zinc-400">Propulsi &amp; Daya</div>
           <div class="text-xs font-bold text-zinc-950">${sim.engine.totalHp} HP <span class="text-[9px] font-normal text-zinc-400">(${vc.minHp}-${vc.maxHp})</span></div>
         </div>
         <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
-          <div class="text-[9px] font-medium text-zinc-400">Laju Lini</div>
-          <div class="text-xs font-bold text-zinc-950">${rateDisplay}</div>
+          <div class="text-[9px] font-medium text-zinc-400">Laju &amp; Mould</div>
+          <div class="text-xs font-bold text-zinc-950">${rateDisplay} <span class="text-[9px] font-normal text-zinc-400">(${sim.hull.prepDays}hr)</span></div>
         </div>
-        <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
-          <div class="text-[9px] font-medium text-zinc-400">HPP Fisik/u</div>
+        <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5" title="Rp ${Math.round(sim.baseUnitCost).toLocaleString('id-ID')} / unit">
+          <div class="flex items-center justify-between text-[9px] font-medium text-zinc-400">
+            <span>HPP Ex-Yard</span>
+            <span class="font-bold ${statusCls}">${statusTxt}</span>
+          </div>
           <div class="text-xs font-bold text-brand-700">${fmtRpShort(sim.baseUnitCost)}</div>
-        </div>
-        <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
-          <div class="text-[9px] font-medium text-zinc-400">Status Teknis</div>
-          <div class="text-xs font-bold ${statusCls}">${statusTxt}</div>
         </div>
       `;
 
@@ -4407,10 +4622,20 @@
     }
 
     function renderTimelineAndLedgerPage(sim) {
-      document.getElementById('lbl-spk-units').textContent =
-        sim.spkCount === 1 ? `1 SPK (${sim.units.toLocaleString('id-ID')} u)` : `${sim.spkCount} SPK (@ ±${Math.round(sim.units / sim.spkCount)} u)`;
-      document.getElementById('lbl-fee-base-delta').textContent =
-        sim.feeBase === 'bruto' ? `+${fmtRpShort(sim.ppnFeeDiff)} ekstra` : `Hemat ${fmtRpShort(sim.ppnFeeDiff)}`;
+      const spkTxt = sim.spkCount === 1 ? `1 SPK (${sim.units.toLocaleString('id-ID')} u)` : `${sim.spkCount} SPK (@ ±${Math.round(sim.units / sim.spkCount)} u)`;
+      const feeDeltaTxt = sim.feeBase === 'bruto' ? `+${fmtRpShort(sim.ppnFeeDiff)} ekstra` : `Hemat ${fmtRpShort(sim.ppnFeeDiff)}`;
+      document.getElementById('lbl-spk-units').textContent = spkTxt;
+      document.getElementById('lbl-fee-base-delta').textContent = feeDeltaTxt;
+      const spkP1 = document.getElementById('lbl-spk-units-p1');
+      if (spkP1) spkP1.textContent = spkTxt;
+      const feeP1 = document.getElementById('lbl-fee-base-delta-p1');
+      if (feeP1) feeP1.textContent = feeDeltaTxt;
+      ['ctrl-coc-p2', 'ctrl-coc-p3'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = sim.costOfCapitalPct;
+      });
+      const wapuP3 = document.getElementById('ctrl-wapu-p3');
+      if (wapuP3) wapuP3.value = sim.wapuBgPct;
 
       const total = sim.totalDays;
       const colorMap = { fee: 'bg-rose-600', prep: 'bg-zinc-700', prod: 'bg-brand-700', qc: 'bg-emerald-600' };
