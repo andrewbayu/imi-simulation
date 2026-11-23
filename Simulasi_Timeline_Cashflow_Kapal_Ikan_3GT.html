@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Proyek Kapal Ikan 3 GT — Simulasi Timeline &amp; Keamanan Pembayaran | PT IMI</title>
+  <title>IMI Vessel Builder &amp; Project Finance Simulator | PT Inovasi Maritim Indonesia</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
@@ -71,8 +71,8 @@
       transition: all 0.14s ease;
       border-radius: 6px;
     }
-    .seg-btn:active, .tier-opt:active, .chip-btn:active, .nav-tab:active {
-      transform: scale(0.985);
+    .seg-btn:active, .chip-btn:active, .side-nav-btn:active, .catalog-card:active {
+      transform: scale(0.99);
     }
     .seg-btn.active {
       background: #ffffff;
@@ -80,45 +80,49 @@
       box-shadow: 0 1px 2px rgba(9, 9, 11, 0.08), 0 0 0 1px rgba(9, 9, 11, 0.06);
       font-weight: 600;
     }
-    .nav-tab {
+    .side-nav-btn {
       transition: all 0.15s ease;
       border-radius: 8px;
     }
-    .nav-tab.active {
+    .side-nav-btn.active {
       background: #09090b;
       color: #ffffff;
       font-weight: 600;
     }
-    .tier-opt {
-      transition: all 0.15s ease;
-      border-radius: 8px;
+    .side-nav-btn:not(.active):hover {
+      background: #f4f4f5;
+      color: #09090b;
     }
-    .tier-opt.is-selected {
+    .vessel-class-btn {
+      transition: all 0.15s ease;
+      border-radius: 10px;
+    }
+    .vessel-class-btn.is-selected {
       background: #eff6ff;
       border-color: #1d4ed8;
       box-shadow: 0 0 0 1px #1d4ed8;
     }
-    .unit-price-input {
-      width: 54px;
-      padding: 2px 5px;
-      border-radius: 5px;
-      border: 1px solid #d4d4d8;
-      background: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      text-align: right;
-      color: #09090b;
-      transition: border-color 0.14s ease, box-shadow 0.14s ease;
+    .catalog-card {
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+      border-radius: 10px;
+      cursor: grab;
     }
-    .unit-price-input:focus {
-      outline: none;
+    .catalog-card:active {
+      cursor: grabbing;
+    }
+    .catalog-card.is-equipped {
+      background: #eff6ff;
       border-color: #1d4ed8;
-      box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.14);
+      box-shadow: 0 0 0 1px #1d4ed8;
     }
-    .unit-price-input.is-modified {
-      border-color: #b45309;
-      background: #fffbeb;
-      color: #92400e;
+    .drop-slot {
+      transition: all 0.16s ease;
+      border-radius: 10px;
+    }
+    .drop-slot.drag-over {
+      border-color: #1d4ed8 !important;
+      background-color: #dbeafe !important;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.18);
     }
     .scenario-row, .tradeoff-row {
       transition: background-color 0.14s ease;
@@ -129,9 +133,6 @@
     }
     .gantt-bar {
       transition: left 0.28s cubic-bezier(0.22, 1, 0.36, 1), width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .print-only {
-      display: none;
     }
     @page {
       size: A4 landscape;
@@ -146,12 +147,14 @@
         background: #ffffff !important;
         font-size: 11px !important;
       }
-      main {
-        max-width: 100% !important;
-        padding: 0 !important;
+      .no-print, #app-sidebar, #mobile-header {
+        display: none !important;
       }
-      .no-print { display: none !important; }
-      .print-only { display: block !important; }
+      #main-workspace {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
       .page-view {
         display: block !important;
       }
@@ -168,121 +171,262 @@
       tr {
         break-inside: avoid;
       }
-      header, .sticky {
-        position: static !important;
-        height: auto !important;
-        padding: 6px 0 !important;
-      }
       canvas {
         max-height: 220px !important;
       }
     }
   </style>
 </head>
-<body class="text-zinc-950 selection:bg-brand-100 selection:text-brand-800">
+<body class="text-zinc-950 selection:bg-brand-100 selection:text-brand-800 min-h-screen flex flex-col lg:flex-row">
 
-  <!-- TOP NAVIGATION (SINGLE LINE, CLEAN 3-PAGE TAB SWITCHER) -->
-  <header class="bg-white/95 backdrop-blur border-b border-zinc-200 sticky top-0 z-40">
-    <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0">
-          <i class="ph-bold ph-anchor text-base"></i>
+  <!-- MOBILE TOP HEADER -->
+  <div id="mobile-header" class="lg:hidden bg-white border-b border-zinc-200 px-4 h-14 flex items-center justify-between sticky top-0 z-40 no-print">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-lg bg-zinc-950 text-white flex items-center justify-center">
+        <i class="ph-bold ph-anchor text-sm"></i>
+      </div>
+      <span class="text-sm font-bold tracking-tight text-zinc-950">IMI Naval Simulator</span>
+    </div>
+    <button type="button" onclick="toggleMobileSidebar()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700">
+      <i class="ph ph-list text-base"></i> Menu
+    </button>
+  </div>
+
+  <!-- MOBILE BACKDROP -->
+  <div id="sidebar-backdrop" onclick="toggleMobileSidebar(false)" class="hidden fixed inset-0 bg-zinc-950/30 z-40 lg:hidden"></div>
+
+  <!-- ===================================================================== -->
+  <!-- LEFT SIDEBAR NAVIGATION                                               -->
+  <!-- ===================================================================== -->
+  <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-72 shrink-0 bg-white border-r border-zinc-200 flex flex-col justify-between transition-transform duration-200 -translate-x-full lg:translate-x-0 overflow-y-auto no-print">
+    <div class="p-4 space-y-5">
+      <!-- Brand -->
+      <div class="flex items-center justify-between gap-2 pb-4 border-b border-zinc-200">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0">
+            <i class="ph-bold ph-anchor text-lg"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="text-sm font-bold tracking-tight text-zinc-950 truncate">PT Inovasi Maritim</div>
+            <div class="text-[11px] text-zinc-500 truncate">Spec Builder &amp; Project Sim</div>
+          </div>
         </div>
-        <div class="min-w-0 flex items-center gap-2">
-          <span class="text-sm font-semibold tracking-tight text-zinc-950 truncate">PT IMI</span>
-          <span class="hidden xl:inline text-zinc-300">/</span>
-          <span class="hidden xl:inline text-sm text-zinc-500 truncate">Kapal Ikan 3 GT</span>
-        </div>
+        <button type="button" onclick="toggleMobileSidebar(false)" class="lg:hidden text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-base"></i>
+        </button>
       </div>
 
-      <!-- 3-Page Navigation Tabs -->
-      <nav aria-label="Halaman Simulasi" class="flex items-center gap-1 p-1 rounded-xl bg-zinc-100 border border-zinc-200/80 no-print overflow-x-auto">
-        <button type="button" id="tab-page-1" onclick="switchPage('page-1')" class="nav-tab active text-xs px-3 py-1.5 whitespace-nowrap">
-          1. Ringkasan Eksekutif
+      <!-- Navigation Steps -->
+      <nav aria-label="Menu Utama" class="space-y-1">
+        <div class="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-400">Alur Kerja Simulasi</div>
+
+        <button type="button" id="nav-page-spec" onclick="switchPage('page-spec')" class="side-nav-btn active w-full flex items-center justify-between px-3 py-2.5 text-xs text-left">
+          <span class="flex items-center gap-2.5">
+            <i class="ph ph-cubes text-base"></i>
+            <span>1. Builder Spesifikasi</span>
+          </span>
+          <span id="nav-ontology-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full">OK</span>
         </button>
-        <button type="button" id="tab-page-2" onclick="switchPage('page-2')" class="nav-tab text-xs px-3 py-1.5 text-zinc-600 hover:text-zinc-950 whitespace-nowrap">
-          2. Spesifikasi &amp; Biaya
+
+        <button type="button" id="nav-page-1" onclick="switchPage('page-1')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
+          <span class="flex items-center gap-2.5">
+            <i class="ph ph-chart-line-up text-base"></i>
+            <span>2. Simulasi Proyek &amp; CEO</span>
+          </span>
+          <span id="nav-risk-dot" class="w-2 h-2 rounded-full bg-rose-600"></span>
         </button>
-        <button type="button" id="tab-page-3" onclick="switchPage('page-3')" class="nav-tab text-xs px-3 py-1.5 text-zinc-600 hover:text-zinc-950 whitespace-nowrap">
-          3. Timeline &amp; Arus Kas
+
+        <button type="button" id="nav-page-2" onclick="switchPage('page-2')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
+          <span class="flex items-center gap-2.5">
+            <i class="ph ph-factory text-base"></i>
+            <span>3. Struktur Biaya &amp; Lini</span>
+          </span>
+        </button>
+
+        <button type="button" id="nav-page-3" onclick="switchPage('page-3')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
+          <span class="flex items-center gap-2.5">
+            <i class="ph ph-calendar-check text-base"></i>
+            <span>4. Timeline &amp; Arus Kas</span>
+          </span>
         </button>
       </nav>
 
-      <div class="flex items-center gap-2 shrink-0 no-print">
-        <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-medium transition whitespace-nowrap">
+      <!-- Live Vessel & Financial Telemetry in Sidebar -->
+      <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Blueprint Aktif</span>
+          <span id="sb-class-pill" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">3 GT Ikan</span>
+        </div>
+        <div id="sb-telemetry" class="space-y-2 text-xs tnum">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Footer Actions -->
+    <div class="p-4 border-t border-zinc-200 space-y-2 bg-zinc-50/50">
+      <button type="button" id="sb-next-btn" onclick="goToNextPage()" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
+        <span>Lanjut ke Simulasi Proyek</span>
+        <i class="ph-bold ph-arrow-right text-xs"></i>
+      </button>
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" onclick="openSaveModal()" class="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-medium transition">
+          <i class="ph ph-floppy-disk text-sm"></i> Simpan
+        </button>
+        <button type="button" onclick="window.print()" class="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-medium transition">
           <i class="ph ph-printer text-sm"></i> Cetak PDF
         </button>
       </div>
     </div>
+  </aside>
 
-    <!-- Compact Persistent Live Telemetry Strip -->
-    <div class="border-t border-zinc-200/80 bg-zinc-50/90 no-print">
-      <div id="live-status-strip" class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 text-[11px] tnum">
-        <!-- Populated by JS -->
-      </div>
-    </div>
-  </header>
+  <!-- ===================================================================== -->
+  <!-- MAIN WORKSPACE                                                        -->
+  <!-- ===================================================================== -->
+  <main id="main-workspace" class="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 max-w-[1280px] mx-auto space-y-6">
 
-  <main class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
+    <!-- =================================================================== -->
+    <!-- VIEW 1 (DEFAULT): BUILDER SPESIFIKASI KAPAL (DRAG & DROP + ONTOLOGY)-->
     <!-- ===================================================================== -->
-    <!-- PAGE 1: RINGKASAN EKSEKUTIF (EXECUTIVE SUMMARY — DEFAULT ACTIVE)      -->
-    <!-- ===================================================================== -->
-    <div id="page-1" class="page-view space-y-6">
+    <div id="page-spec" class="page-view space-y-6">
 
-      <!-- 1A: Brief & Vessel Photos -->
-      <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <div class="lg:col-span-7 space-y-4">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-2">Ringkasan Keputusan Management</p>
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 leading-[1.15]">
-              Simulasi Kelayakan &amp; Keamanan Pembayaran Kapal Ikan 3 GT
-            </h1>
-            <p class="text-sm text-zinc-600 mt-2.5 max-w-[64ch] leading-relaxed">
-              Menguji permintaan <strong>Fee 16% (8% saat Teken Kontrak + 8% setelah DP turun)</strong> pada pengadaan Penunjukkan Langsung — termasuk dampak potongan WAPU/BG, durasi produksi ke overhead, dan biaya bunga talangan.
-            </p>
-          </div>
-
-          <div class="pt-3 border-t border-zinc-200 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
-            <div>
-              <div class="text-[11px] font-medium text-zinc-500">Dimensi Utama</div>
-              <div class="text-sm font-semibold text-zinc-950 tnum mt-0.5">LOA 9,2m · LWL 8,7m</div>
-            </div>
-            <div>
-              <div class="text-[11px] font-medium text-zinc-500">Lebar &amp; Tinggi</div>
-              <div class="text-sm font-semibold text-zinc-950 tnum mt-0.5">B 1,2m · H 0,75m · T 0,4m</div>
-            </div>
-            <div>
-              <div class="text-[11px] font-medium text-zinc-500">Konstruksi Body</div>
-              <div class="text-sm font-semibold text-zinc-950 mt-0.5">Fiber / Alu · Kayu 6×8 cm</div>
-            </div>
-            <div>
-              <div class="text-[11px] font-medium text-zinc-500">Mesin Wajib</div>
-              <div class="text-sm font-semibold text-brand-700 mt-0.5">YAMAHA 15 PK</div>
-            </div>
-          </div>
+      <!-- Header + Predefined Dropdown + Save Controls -->
+      <section class="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1.5">Langkah 1 · Konfigurator Spesifikasi Kapal</p>
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 leading-[1.15]">
+            Builder Spesifikasi &amp; Korelasi Teknis Kapal
+          </h1>
+          <p class="text-sm text-zinc-600 mt-1.5 max-w-[66ch]">
+            Pilih jenis kapal atau muat preset, lalu <strong>klik (+) atau seret (drag &amp; drop)</strong> kartu komponen ke blueprint kapal. Klik kartu aktif untuk mengubah harga, lead time, atau DP supplier (parameter OEM/PK tetap terkunci).
+          </p>
         </div>
 
-        <div class="lg:col-span-5 grid grid-cols-2 gap-3">
-          <figure class="panel overflow-hidden">
-            <img src="assets/ref-kapal-1.jpg" alt="Referensi Kapal Nelayan Open-Deck 1" class="w-full h-40 object-cover bg-zinc-100" />
-            <figcaption class="px-3 py-2 text-[11px] text-zinc-600 border-t border-zinc-100">
-              <span class="font-semibold text-zinc-900">Ref 1</span> · Open-hull ramping &amp; gading melintang
-            </figcaption>
-          </figure>
-          <figure class="panel overflow-hidden">
-            <img src="assets/ref-kapal-2.jpg" alt="Referensi Kapal Nelayan Open-Deck 2" class="w-full h-40 object-cover bg-zinc-100" />
-            <figcaption class="px-3 py-2 text-[11px] text-zinc-600 border-t border-zinc-100">
-              <span class="font-semibold text-zinc-900">Ref 2</span> · Yamaha 15 PK, box ikan &amp; papan duduk
-            </figcaption>
-          </figure>
+        <!-- Predefined & Saved Presets Dropdown + Save Button -->
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0 no-print">
+          <div class="min-w-[260px]">
+            <label for="preset-dropdown" class="block text-[11px] font-semibold text-zinc-500 mb-1">Preset Kapal &amp; Setting Tersimpan</label>
+            <select id="preset-dropdown" onchange="onPresetDropdownChange(this.value)" class="w-full text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
+              <!-- Populated dynamically with Built-in + LocalStorage saved presets -->
+            </select>
+          </div>
+          <div class="pt-4">
+            <button type="button" onclick="openSaveModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition">
+              <i class="ph ph-floppy-disk text-sm"></i> Simpan Setting
+            </button>
+          </div>
         </div>
       </section>
 
-      <!-- 1B: Primary Control Deck (3 Editable Parameters + Fee Controls) -->
+      <!-- Step 1A: Pilih Jenis Kapal (Curates Component Catalog & Sets Ontology Rules) -->
+      <section class="panel p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-zinc-950">1. Pilih Jenis Kapal (Menentukan Kurasi Kartu &amp; Aturan Ontologi)</span>
+          </div>
+          <label class="inline-flex items-center gap-2 text-xs text-zinc-600 cursor-pointer select-none no-print">
+            <input id="toggle-show-all-cards" type="checkbox" onchange="onToggleCuration(this.checked)" class="rounded border-zinc-300 text-brand-700 focus:ring-brand-700" />
+            <span>Tampilkan juga opsi di luar kelas kapal (untuk uji alert ontologi)</span>
+          </label>
+        </div>
+        <div id="vessel-class-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Step 1B: Split Builder Workspace (Catalog Left + Blueprint Drop Slots & Ontology Right) -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+
+        <!-- LEFT: Component Card Catalog (Drag or Click +) -->
+        <div class="xl:col-span-7 panel overflow-hidden">
+          <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-bold text-zinc-950">2. Katalog Komponen (Klik <span class="text-brand-700">(+)</span> atau Drag ke Blueprint)</h2>
+              <p class="text-[11px] text-zinc-500">Kartu dikurasi otomatis sesuai jenis kapal aktif. Parameter Brand/PK/Material terkunci; Harga &amp; Lead Time bisa diedit.</p>
+            </div>
+            <button id="btn-reset-cards" type="button" onclick="resetCatalogEdits()" class="hidden no-print text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-md transition">
+              Reset Nilai Kartu
+            </button>
+          </div>
+
+          <!-- Category Filter Tabs -->
+          <div class="px-4 py-2.5 border-b border-zinc-200 flex items-center gap-1.5 overflow-x-auto bg-white no-print" id="catalog-filter-tabs">
+            <!-- Populated by JS -->
+          </div>
+
+          <div id="catalog-cards-container" class="p-4 space-y-4 max-h-[760px] overflow-y-auto bg-zinc-50/40">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- RIGHT: Active Vessel Blueprint (5 Drop Zones) + Ontology & Correlation Alerts -->
+        <div class="xl:col-span-5 space-y-4">
+
+          <!-- Ontology & Correlation Status Panel -->
+          <div id="ontology-alert-panel" class="panel p-4 space-y-2.5">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Active Vessel Blueprint Drop Slots -->
+          <div class="panel overflow-hidden">
+            <div class="px-4 py-3 bg-zinc-950 text-white flex items-center justify-between">
+              <div>
+                <div class="text-xs font-bold">Blueprint Kapal Terpasang (5 Slot WBS)</div>
+                <div class="text-[11px] text-zinc-400">Drop kartu ke slot di bawah atau klik slot untuk Inspector Harga/Lead Time</div>
+              </div>
+              <span id="bp-unit-cogs" class="text-xs font-bold tnum text-blue-300"></span>
+            </div>
+
+            <div id="blueprint-slots-container" class="p-3.5 space-y-2.5 bg-zinc-50/50">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Reference Visual Strip (Shows 3GT photos when 3GT is active) -->
+            <div id="bp-reference-photos" class="p-3.5 pt-0 grid grid-cols-2 gap-2.5">
+              <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
+                <img src="assets/ref-kapal-1.jpg" alt="Referensi Kapal 3 GT 1" class="w-full h-24 object-cover" />
+                <figcaption class="px-2 py-1 text-[10px] text-zinc-600 truncate">Ref 1: Open-hull 9,2m × 1,2m</figcaption>
+              </figure>
+              <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
+                <img src="assets/ref-kapal-2.jpg" alt="Referensi Kapal 3 GT 2" class="w-full h-24 object-cover" />
+                <figcaption class="px-2 py-1 text-[10px] text-zinc-600 truncate">Ref 2: Yamaha 15 PK + Box Ikan</figcaption>
+              </figure>
+            </div>
+
+            <div class="p-3.5 border-t border-zinc-200 bg-white flex items-center justify-between gap-3 no-print">
+              <div class="text-[11px] text-zinc-500">
+                Total Lead Time Tambahan: <strong id="bp-extra-days" class="text-zinc-900 tnum"></strong>
+              </div>
+              <button type="button" onclick="switchPage('page-1')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
+                <span>Simulasi Proyek &amp; Pembayaran</span>
+                <i class="ph-bold ph-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VIEW 2: RINGKASAN EKSEKUTIF & CEO (PROJECT SIMULATION)              -->
+    <!-- =================================================================== -->
+    <div id="page-1" class="page-view hidden space-y-6 print-page-break">
+
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 2 · Simulasi Proyek &amp; Keamanan Pembayaran</p>
+          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Ringkasan Eksekutif, Arus Kas &amp; Negosiasi CEO</h2>
+          <p class="text-xs text-zinc-500 mt-1" id="p1-vessel-subtitle"></p>
+        </div>
+        <button type="button" onclick="switchPage('page-spec')" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700">
+          ← Edit Spesifikasi Kapal
+        </button>
+      </div>
+
+      <!-- Primary Control Deck: 3 Editable Parameters + Fee Controls -->
       <section class="panel overflow-hidden no-print">
         <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-4 items-start">
-          <!-- Parameter 1: Volume -->
           <div class="xl:col-span-3 space-y-1.5">
             <label for="ctrl-units" class="block text-xs font-semibold text-zinc-700">Volume Proyek</label>
             <div class="input-shell flex items-center px-3 py-2">
@@ -299,7 +443,6 @@
             </div>
           </div>
 
-          <!-- Parameter 2: Markup -->
           <div class="xl:col-span-2 space-y-1.5">
             <label for="ctrl-markup" class="block text-xs font-semibold text-zinc-700">Markup dari COGS</label>
             <div class="input-shell flex items-center px-3 py-2">
@@ -316,7 +459,6 @@
             </div>
           </div>
 
-          <!-- Parameter 3: DP -->
           <div class="xl:col-span-2 space-y-1.5">
             <label for="ctrl-dp" class="block text-xs font-semibold text-zinc-700">Termin DP Pemerintah</label>
             <div class="input-shell flex items-center px-3 py-2">
@@ -332,11 +474,10 @@
             </div>
           </div>
 
-          <!-- Fee Controls -->
           <div class="md:col-span-2 xl:col-span-5 space-y-1.5">
             <div class="flex items-center justify-between">
               <label class="block text-xs font-semibold text-zinc-700">Skema Pembayaran Fee (Total <span id="lbl-total-fee-pct" class="tnum">16</span>%)</label>
-              <span class="text-[11px] text-zinc-500">Uji skema diminta vs negosiasi</span>
+              <span class="text-[11px] text-zinc-500">Skema diminta vs negosiasi</span>
             </div>
             <div class="grid grid-cols-3 gap-1 p-1 rounded-lg bg-zinc-100 border border-zinc-200/80">
               <button type="button" id="seg-requested" onclick="setFeeMode('requested')" class="seg-btn active text-xs py-1.5 px-2 text-zinc-600 truncate">
@@ -364,54 +505,40 @@
                   class="w-12 px-1.5 py-0.5 rounded border border-zinc-300 bg-white text-zinc-900 font-semibold tnum text-center focus:outline-none focus:border-brand-700" />
                 <span>%</span>
               </label>
-              <span id="fee-mode-hint" class="text-zinc-400">Ketik angka bebas untuk simulasi split fee.</span>
+              <span id="fee-mode-hint" class="text-zinc-400">Ketik angka bebas untuk simulasi negosiasi.</span>
             </div>
           </div>
         </div>
 
-        <!-- Quick Link Strip to Page 2 & Page 3 Assumptions -->
         <div class="px-4 sm:px-5 py-2.5 bg-zinc-50 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-          <div id="p1-assumption-pill" class="text-zinc-600 tnum">
-            <!-- Populated by JS -->
-          </div>
+          <div id="p1-assumption-pill" class="text-zinc-600 tnum"></div>
           <div class="flex items-center gap-3 shrink-0">
-            <button type="button" onclick="switchPage('page-2')" class="font-semibold text-brand-700 hover:text-brand-800 transition">
-              Ubah Spec, Overhead &amp; Kapasitas →
-            </button>
+            <button type="button" onclick="switchPage('page-2')" class="font-semibold text-brand-700 hover:text-brand-800">Overhead &amp; Kapasitas →</button>
             <span class="text-zinc-300">|</span>
-            <button type="button" onclick="switchPage('page-3')" class="font-semibold text-brand-700 hover:text-brand-800 transition">
-              Atur SPK, WAPU &amp; Delay SP2D →
-            </button>
+            <button type="button" onclick="switchPage('page-3')" class="font-semibold text-brand-700 hover:text-brand-800">SPK, WAPU &amp; Delay →</button>
           </div>
         </div>
       </section>
 
-      <!-- 1C: Verdict Banner + Unified 6-KPI Strip -->
+      <!-- Verdict Banner + 6-KPI Strip -->
       <section class="panel overflow-hidden">
-        <div id="verdict-banner" class="p-5 border-b border-zinc-200 transition-colors">
-          <!-- Populated by JS -->
-        </div>
-        <div id="kpi-strip" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-zinc-200 bg-white">
-          <!-- Populated by JS -->
-        </div>
+        <div id="verdict-banner" class="p-5 border-b border-zinc-200 transition-colors"></div>
+        <div id="kpi-strip" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-y md:divide-y-0 md:divide-x divide-zinc-200 bg-white"></div>
       </section>
 
-      <!-- 1D: 3-Scenario Comparison Table -->
+      <!-- 3-Scenario Comparison Table -->
       <section class="panel overflow-hidden">
         <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 class="text-sm font-bold text-zinc-950">Komparasi 3 Skenario (Klik untuk Pilih Skenario)</h2>
-            <p class="text-[11px] text-zinc-500">Semua angka sudah memperhitungkan overhead waktu produksi, biaya akselerasi lini, potongan WAPU/BG, dan bunga talangan.</p>
+            <h3 class="text-sm font-bold text-zinc-950">Komparasi Cepat 3 Skenario Kapal Ikan 3 GT (Klik untuk Muat)</h3>
+            <p class="text-[11px] text-zinc-500">Membandingkan paket Termurah, Sedang, dan Termahal dengan asumsi volume, markup, SPK, dan overhead yang sedang aktif.</p>
           </div>
-          <button type="button" onclick="switchPage('page-2')" class="no-print text-xs font-semibold text-brand-700 hover:text-brand-800">
-            Tukar-Pasang Komponen Spec →
-          </button>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-zinc-50/50 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
-                <th class="py-2.5 px-4">Skenario Preset</th>
+                <th class="py-2.5 px-4">Skenario 3 GT</th>
                 <th class="py-2.5 px-3 text-right">COGS / Unit</th>
                 <th class="py-2.5 px-3 text-right">Nilai / Unit</th>
                 <th class="py-2.5 px-3 text-right">Nilai Proyek</th>
@@ -421,24 +548,20 @@
                 <th class="py-2.5 px-4 text-right">Timeline</th>
               </tr>
             </thead>
-            <tbody id="scenario-compare-body" class="divide-y divide-zinc-200 text-xs">
-              <!-- Populated by JS -->
-            </tbody>
+            <tbody id="scenario-compare-body" class="divide-y divide-zinc-200 text-xs"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- 1E: Cashflow Safety Curve + CEO Walk-Away Negotiation Box -->
+      <!-- Cashflow Chart + CEO Walk-Away Box -->
       <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div class="lg:col-span-7 panel p-5 flex flex-col">
           <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
             <div>
-              <h2 class="text-base font-bold tracking-tight text-zinc-950">Kurva Arus Kas Kumulatif</h2>
-              <p class="text-xs text-zinc-500 mt-0.5">Skema aktif vs benchmark aman (0% teken, pro-rata termin, netto PPN). Di bawah Rp 0 = butuh talangan.</p>
+              <h3 class="text-base font-bold tracking-tight text-zinc-950">Kurva Arus Kas Kumulatif</h3>
+              <p class="text-xs text-zinc-500 mt-0.5">Skema aktif vs benchmark aman (0% teken, pro-rata termin, netto PPN).</p>
             </div>
-            <button type="button" onclick="switchPage('page-3')" class="no-print text-xs font-semibold text-brand-700 hover:text-brand-800 shrink-0">
-              Lihat Tabel Fase →
-            </button>
+            <button type="button" onclick="switchPage('page-3')" class="no-print text-xs font-semibold text-brand-700 hover:text-brand-800 shrink-0">Tabel Fase →</button>
           </div>
           <div class="h-72 relative flex-1">
             <canvas id="cashflowChart"></canvas>
@@ -449,11 +572,11 @@
           <div class="space-y-3.5">
             <div class="flex items-start justify-between gap-3">
               <div>
-                <h2 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
+                <h3 class="text-sm font-bold text-zinc-950 flex items-center gap-2">
                   <i class="ph-bold ph-shield-warning text-rose-600 text-base"></i>
                   Batas Merah Negosiasi CEO (Walk-Away)
-                </h2>
-                <p class="text-[11px] text-zinc-500 mt-0.5">Uji eksposur hari ke-0 terhadap plafon kas bebas yang berani ditanggung IMI.</p>
+                </h3>
+                <p class="text-[11px] text-zinc-500 mt-0.5">Uji eksposur hari ke-0 terhadap plafon kas bebas IMI.</p>
               </div>
               <span id="ceo-plafon-badge" class="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full"></span>
             </div>
@@ -479,39 +602,33 @@
               </div>
             </div>
 
-            <div id="ceo-walkaway-metrics" class="space-y-2.5 text-xs">
-              <!-- Populated by JS -->
-            </div>
+            <div id="ceo-walkaway-metrics" class="space-y-2.5 text-xs"></div>
           </div>
-
           <div class="pt-3 border-t border-zinc-200 text-[11px] text-zinc-500">
-            Net Profit Riil = Kas Bersih Cair − Total Fee − Total COGS (Material + Overhead Waktu + Akselerasi) − Bunga Talangan.
+            Net Profit Riil memperhitungkan COGS komponen + overhead waktu + akselerasi + WAPU/BG + bunga talangan.
           </div>
         </div>
       </section>
     </div>
 
-    <!-- ===================================================================== -->
-    <!-- PAGE 2: SPESIFIKASI & STRUKTUR BIAYA (SPEC & TIME-COST ENGINEERING)   -->
+    <!-- =================================================================== -->
+    <!-- VIEW 3: STRUKTUR BIAYA & LINI (OVERHEAD, ACCEL, SWEET SPOT)         -->
     <!-- ===================================================================== -->
     <div id="page-2" class="page-view hidden space-y-6 print-page-break">
-
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Halaman 2 · Engineering &amp; Costing</p>
-          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Spesifikasi Interchangeable &amp; Dampak Durasi ke Biaya</h2>
-          <p class="text-xs text-zinc-500 mt-1">
-            Produksi dan pengiriman lebih lama memicu <strong>Overhead Harian Galangan</strong> lebih besar; mempercepat lini mengurangi overhead &amp; bunga namun memicu <strong>Biaya Akselerasi</strong>.
-          </p>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 3 · Struktur Biaya &amp; Kapasitas Lini</p>
+          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Dampak Waktu Produksi ke COGS &amp; Sweet Spot Galangan</h2>
+          <p class="text-xs text-zinc-500 mt-1">Durasi proyek memicu <strong>Overhead Harian</strong>; ekspansi lini mempercepat produksi dengan <strong>Biaya Akselerasi</strong>.</p>
         </div>
-        <button type="button" onclick="switchPage('page-1')" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700">
-          ← Kembali ke Ringkasan
+        <button type="button" onclick="switchPage('page-spec')" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700">
+          ← Ubah Komponen di Builder
         </button>
       </div>
 
-      <!-- 2A: Time-Driven Cost Controls + COGS Structure Strip -->
+      <!-- Time-Driven Cost Controls + COGS Strip -->
       <section class="panel overflow-hidden">
-        <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-12 gap-4 items-start bg-zinc-50/70 border-b border-zinc-200">
+        <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-12 gap-4 items-start bg-zinc-50/70 border-b border-zinc-200 no-print">
           <div class="md:col-span-3 space-y-1.5">
             <label for="ctrl-overhead-day" class="block text-xs font-semibold text-zinc-700">Overhead Harian Galangan</label>
             <div class="input-shell flex items-center px-3 py-2 bg-white">
@@ -521,21 +638,15 @@
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
               <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">Jt / hari</span>
             </div>
-            <p class="text-[11px] text-zinc-500">Sewa slipway, listrik, keamanan &amp; gaji tim proyek per hari kalender.</p>
+            <p class="text-[11px] text-zinc-500">Sewa slipway, listrik, keamanan &amp; tim tetap per hari kalender.</p>
           </div>
 
           <div class="md:col-span-5 space-y-1.5">
-            <label class="block text-xs font-semibold text-zinc-700">Kapasitas Lini Galangan (Kecepatan Produksi)</label>
+            <label class="block text-xs font-semibold text-zinc-700">Kapasitas Lini Galangan</label>
             <div class="grid grid-cols-3 gap-1.5 p-1 rounded-lg bg-zinc-200/70">
-              <button type="button" id="cap-1" onclick="setCapacity(1)" class="seg-btn active text-xs py-2 px-2 text-zinc-700 tnum">
-                1× Standar
-              </button>
-              <button type="button" id="cap-1.5" onclick="setCapacity(1.5)" class="seg-btn text-xs py-2 px-2 text-zinc-700 tnum">
-                1,5× Ekspansi
-              </button>
-              <button type="button" id="cap-2" onclick="setCapacity(2)" class="seg-btn text-xs py-2 px-2 text-zinc-700 tnum">
-                2× Konsorsium
-              </button>
+              <button type="button" id="cap-1" onclick="setCapacity(1)" class="seg-btn active text-xs py-2 px-2 text-zinc-700 tnum">1× Standar</button>
+              <button type="button" id="cap-1.5" onclick="setCapacity(1.5)" class="seg-btn text-xs py-2 px-2 text-zinc-700 tnum">1,5× Ekspansi</button>
+              <button type="button" id="cap-2" onclick="setCapacity(2)" class="seg-btn text-xs py-2 px-2 text-zinc-700 tnum">2× Konsorsium</button>
             </div>
             <p id="capacity-note" class="text-[11px] text-zinc-500 tnum"></p>
           </div>
@@ -549,23 +660,17 @@
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
               <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">Jt / unit</span>
             </div>
-            <p class="text-[11px] text-zinc-500">Otomatis 0 Jt (1×), +2,5 Jt (1,5×), +5,5 Jt (2×) — bebas disesuaikan.</p>
+            <p class="text-[11px] text-zinc-500">Default 0 Jt (1×), 2,5 Jt (1,5×), 5,5 Jt (2×) — bebas diedit.</p>
           </div>
         </div>
-
-        <!-- COGS Breakdown Strip -->
-        <div id="cogs-breakdown-strip" class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 bg-white">
-          <!-- Populated by JS -->
-        </div>
+        <div id="cogs-breakdown-strip" class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 bg-white"></div>
       </section>
 
-      <!-- 2B: Sweet-Spot Production Speed vs Total Cost Trade-Off Table -->
+      <!-- Sweet Spot Trade-Off Table -->
       <section class="panel overflow-hidden">
-        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 class="text-sm font-bold text-zinc-950">Analisa Sweet Spot: Kecepatan Produksi vs Total Biaya &amp; Profit Riil</h3>
-            <p class="text-[11px] text-zinc-500">Klik baris kapasitas di bawah untuk memilih titik optimum antara durasi pengiriman, overhead galangan, biaya akselerasi, dan bunga bank.</p>
-          </div>
+        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200">
+          <h3 class="text-sm font-bold text-zinc-950">Analisa Sweet Spot: Kecepatan Produksi vs Total Biaya &amp; Profit Riil</h3>
+          <p class="text-[11px] text-zinc-500">Klik baris kapasitas untuk mengganti kecepatan lini produksi.</p>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
@@ -581,57 +686,53 @@
                 <th class="py-2.5 px-4 text-right">Net Profit Riil</th>
               </tr>
             </thead>
-            <tbody id="tradeoff-table-body" class="divide-y divide-zinc-200 text-xs">
-              <!-- Populated by JS -->
-            </tbody>
+            <tbody id="tradeoff-table-body" class="divide-y divide-zinc-200 text-xs"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- 2C: Interchangeable Spec Configurator with Inline Unit Prices -->
+      <!-- Active WBS Summary Table (with quick inspect buttons) -->
       <section class="panel overflow-hidden">
-        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-xs font-semibold text-zinc-900">Konfigurator Komponen Interchangeable (Klik Kartu &amp; Edit Harga Satuan)</span>
-            <span id="custom-badge" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
-              Custom Mix Aktif
-            </span>
-            <span id="price-override-badge" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-              Harga Diedit
-            </span>
-          </div>
-          <div class="flex items-center gap-3">
-            <button id="btn-reset-prices" type="button" onclick="resetUnitPrices()" class="hidden no-print inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 hover:text-amber-950 bg-amber-100/80 hover:bg-amber-200/80 px-2.5 py-1 rounded-md transition">
-              <i class="ph ph-arrow-counter-clockwise text-xs"></i> Reset Harga Standar
-            </button>
-            <span class="text-[11px] text-zinc-500">Basis rumus: IMI RAB Studio (<span class="tnum">L/13</span> × Slender Hull)</span>
+        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-zinc-950">Ringkasan 5 Komponen Terpasang (Klik Baris untuk Edit Harga / Lead Time / DP Supplier)</h3>
+            <p class="text-[11px] text-zinc-500">Nilai DP Supplier (%) per komponen langsung menentukan beban kas keluar di Fase Pengadaan (F2).</p>
           </div>
         </div>
-        <div id="spec-matrix" class="divide-y divide-zinc-200">
-          <!-- Populated by JS -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-zinc-50/50 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
+                <th class="py-2.5 px-4">WBS &amp; Komponen Aktif</th>
+                <th class="py-2.5 px-3">Spesifikasi Terkunci (OEM / PK / Bahan)</th>
+                <th class="py-2.5 px-3 text-right">Harga / Unit</th>
+                <th class="py-2.5 px-3 text-right">Total Komponen</th>
+                <th class="py-2.5 px-3 text-right">DP Supplier (F2)</th>
+                <th class="py-2.5 px-4 text-right">Lead Time</th>
+              </tr>
+            </thead>
+            <tbody id="active-wbs-table-body" class="divide-y divide-zinc-200 text-xs"></tbody>
+          </table>
         </div>
       </section>
     </div>
 
-    <!-- ===================================================================== -->
-    <!-- PAGE 3: TIMELINE & ARUS KAS FASE (TIMELINE & PAYMENT SCHEDULE)        -->
+    <!-- =================================================================== -->
+    <!-- VIEW 4: TIMELINE & ARUS KAS FASE (GANTT + TREASURY LEDGER)          -->
     <!-- ===================================================================== -->
     <div id="page-3" class="page-view hidden space-y-6 print-page-break">
-
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Halaman 3 · Jadwal &amp; Treasury</p>
-          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Timeline Produksi &amp; Breakdown Pembayaran per Fase</h2>
-          <p class="text-xs text-zinc-500 mt-1">
-            Atur pemecahan SPK, basis fee Netto vs Bruto PPN, potongan bendahara WAPU/BG, serta stress-test keterlambatan pencairan SP2D.
-          </p>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 4 · Timeline &amp; Jadwal Arus Kas</p>
+          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Gantt Produksi &amp; Breakdown Pembayaran per Fase</h2>
+          <p class="text-xs text-zinc-500 mt-1">Atur pemecahan SPK, basis fee Netto/Bruto PPN, WAPU/BG, delay SP2D, dan bunga modal talangan.</p>
         </div>
         <button type="button" onclick="switchPage('page-1')" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700">
-          ← Kembali ke Ringkasan
+          ← Kembali ke Ringkasan CEO
         </button>
       </div>
 
-      <!-- 3A: Gov Realism & Contract Structure Controls -->
+      <!-- Gov Realism Controls -->
       <section class="panel p-4 sm:p-5 bg-zinc-50/70 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-center no-print">
         <div class="lg:col-span-3 space-y-1">
           <div class="flex items-center justify-between text-[11px]">
@@ -690,7 +791,7 @@
         </div>
       </section>
 
-      <!-- 3B: Detailed Gantt Chart -->
+      <!-- Gantt Chart -->
       <section class="panel p-5 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -704,20 +805,17 @@
             <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-600"></span> QC, Dokumen &amp; BAST</span>
           </div>
         </div>
-
         <div class="overflow-x-auto">
-          <div id="gantt-container" class="min-w-[780px] space-y-2">
-            <!-- Populated by JS -->
-          </div>
+          <div id="gantt-container" class="min-w-[780px] space-y-2"></div>
         </div>
       </section>
 
-      <!-- 3C: Phase-by-Phase Payment Breakdown Table -->
+      <!-- Phase Cashflow Table -->
       <section class="panel overflow-hidden">
         <div class="px-5 py-4 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 class="text-base font-bold tracking-tight text-zinc-950">Breakdown Pembayaran &amp; Arus Kas per Fase</h3>
-            <p class="text-xs text-zinc-500 mt-0.5">Kas masuk bersih (setelah WAPU/BG), Fee Mitra, Biaya Produksi (Fisik + Overhead + Akselerasi), Net Fase, dan Kas Kumulatif.</p>
+            <p class="text-xs text-zinc-500 mt-0.5">Kas masuk bersih, Fee Mitra, Biaya Produksi/Supplier (sesuai DP % kartu), Net Fase, dan Kas Kumulatif.</p>
           </div>
           <span id="table-unit-badge" class="text-xs font-semibold px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-700 tnum"></span>
         </div>
@@ -735,210 +833,884 @@
                 <th class="py-3 px-4 text-center">Status</th>
               </tr>
             </thead>
-            <tbody id="cashflow-table-body" class="divide-y divide-zinc-200 text-xs">
-              <!-- Populated by JS -->
-            </tbody>
-            <tfoot id="cashflow-table-foot" class="bg-zinc-950 text-white text-xs font-semibold">
-              <!-- Populated by JS -->
-            </tfoot>
+            <tbody id="cashflow-table-body" class="divide-y divide-zinc-200 text-xs"></tbody>
+            <tfoot id="cashflow-table-foot" class="bg-zinc-950 text-white text-xs font-semibold"></tfoot>
           </table>
         </div>
       </section>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="mt-8 pt-4 pb-6 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-3 text-[11px] text-zinc-500">
-      <div>
-        Basis perhitungan: <strong>IMI RAB Studio</strong> (<code>L/13 × BASE_13M_STRUCTURAL</code> · 9,2m × 1,2m × 0,75m + Balok Kayu 6×8 cm + Yamaha 15 PK) + Overhead Harian + Akselerasi Lini + Friksi SP2D/WAPU/BG.
-      </div>
-      <div>
-        PT Inovasi Maritim Indonesia · Dokumen Internal Management
-      </div>
+    <footer class="pt-4 pb-6 border-t border-zinc-200 flex flex-wrap items-center justify-between gap-3 text-[11px] text-zinc-500">
+      <div>Basis data: <strong>IMI RAB Studio</strong> (Parametric L/13 &amp; 9,2m × 1,2m Open-Hull Fishing Boat + Ontologi Korelasi Teknis-Finansial).</div>
+      <div>PT Inovasi Maritim Indonesia · Dokumen Internal Management</div>
     </footer>
-
   </main>
+
+  <!-- ===================================================================== -->
+  <!-- CARD INSPECTOR MODAL (LOCKED SPECS VS EDITABLE COMMERCIAL/TIMELINE)   -->
+  <!-- ===================================================================== -->
+  <div id="inspector-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeInspectorModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+        <div>
+          <span id="insp-wbs-tag" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700"></span>
+          <h3 id="insp-title" class="text-base font-bold text-zinc-950 mt-1">Inspector Komponen</h3>
+        </div>
+        <button type="button" onclick="closeInspectorModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <!-- Locked Immutable Engineering Specs -->
+        <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
+          <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+            <i class="ph-bold ph-lock-key text-zinc-500"></i> Spesifikasi Terkunci (Tidak Dapat Diedit)
+          </div>
+          <div id="insp-locked-grid" class="grid grid-cols-2 gap-2.5 text-xs">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Editable Commercial & Timeline Parameters -->
+        <div class="space-y-3">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-brand-700 flex items-center gap-1.5">
+            <i class="ph-bold ph-sliders-horizontal"></i> Parameter Komersial &amp; Jadwal (Bisa Diedit)
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="insp-cost" class="block text-xs font-semibold text-zinc-700 mb-1">Harga Satuan (Juta Rp / unit)</label>
+              <div class="input-shell flex items-center px-3 py-2">
+                <span class="text-xs text-zinc-400 pr-1">Rp</span>
+                <input id="insp-cost" type="number" min="0" step="0.1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-xs text-zinc-400 pl-1">Jt</span>
+              </div>
+            </div>
+            <div>
+              <label for="insp-dp-sup" class="block text-xs font-semibold text-zinc-700 mb-1">DP Supplier di Fase F2 (%)</label>
+              <div class="input-shell flex items-center px-3 py-2">
+                <input id="insp-dp-sup" type="number" min="0" max="100" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-xs text-zinc-400 pl-1">%</span>
+              </div>
+            </div>
+            <div id="insp-extra-wrap">
+              <label for="insp-extra-days" class="block text-xs font-semibold text-zinc-700 mb-1">Tambahan Lead Time (Hari)</label>
+              <div class="input-shell flex items-center px-3 py-2">
+                <input id="insp-extra-days" type="number" min="0" max="365" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-xs text-zinc-400 pl-1">hari</span>
+              </div>
+            </div>
+            <div id="insp-hull-prep-wrap" class="hidden">
+              <label for="insp-prep-days" class="block text-xs font-semibold text-zinc-700 mb-1">Persiapan Mould/Jig (Hari)</label>
+              <div class="input-shell flex items-center px-3 py-2">
+                <input id="insp-prep-days" type="number" min="1" max="180" step="1" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-xs text-zinc-400 pl-1">hari</span>
+              </div>
+            </div>
+            <div id="insp-hull-rate-wrap" class="hidden">
+              <label for="insp-rate" class="block text-xs font-semibold text-zinc-700 mb-1">Output Produksi (Unit / Hari)</label>
+              <div class="input-shell flex items-center px-3 py-2">
+                <input id="insp-rate" type="number" min="0.05" max="50" step="0.05" class="w-full text-sm font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-xs text-zinc-400 pl-1">u/h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-3">
+        <button type="button" onclick="resetSingleCardFromInspector()" class="text-xs font-semibold text-zinc-600 hover:text-zinc-900">
+          Reset Default Kartu
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeInspectorModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700 hover:bg-zinc-50">
+            Batal
+          </button>
+          <button type="button" onclick="saveInspectorChanges()" class="px-4 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">
+            Simpan &amp; Pasang
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SAVE CONFIGURATION MODAL (PERSISTS TO LOCALSTORAGE + DROPDOWN)        -->
+  <!-- ===================================================================== -->
+  <div id="save-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeSaveModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+        <h3 class="text-sm font-bold text-zinc-950">Simpan Konfigurasi Kapal &amp; Proyek</h3>
+        <button type="button" onclick="closeSaveModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-base"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3">
+        <div>
+          <label for="save-config-name" class="block text-xs font-semibold text-zinc-700 mb-1">Nama Konfigurasi</label>
+          <div class="input-shell px-3 py-2">
+            <input id="save-config-name" type="text" placeholder="Contoh: Kapal Ikan 3GT Hybrid - Nego Yamaha 28Jt" class="w-full text-sm font-medium bg-transparent focus:outline-none" />
+          </div>
+          <p class="text-[11px] text-zinc-500 mt-1.5">Menyimpan jenis kapal, 5 kartu terpilih, editan harga/lead time, volume, markup, DP, SPK, dan overhead ke memori browser dan menampilkannya di dropdown preset.</p>
+        </div>
+      </div>
+      <div class="px-5 py-3 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-2">
+        <button type="button" onclick="closeSaveModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
+        <button type="button" onclick="confirmSaveConfig()" class="px-4 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold">Simpan Sekarang</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // =========================================================================
-    // 1. DATA MODEL: 5 INTERCHANGEABLE SPEC MODULES + CAPACITY DEFAULTS
+    // 1. VESSEL ONTOLOGY, CLASSES, COMPONENT CARDS & PRESETS
     // =========================================================================
-    const SPEC_MODULES = [
+    const WBS_CATEGORIES = [
+      { id: 'hull',            code: 'WBS I',       title: 'Body & Lambung Kapal',       icon: 'ph-boat' },
+      { id: 'engine',          code: 'WBS III',     title: 'Mesin & Propulsi',           icon: 'ph-engine' },
+      { id: 'outfitting',      code: 'WBS II/IV/V', title: 'Outfitting, Palka & Tambat', icon: 'ph-toolbox' },
+      { id: 'nav_elec',        code: 'WBS VI–VIII', title: 'Navigasi, Listrik & Safety', icon: 'ph-compass' },
+      { id: 'permit_delivery', code: 'WBS IX & X',  title: 'Perizinan, BKI & Kirim',     icon: 'ph-certificate' }
+    ];
+
+    const VESSEL_CLASSES = [
       {
-        id: 'hull',
-        wbs: 'WBS I',
-        name: 'Body Kapal & Rangka (9,2m × 1,2m × 0,75m)',
-        desc: 'Material lambung Fiber/Aluminium, balok kayu 6×8 cm, finishing cat marine',
-        options: [
-          {
-            tier: 1, label: 'Termurah · Full FRP',
-            spec: 'FRP Hand Lay-Up + Balok Kayu 6×8 cm + Cat PU Dasar & Topcoat',
-            cost: 36500000, defaultCost: 36500000,
-            prepDays: 20, unitsPerDay: 10.0, extraDays: 0
-          },
-          {
-            tier: 2, label: 'Sedang · Hybrid Fiber-Alu',
-            spec: 'FRP Marine Grade + Transom/Gunwale/Rib Aluminium + Kayu 6×8 + Antifouling',
-            cost: 58500000, defaultCost: 58500000,
-            prepDays: 30, unitsPerDay: 7.5, extraDays: 0
-          },
-          {
-            tier: 3, label: 'Termahal · Heavy Alu-Composite',
-            spec: 'Marine Aluminium 5083 / Heavy Composite + Deck Anti-Slip + Coating 3-Layer',
-            cost: 88000000, defaultCost: 88000000,
-            prepDays: 40, unitsPerDay: 5.5, extraDays: 0
-          }
-        ]
+        id: 'fishing-3gt',
+        name: 'Kapal Ikan 3 GT',
+        badge: '9,2m × 1,2m',
+        desc: 'Open-Hull · Kayu 6×8 cm · KAK Wajib Yamaha 15 PK',
+        minHp: 12, maxHp: 40, hasCabin: false, defaultVolume: 1000, defaultOverheadJt: 10, requireYamaha15: true
       },
       {
-        id: 'engine',
-        wbs: 'WBS III',
-        name: 'Mesin Wajib YAMAHA 15 PK',
-        desc: 'Unit mesin tempel Yamaha 15 PK, tangki BBM 24L, rigging & instalasi transom',
-        options: [
-          {
-            tier: 1, label: 'Termurah · 2-Tak Fleet',
-            spec: 'Yamaha 15 PK 2-Tak (E15DMHS Bulk) + Tangki 24L + Instalasi Dasar',
-            cost: 30500000, defaultCost: 30500000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 0
-          },
-          {
-            tier: 2, label: 'Sedang · 2-Tak Dealer + Kit',
-            spec: 'Yamaha 15 PK 2-Tak (15FMHS Resmi) + Tangki 24L + Filter Racor + Sparekit',
-            cost: 35000000, defaultCost: 35000000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 10
-          },
-          {
-            tier: 3, label: 'Termahal · 4-Tak F15CMH',
-            spec: 'Yamaha 15 PK 4-Tak (F15CMH Low Emission) + Racor + Toolkit + Garansi Ekstra',
-            cost: 46500000, defaultCost: 46500000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 25
-          }
-        ]
+        id: 'patrol-fast',
+        name: 'Kapal Patroli Cepat',
+        badge: '8,5m – 10m',
+        desc: 'Deep-V Kabin Patroli · Twin Engine 115–200 HP',
+        minHp: 200, maxHp: 500, hasCabin: true, defaultVolume: 4, defaultOverheadJt: 1.5, requireYamaha15: false
       },
       {
-        id: 'outfitting',
-        wbs: 'WBS II, IV, V',
-        name: 'Outfitting, Palka Ikan & Alat Tambat',
-        desc: 'Palka/box ikan, papan duduk, fender pelindung, jangkar & tali tambat',
-        options: [
-          {
-            tier: 1, label: 'Termurah · Minimal Nelayan',
-            spec: 'Coolbox Portabel, Papan Duduk Kayu, Jangkar 7kg + Tali 50m, Fender Basic',
-            cost: 5500000, defaultCost: 5500000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 0
-          },
-          {
-            tier: 2, label: 'Sedang · Standard KKP',
-            spec: 'Palka Insulasi PU 300L Terintegrasi, Pompa Bilga, Fender Karet, Cleat SS',
-            cost: 13500000, defaultCost: 13500000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 12
-          },
-          {
-            tier: 3, label: 'Termahal · Heavy-Duty SS316',
-            spec: '2× Palka PU + Loker Kedap, Bilga Otomatis 12V, Fender Alu+D-Rubber, Kanopi SS316',
-            cost: 24500000, defaultCost: 24500000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 22
-          }
-        ]
+        id: 'crew-workboat',
+        name: 'Crew / Workboat',
+        badge: '12,5m – 13m',
+        desc: 'Step-Hull Cabin · Twin 200–250 HP · Genset 3 kVA',
+        minHp: 350, maxHp: 650, hasCabin: true, defaultVolume: 2, defaultOverheadJt: 2.0, requireYamaha15: false
       },
       {
-        id: 'nav_elec',
-        wbs: 'WBS VI–VIII',
-        name: 'Navigasi, Kelistrikan & Keselamatan',
-        desc: 'Alat keselamatan SOLAS, lampu navigasi, fishfinder/GPS & kelistrikan DC 12V',
-        options: [
-          {
-            tier: 1, label: 'Termurah · Safety Dasar',
-            spec: '2× Life Jacket SOLAS, 1× Life Buoy, Senter Marine, Kompas Saku, P3K Dasar',
-            cost: 1800000, defaultCost: 1800000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 0
-          },
-          {
-            tier: 2, label: 'Sedang · DC 12V + Fishfinder',
-            spec: 'Aki 12V + Panel Switch, Lampu Nav LED, GPS/Fishfinder 4", 3× Life Jacket, APAR',
-            cost: 9500000, defaultCost: 9500000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 8
-          },
-          {
-            tier: 3, label: 'Termahal · Garmin + Solar DC',
-            spec: 'Garmin Chartplotter/Fishfinder, VHF Marine, Panel Surya + Aki + Full SOLAS',
-            cost: 21000000, defaultCost: 21000000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 15
-          }
-        ]
-      },
-      {
-        id: 'permit_delivery',
-        wbs: 'WBS IX & X',
-        name: 'Perizinan, QC, Uji Coba & Distribusi',
-        desc: 'Pas Kecil/Hubla, sertifikasi BKI, sea trial & pengiriman ke titik serah terima',
-        options: [
-          {
-            tier: 1, label: 'Termurah · Ex-Yard + Pas Kecil',
-            spec: 'Uji Apung Sampling, Pas Kecil & Surat Ukur Kolektif, BAST di Galangan',
-            cost: 4200000, defaultCost: 4200000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 10
-          },
-          {
-            tier: 2, label: 'Sedang · Hubla + Kirim Regional',
-            spec: 'Sea Trial per Batch, Dokumen Hubla Lengkap, Pengiriman Truk/Tongkang Regional',
-            cost: 10500000, defaultCost: 10500000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 18
-          },
-          {
-            tier: 3, label: 'Termahal · BKI + Antar-Pulau',
-            spec: 'Supervisi & Sertifikat BKI, Hubla Lengkap, Official Sea Trial, Logistik Antar-Pulau',
-            cost: 20000000, defaultCost: 20000000,
-            prepDays: 0, unitsPerDay: 0, extraDays: 30
-          }
-        ]
+        id: 'passenger-ferry',
+        name: 'Passenger Boat',
+        badge: '12,5m – 16,5m',
+        desc: 'Commuter / Flybridge 16–20 Pax · 400–1.200 HP',
+        minHp: 400, maxHp: 1300, hasCabin: true, defaultVolume: 1, defaultOverheadJt: 2.5, requireYamaha15: false
       }
     ];
 
-    const PRESET_META = [
-      { tier: 1, name: 'Skenario 1 · Termurah', sub: 'Full FRP + Kayu 6×8 + Yamaha 15 PK 2-Tak Fleet' },
-      { tier: 2, name: 'Skenario 2 · Sedang', sub: 'Hybrid Fiber-Aluminium + Palka PU + Yamaha 15 PK Resmi' },
-      { tier: 3, name: 'Skenario 3 · Termahal', sub: 'Heavy Alu-Composite 5083 + Yamaha 15 PK 4-Tak + BKI' }
+    const COMPONENT_CATALOG = [
+      // HULLS (WBS I)
+      {
+        id: 'hull-3gt-frp', category: 'hull', name: 'Open-Hull 3 GT Full FRP + Kayu 6×8',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'IMI Custom', powerLabel: 'LOA 9,2m × B 1,2m', materialOrCycle: 'FRP Hand Lay-Up', dimensionsOrSpec: 'Open-Deck · H 0,75m · T 0,4m' },
+        cost: 36500000, defaultCost: 36500000, prepDays: 20, defaultPrepDays: 20, unitsPerDay: 10.0, defaultUnitsPerDay: 10.0, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        hullGrade: 'economy', hasCabin: false
+      },
+      {
+        id: 'hull-3gt-hybrid', category: 'hull', name: 'Open-Hull 3 GT Hybrid Fiber-Aluminium',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'IMI Custom', powerLabel: 'LOA 9,2m × B 1,2m', materialOrCycle: 'FRP + Transom/Rib Alu', dimensionsOrSpec: 'Open-Deck · Kayu 6×8 + AF Coat' },
+        cost: 58500000, defaultCost: 58500000, prepDays: 30, defaultPrepDays: 30, unitsPerDay: 7.5, defaultUnitsPerDay: 7.5, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        hullGrade: 'standard', hasCabin: false
+      },
+      {
+        id: 'hull-3gt-alu', category: 'hull', name: 'Open-Hull 3 GT Heavy Alu-Composite 5083',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'IMI Marine Alu', powerLabel: 'LOA 9,2m × B 1,2m', materialOrCycle: 'Marine Alu 5083 + FRP', dimensionsOrSpec: 'Anti-Slip Deck · 3-Layer Coat' },
+        cost: 88000000, defaultCost: 88000000, prepDays: 40, defaultPrepDays: 40, unitsPerDay: 5.5, defaultUnitsPerDay: 5.5, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        hullGrade: 'heavy', hasCabin: false
+      },
+      {
+        id: 'hull-patrol-85', category: 'hull', name: 'Patrol Deep-V FRP 8,5m (8 Pax)',
+        compatibleClasses: ['patrol-fast'],
+        locked: { brand: 'IMI GA001', powerLabel: 'LOA 8,5m × B 2,5m', materialOrCycle: 'FRP Deep-V + Cabin', dimensionsOrSpec: 'Superstructure Kabin · Draft 0,4m' },
+        cost: 315000000, defaultCost: 315000000, prepDays: 25, defaultPrepDays: 25, unitsPerDay: 0.25, defaultUnitsPerDay: 0.25, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        hullGrade: 'standard', hasCabin: true
+      },
+      {
+        id: 'hull-patrol-100', category: 'hull', name: 'Patrol High-Speed ALS 10,0m',
+        compatibleClasses: ['patrol-fast'],
+        locked: { brand: 'IMI ALS-10', powerLabel: 'LOA 10,0m × B 2,6m', materialOrCycle: 'Heavy FRP Deep-V', dimensionsOrSpec: 'Cabin Wheelhouse · Draft 0,5m' },
+        cost: 375000000, defaultCost: 375000000, prepDays: 30, defaultPrepDays: 30, unitsPerDay: 0.20, defaultUnitsPerDay: 0.20, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        hullGrade: 'heavy', hasCabin: true
+      },
+      {
+        id: 'hull-crew-130', category: 'hull', name: 'Crew Boat Step-Hull FRP 13,0m',
+        compatibleClasses: ['crew-workboat'],
+        locked: { brand: 'IMI Qtt #004', powerLabel: 'LOA 13,0m × B 3,1m', materialOrCycle: 'FRP Step-Hull + Kabin', dimensionsOrSpec: '13 Pax Cabin + Toilet · Draft 0,65m' },
+        cost: 495000000, defaultCost: 495000000, prepDays: 35, defaultPrepDays: 35, unitsPerDay: 0.15, defaultUnitsPerDay: 0.15, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        hullGrade: 'heavy', hasCabin: true
+      },
+      {
+        id: 'hull-pass-125', category: 'hull', name: 'VAJRA Commuter FRP 12,5m (16 Pax)',
+        compatibleClasses: ['passenger-ferry', 'crew-workboat'],
+        locked: { brand: 'IMI VAJRA-04C', powerLabel: 'LOA 12,5m × B 3,0m', materialOrCycle: 'FRP Single-Deck', dimensionsOrSpec: '16 Pax Commuter Cabin · Draft 0,55m' },
+        cost: 465000000, defaultCost: 465000000, prepDays: 35, defaultPrepDays: 35, unitsPerDay: 0.16, defaultUnitsPerDay: 0.16, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        hullGrade: 'heavy', hasCabin: true
+      },
+      {
+        id: 'hull-pass-165', category: 'hull', name: 'Passenger Flybridge FRP 16,5m (20 Pax)',
+        compatibleClasses: ['passenger-ferry'],
+        locked: { brand: 'IMI Qtt #005', powerLabel: 'LOA 16,5m × B 3,8m', materialOrCycle: 'FRP Double-Deck Flybridge', dimensionsOrSpec: '20 Pax + Upper Deck · Draft 0,75m' },
+        cost: 760000000, defaultCost: 760000000, prepDays: 45, defaultPrepDays: 45, unitsPerDay: 0.10, defaultUnitsPerDay: 0.10, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        hullGrade: 'heavy', hasCabin: true
+      },
+
+      // ENGINES (WBS III)
+      {
+        id: 'eng-yamaha-15-fleet', category: 'engine', name: 'Yamaha 15 PK 2-Tak Fleet (E15DMHS)',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'YAMAHA', powerLabel: '15 PK (1× 15 HP)', materialOrCycle: '2-Tak Bulk Fleet', dimensionsOrSpec: 'Tangki 24L · Rigging Standar' },
+        cost: 30500000, defaultCost: 30500000, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        totalHp: 15, isYamaha15Pk: true
+      },
+      {
+        id: 'eng-yamaha-15-dealer', category: 'engine', name: 'Yamaha 15 PK 2-Tak Dealer + Kit (15FMHS)',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'YAMAHA', powerLabel: '15 PK (1× 15 HP)', materialOrCycle: '2-Tak Dealer Resmi', dimensionsOrSpec: 'Tangki 24L + Filter Racor + Sparekit' },
+        cost: 35000000, defaultCost: 35000000, extraDays: 10, defaultExtraDays: 10, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        totalHp: 15, isYamaha15Pk: true
+      },
+      {
+        id: 'eng-yamaha-15-4t', category: 'engine', name: 'Yamaha 15 PK 4-Tak Low Emission (F15CMH)',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'YAMAHA', powerLabel: '15 PK (1× 15 HP)', materialOrCycle: '4-Tak EFI / Low Emission', dimensionsOrSpec: 'Tangki 24L + Racor + Garansi Ekstra' },
+        cost: 46500000, defaultCost: 46500000, extraDays: 25, defaultExtraDays: 25, dpSupplierPct: 35, defaultDpSupplierPct: 35,
+        totalHp: 15, isYamaha15Pk: true
+      },
+      {
+        id: 'eng-yamaha-115x2', category: 'engine', name: '2× Yamaha OBM 115 HP 2-Tak (V4)',
+        compatibleClasses: ['patrol-fast'],
+        locked: { brand: 'YAMAHA', powerLabel: '230 HP (2× 115 HP)', materialOrCycle: '2-Tak V4 Twin OBM', dimensionsOrSpec: 'Hydraulic Steering + Dual Aki + Tie-Bar' },
+        cost: 430000000, defaultCost: 430000000, extraDays: 18, defaultExtraDays: 18, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        totalHp: 230, isYamaha15Pk: false
+      },
+      {
+        id: 'eng-yamaha-200x2', category: 'engine', name: '2× Yamaha OBM 200 HP 4-Tak',
+        compatibleClasses: ['patrol-fast', 'crew-workboat', 'passenger-ferry'],
+        locked: { brand: 'YAMAHA', powerLabel: '400 HP (2× 200 HP)', materialOrCycle: '4-Tak Twin Counter', dimensionsOrSpec: 'Hydraulic Dual Cylinder + Rigging OEM' },
+        cost: 605000000, defaultCost: 605000000, extraDays: 24, defaultExtraDays: 24, dpSupplierPct: 35, defaultDpSupplierPct: 35,
+        totalHp: 400, isYamaha15Pk: false
+      },
+      {
+        id: 'eng-yamaha-250x2', category: 'engine', name: '2× Yamaha OBM 250 HP 4-Tak',
+        compatibleClasses: ['crew-workboat', 'passenger-ferry'],
+        locked: { brand: 'YAMAHA', powerLabel: '500 HP (2× 250 HP)', materialOrCycle: '4-Tak Counter Rotation', dimensionsOrSpec: 'Hydraulic Steering + 3× Aki Heavy Duty' },
+        cost: 705000000, defaultCost: 705000000, extraDays: 28, defaultExtraDays: 28, dpSupplierPct: 35, defaultDpSupplierPct: 35,
+        totalHp: 500, isYamaha15Pk: false
+      },
+      {
+        id: 'eng-yamaha-300x4', category: 'engine', name: '4× Yamaha OBM 300 HP 4-Tak',
+        compatibleClasses: ['passenger-ferry'],
+        locked: { brand: 'YAMAHA', powerLabel: '1.200 HP (4× 300 HP)', materialOrCycle: '4-Tak Quad Counter', dimensionsOrSpec: 'Quad Binnacle + Triple Tie-Bar + 5× Aki' },
+        cost: 1795000000, defaultCost: 1795000000, extraDays: 40, defaultExtraDays: 40, dpSupplierPct: 40, defaultDpSupplierPct: 40,
+        totalHp: 1200, isYamaha15Pk: false
+      },
+
+      // OUTFITTING (WBS II, IV, V)
+      {
+        id: 'out-3gt-basic', category: 'outfitting', name: 'Outfitting Minimal Nelayan (Coolbox + Kayu)',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'IMI Std', powerLabel: 'Open-Deck Basic', materialOrCycle: 'Coolbox + Papan Kayu', dimensionsOrSpec: 'Jangkar 7kg + Tali 50m + Fender Dasar' },
+        cost: 5500000, defaultCost: 5500000, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 20, defaultDpSupplierPct: 20,
+        requiresCabin: false
+      },
+      {
+        id: 'out-3gt-kkp', category: 'outfitting', name: 'Outfitting Standard KKP (Palka PU 300L)',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'IMI KKP-Spec', powerLabel: 'Palka Insulasi PU', materialOrCycle: 'FRP + Karet + Cleat SS', dimensionsOrSpec: 'Palka 300L + Pompa Bilga + Jangkar 10kg' },
+        cost: 13500000, defaultCost: 13500000, extraDays: 12, defaultExtraDays: 12, dpSupplierPct: 20, defaultDpSupplierPct: 20,
+        requiresCabin: false
+      },
+      {
+        id: 'out-3gt-ss316', category: 'outfitting', name: 'Outfitting Heavy-Duty SS316 + Kanopi',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'IMI Heavy', powerLabel: '2× Palka + Kanopi', materialOrCycle: 'SS316 + Alu D-Fender', dimensionsOrSpec: 'Bilga Otomatis 12V + Loker Kedap + Railing' },
+        cost: 24500000, defaultCost: 24500000, extraDays: 22, defaultExtraDays: 22, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        requiresCabin: false
+      },
+      {
+        id: 'out-patrol-std', category: 'outfitting', name: 'Outfitting Patrol Cabin (8 Pax + D-Fender)',
+        compatibleClasses: ['patrol-fast'],
+        locked: { brand: 'IMI Patrol', powerLabel: '700–800L FO · 200L FW', materialOrCycle: 'Tempered Glass + SS316', dimensionsOrSpec: 'Kursi Pilot + 8 Pax + Jangkar 25kg' },
+        cost: 135000000, defaultCost: 135000000, extraDays: 18, defaultExtraDays: 18, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        requiresCabin: true
+      },
+      {
+        id: 'out-comm-cabin', category: 'outfitting', name: 'Outfitting Cabin 13–16 Pax + Galley + Toilet',
+        compatibleClasses: ['crew-workboat', 'passenger-ferry'],
+        locked: { brand: 'IMI Commercial', powerLabel: '1000L FO · 400L FW', materialOrCycle: 'Tempered + Sanitary + SS', dimensionsOrSpec: 'Sofa Pax + Galley + Jangkar 40kg' },
+        cost: 245000000, defaultCost: 245000000, extraDays: 25, defaultExtraDays: 25, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        requiresCabin: true
+      },
+      {
+        id: 'out-flybridge-lux', category: 'outfitting', name: 'Outfitting Flybridge 20 Pax + 6000L FO',
+        compatibleClasses: ['passenger-ferry'],
+        locked: { brand: 'IMI Flagship', powerLabel: '6000L FO · 800L FW', materialOrCycle: 'Full Cabin + 2× Toilet', dimensionsOrSpec: 'Luxury Seats + Galley + Jangkar 60kg' },
+        cost: 420000000, defaultCost: 420000000, extraDays: 35, defaultExtraDays: 35, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        requiresCabin: true
+      },
+
+      // NAVIGATION, ELECTRICAL & SAFETY (WBS VI-VIII)
+      {
+        id: 'nav-3gt-basic', category: 'nav_elec', name: 'Safety Dasar SOLAS + Kompas Saku',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'SOLAS Std', powerLabel: 'Non-Electric / Senter', materialOrCycle: '2× Life Jacket + Ring', dimensionsOrSpec: 'Kompas Saku + P3K Dasar' },
+        cost: 1800000, defaultCost: 1800000, extraDays: 0, defaultExtraDays: 0, dpSupplierPct: 15, defaultDpSupplierPct: 15,
+        requiresCabin: false, hasHeavyAcOrGenset: false
+      },
+      {
+        id: 'nav-3gt-ff', category: 'nav_elec', name: 'DC 12V + Lampu Nav LED + Fishfinder 4"',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'Marine DC', powerLabel: '12V Aki + Fishfinder', materialOrCycle: 'LED Nav + Panel Switch', dimensionsOrSpec: '3× Life Jacket + Life Buoy + APAR 1kg' },
+        cost: 9500000, defaultCost: 9500000, extraDays: 8, defaultExtraDays: 8, dpSupplierPct: 20, defaultDpSupplierPct: 20,
+        requiresCabin: false, hasHeavyAcOrGenset: false
+      },
+      {
+        id: 'nav-3gt-garmin', category: 'nav_elec', name: 'Garmin Plotter + VHF + Solar DC + SOLAS',
+        compatibleClasses: ['fishing-3gt', 'patrol-fast'],
+        locked: { brand: 'Garmin / ICOM', powerLabel: 'Solar 12V + VHF 25W', materialOrCycle: 'Chartplotter + Radio VHF', dimensionsOrSpec: 'Panel Surya + Spotlight + Full SOLAS' },
+        cost: 21000000, defaultCost: 21000000, extraDays: 15, defaultExtraDays: 15, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        requiresCabin: false, hasHeavyAcOrGenset: false
+      },
+      {
+        id: 'nav-cabin-3kva', category: 'nav_elec', name: 'Nav Garmin 585+ + Genset 3 kVA + AC Kabin',
+        compatibleClasses: ['patrol-fast', 'crew-workboat', 'passenger-ferry'],
+        locked: { brand: 'Garmin + Genset', powerLabel: 'AC 220V (3 kVA) + DC', materialOrCycle: 'Silent Genset + Split AC', dimensionsOrSpec: 'VHF ICOM + Garmin 585+ + Wiper + SOLAS' },
+        cost: 95000000, defaultCost: 95000000, extraDays: 20, defaultExtraDays: 20, dpSupplierPct: 30, defaultDpSupplierPct: 30,
+        requiresCabin: true, hasHeavyAcOrGenset: true
+      },
+      {
+        id: 'nav-flybridge-7kva', category: 'nav_elec', name: 'Full Nav/Radar + Genset 7 kVA + Dual AC',
+        compatibleClasses: ['passenger-ferry'],
+        locked: { brand: 'Garmin + 7 kVA', powerLabel: 'AC 220V (7 kVA) + 2× AC', materialOrCycle: 'Marine Radar + Genset 7kVA', dimensionsOrSpec: '22 Pax SOLAS + 3× APAR + Shore Power' },
+        cost: 165000000, defaultCost: 165000000, extraDays: 28, defaultExtraDays: 28, dpSupplierPct: 35, defaultDpSupplierPct: 35,
+        requiresCabin: true, hasHeavyAcOrGenset: true
+      },
+
+      // PERMIT, QC & DELIVERY (WBS IX-X)
+      {
+        id: 'perm-3gt-exyard', category: 'permit_delivery', name: 'Ex-Yard + Uji Apung + Pas Kecil Kolektif',
+        compatibleClasses: ['fishing-3gt'],
+        locked: { brand: 'Hubla Pas Kecil', powerLabel: 'Serah Terima Galangan', materialOrCycle: 'Uji Apung Sampling', dimensionsOrSpec: 'Pas Kecil + Surat Ukur + BAST Galangan' },
+        cost: 4200000, defaultCost: 4200000, extraDays: 10, defaultExtraDays: 10, dpSupplierPct: 10, defaultDpSupplierPct: 10,
+        requiresBkiOrRina: false
+      },
+      {
+        id: 'perm-3gt-reg', category: 'permit_delivery', name: 'Hubla Lengkap + Sea Trial + Kirim Regional',
+        compatibleClasses: ['fishing-3gt', 'patrol-fast'],
+        locked: { brand: 'Hubla Regional', powerLabel: 'Kirim Truk / Tongkang', materialOrCycle: 'Sea Trial per Batch', dimensionsOrSpec: 'Dokumen Hubla + Distribusi Regional' },
+        cost: 10500000, defaultCost: 10500000, extraDays: 18, defaultExtraDays: 18, dpSupplierPct: 15, defaultDpSupplierPct: 15,
+        requiresBkiOrRina: false
+      },
+      {
+        id: 'perm-3gt-bki', category: 'permit_delivery', name: 'Supervisi BKI + Hubla + Kirim Antar-Pulau',
+        compatibleClasses: ['fishing-3gt', 'patrol-fast', 'crew-workboat'],
+        locked: { brand: 'BKI + Hubla', powerLabel: 'Logistik Antar-Pulau', materialOrCycle: 'Supervisi BKI + Sea Trial', dimensionsOrSpec: 'Sertifikat BKI + Asuransi Pengiriman' },
+        cost: 20000000, defaultCost: 20000000, extraDays: 30, defaultExtraDays: 30, dpSupplierPct: 20, defaultDpSupplierPct: 20,
+        requiresBkiOrRina: true
+      },
+      {
+        id: 'perm-class-full', category: 'permit_delivery', name: 'Dokumen Hubla + Klasifikasi BKI/RINA + Launching',
+        compatibleClasses: ['crew-workboat', 'passenger-ferry'],
+        locked: { brand: 'BKI / RINA Class', powerLabel: 'Slipway + Sea Trial', materialOrCycle: 'Full Class Certification', dimensionsOrSpec: 'Gross Akta + Pas Besar + Sertifikat Class' },
+        cost: 82000000, defaultCost: 82000000, extraDays: 30, defaultExtraDays: 30, dpSupplierPct: 25, defaultDpSupplierPct: 25,
+        requiresBkiOrRina: true
+      }
+    ];
+
+    const PREDEFINED_PRESETS = [
+      {
+        id: 'preset-3gt-1', group: 'Kapal Ikan 3 GT (Proyek 1.000 Unit)',
+        name: '3 GT · Skenario 1 (Termurah — Full FRP)',
+        vesselClass: 'fishing-3gt', units: 1000,
+        cards: { hull: 'hull-3gt-frp', engine: 'eng-yamaha-15-fleet', outfitting: 'out-3gt-basic', nav_elec: 'nav-3gt-basic', permit_delivery: 'perm-3gt-exyard' }
+      },
+      {
+        id: 'preset-3gt-2', group: 'Kapal Ikan 3 GT (Proyek 1.000 Unit)',
+        name: '3 GT · Skenario 2 (Sedang — Hybrid Fiber-Alu)',
+        vesselClass: 'fishing-3gt', units: 1000,
+        cards: { hull: 'hull-3gt-hybrid', engine: 'eng-yamaha-15-dealer', outfitting: 'out-3gt-kkp', nav_elec: 'nav-3gt-ff', permit_delivery: 'perm-3gt-reg' }
+      },
+      {
+        id: 'preset-3gt-3', group: 'Kapal Ikan 3 GT (Proyek 1.000 Unit)',
+        name: '3 GT · Skenario 3 (Termahal — Heavy Alu 5083 + BKI)',
+        vesselClass: 'fishing-3gt', units: 1000,
+        cards: { hull: 'hull-3gt-alu', engine: 'eng-yamaha-15-4t', outfitting: 'out-3gt-ss316', nav_elec: 'nav-3gt-garmin', permit_delivery: 'perm-3gt-bki' }
+      },
+      {
+        id: 'preset-patrol-85', group: 'Preset Standar IMI RAB Studio',
+        name: '8,5m FRP Patrol Boat (8 Pax · 2× 115 HP)',
+        vesselClass: 'patrol-fast', units: 1,
+        cards: { hull: 'hull-patrol-85', engine: 'eng-yamaha-115x2', outfitting: 'out-patrol-std', nav_elec: 'nav-3gt-garmin', permit_delivery: 'perm-3gt-reg' }
+      },
+      {
+        id: 'preset-patrol-100', group: 'Preset Standar IMI RAB Studio',
+        name: '10,0m Patrol Boat ALS (2× 200 HP)',
+        vesselClass: 'patrol-fast', units: 1,
+        cards: { hull: 'hull-patrol-100', engine: 'eng-yamaha-200x2', outfitting: 'out-patrol-std', nav_elec: 'nav-cabin-3kva', permit_delivery: 'perm-3gt-bki' }
+      },
+      {
+        id: 'preset-vajra-125', group: 'Preset Standar IMI RAB Studio',
+        name: '12,5m VAJRA Passenger Commuter (16 Pax)',
+        vesselClass: 'passenger-ferry', units: 1,
+        cards: { hull: 'hull-pass-125', engine: 'eng-yamaha-200x2', outfitting: 'out-comm-cabin', nav_elec: 'nav-cabin-3kva', permit_delivery: 'perm-class-full' }
+      },
+      {
+        id: 'preset-crew-130', group: 'Preset Standar IMI RAB Studio',
+        name: '13,0m Crew Boat Step-Hull (Quotation #004)',
+        vesselClass: 'crew-workboat', units: 1,
+        cards: { hull: 'hull-crew-130', engine: 'eng-yamaha-250x2', outfitting: 'out-comm-cabin', nav_elec: 'nav-cabin-3kva', permit_delivery: 'perm-class-full' }
+      },
+      {
+        id: 'preset-pass-165', group: 'Preset Standar IMI RAB Studio',
+        name: '16,5m Passenger Flybridge (Quotation #005 · RINA)',
+        vesselClass: 'passenger-ferry', units: 1,
+        cards: { hull: 'hull-pass-165', engine: 'eng-yamaha-300x4', outfitting: 'out-flybridge-lux', nav_elec: 'nav-flybridge-7kva', permit_delivery: 'perm-class-full' }
+      }
     ];
 
     const CAPACITY_MODES = [
-      { mult: 1,   label: '1× Standar (Single Yard)',  defaultAccelJt: 0 },
+      { mult: 1,   label: '1× Standar (Single Yard)',       defaultAccelJt: 0 },
       { mult: 1.5, label: '1,5× Ekspansi (Mould + Lembur)', defaultAccelJt: 2.5 },
       { mult: 2,   label: '2× Konsorsium (Galangan Mitra)', defaultAccelJt: 5.5 }
     ];
 
-    // State
-    let currentPage = 'page-1';
-    let selectedTiers = { hull: 2, engine: 2, outfitting: 2, nav_elec: 2, permit_delivery: 2 };
-    let activeFeeMode = 'requested'; // 'requested' | 'nego-escrow' | 'nego-prorata' | 'custom'
-    let spkCount = 1;                // 1 | 2 | 4 | 5
-    let feeBase = 'netto';           // 'netto' | 'bruto'
-    let delayDays = 0;               // 0 | 15 | 30 | 45
-    let capacityMultiplier = 1;      // 1 | 1.5 | 2
+    const STORAGE_KEY = 'imi_saved_vessel_configs_v1';
+
+    // Active Application State
+    let currentPage = 'page-spec';
+    let activeVesselClass = 'fishing-3gt';
+    let selectedCards = {
+      hull: 'hull-3gt-hybrid',
+      engine: 'eng-yamaha-15-dealer',
+      outfitting: 'out-3gt-kkp',
+      nav_elec: 'nav-3gt-ff',
+      permit_delivery: 'perm-3gt-reg'
+    };
+    let catalogCategoryFilter = 'all'; // 'all' | WBS category
+    let showIncompatibleCards = false;
+    let activePresetId = 'preset-3gt-2';
+    let activeFeeMode = 'requested';
+    let spkCount = 1;
+    let feeBase = 'netto';
+    let delayDays = 0;
+    let capacityMultiplier = 1;
+    let inspectingCardId = null;
     let cashflowChartInstance = null;
 
     // =========================================================================
-    // 2. NAVIGATION & CONTROLS
+    // 2. ONTOLOGY & CORRELATION ENGINE
     // =========================================================================
-    function switchPage(pageId) {
-      currentPage = pageId;
-      ['page-1', 'page-2', 'page-3'].forEach(id => {
-        const pageEl = document.getElementById(id);
-        const tabEl = document.getElementById(`tab-${id}`);
-        const isActive = id === pageId;
-        if (pageEl) pageEl.classList.toggle('hidden', !isActive);
-        if (tabEl) {
-          tabEl.classList.toggle('active', isActive);
-          tabEl.classList.toggle('text-zinc-600', !isActive);
+    function getCardById(id) {
+      return COMPONENT_CATALOG.find(c => c.id === id);
+    }
+
+    function evaluateOntology(vesselClassId = activeVesselClass, cardMap = selectedCards) {
+      const vc = VESSEL_CLASSES.find(v => v.id === vesselClassId) || VESSEL_CLASSES[0];
+      const hull = getCardById(cardMap.hull);
+      const engine = getCardById(cardMap.engine);
+      const outfitting = getCardById(cardMap.outfitting);
+      const nav = getCardById(cardMap.nav_elec);
+      const permit = getCardById(cardMap.permit_delivery);
+
+      const alerts = [];
+
+      // Rule 1: Engine Power vs Vessel Class / Hull Geometry
+      if (engine && vc) {
+        if (engine.totalHp < vc.minHp) {
+          alerts.push({
+            level: 'critical',
+            title: 'Mesin Terlalu Kecil (Underpowered)',
+            msg: `${engine.name} (${engine.totalHp} HP) di bawah kebutuhan minimum ${vc.name} (min. ${vc.minHp} HP). Kapal tidak mampu mencapai kecepatan dinas / gagal uji laut.`
+          });
+        } else if (engine.totalHp > vc.maxHp) {
+          alerts.push({
+            level: 'critical',
+            title: 'Mesin Terlalu Besar (Overpowered)',
+            msg: `${engine.name} (${engine.totalHp} HP) melampaui batas aman lambung ${vc.name} (maks. ${vc.maxHp} HP). Berisiko merusak transom & stabilitas.`
+          });
+        }
+      }
+
+      // Rule 2: KAK Compliance for 3 GT Fishing Boat
+      if (vc.requireYamaha15 && engine && !engine.isYamaha15Pk) {
+        alerts.push({
+          level: 'critical',
+          title: 'Pelanggaran KAK Wajib Yamaha 15 PK',
+          msg: `Proyek ${vc.name} mewajibkan mesin **YAMAHA 15 PK**, namun kartu terpasang adalah ${engine.name}.`
+        });
+      }
+
+      // Rule 3: Open-Deck Hull vs Cabin Outfitting / AC & Genset
+      if (hull && !hull.hasCabin) {
+        if ((outfitting && outfitting.requiresCabin) || (nav && nav.hasHeavyAcOrGenset)) {
+          alerts.push({
+            level: 'warning',
+            title: 'Korelasi Lambung Open-Deck vs Kabin/AC',
+            msg: `${hull.name} adalah lambung terbuka tanpa rumah geladak, tidak kompatibel penuh dengan paket kabin tertutup / Genset AC 220V.`
+          });
+        }
+      }
+
+      // Rule 4: Hull Class Compatibility Check
+      [hull, outfitting, nav, permit].forEach(c => {
+        if (c && !c.compatibleClasses.includes(vc.id)) {
+          alerts.push({
+            level: 'warning',
+            title: `Komponen di Luar Kelas ${vc.name}`,
+            msg: `Kartu "${c.name}" dikurasi untuk kelas lain (${c.compatibleClasses.join(', ')}). Pastikan dimensi & bobot disesuaikan.`
+          });
         }
       });
+
+      // Rule 5: Economy Hull vs Full Classification BKI/RINA
+      if (hull && hull.hullGrade === 'economy' && permit && permit.requiresBkiOrRina) {
+        alerts.push({
+          level: 'warning',
+          title: 'Risiko Survei BKI pada Laminasi Ekonomis',
+          msg: `${permit.name} mensyaratkan verifikasi struktural ketat; pertimbangkan upgrade lambung ke Hybrid atau Heavy Alu/FRP.`
+        });
+      }
+
+      const criticalCount = alerts.filter(a => a.level === 'critical').length;
+      const warningCount = alerts.filter(a => a.level === 'warning').length;
+      const status = criticalCount > 0 ? 'critical' : (warningCount > 0 ? 'warning' : 'valid');
+
+      return { status, criticalCount, warningCount, alerts };
+    }
+
+    // =========================================================================
+    // 3. SAVED PRESETS (LOCALSTORAGE) & NAVIGATION
+    // =========================================================================
+    function loadSavedConfigs() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function persistSavedConfigs(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function switchPage(pageId) {
+      currentPage = pageId;
+      ['page-spec', 'page-1', 'page-2', 'page-3'].forEach(id => {
+        const pageEl = document.getElementById(id);
+        const navEl = document.getElementById(`nav-${id}`);
+        const isActive = id === pageId;
+        if (pageEl) pageEl.classList.toggle('hidden', !isActive);
+        if (navEl) {
+          navEl.classList.toggle('active', isActive);
+          navEl.classList.toggle('text-zinc-600', !isActive);
+        }
+      });
+
+      const nextBtn = document.getElementById('sb-next-btn');
+      const order = ['page-spec', 'page-1', 'page-2', 'page-3'];
+      const labels = ['Lanjut: Simulasi Proyek', 'Lanjut: Struktur Biaya', 'Lanjut: Timeline & Kas', 'Kembali: Builder Kapal'];
+      if (nextBtn) {
+        nextBtn.querySelector('span').textContent = labels[order.indexOf(pageId)] || 'Lanjut';
+      }
 
       if (pageId === 'page-1' && cashflowChartInstance) {
         requestAnimationFrame(() => cashflowChartInstance.resize());
       }
+      toggleMobileSidebar(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function goToNextPage() {
+      const order = ['page-spec', 'page-1', 'page-2', 'page-3'];
+      const nextIdx = (order.indexOf(currentPage) + 1) % order.length;
+      switchPage(order[nextIdx]);
+    }
+
+    function toggleMobileSidebar(forceState = null) {
+      const sb = document.getElementById('app-sidebar');
+      const bd = document.getElementById('sidebar-backdrop');
+      const isClosed = sb.classList.contains('-translate-x-full');
+      const open = forceState !== null ? forceState : isClosed;
+      sb.classList.toggle('-translate-x-full', !open);
+      bd.classList.toggle('hidden', !open);
+    }
+
+    // =========================================================================
+    // 4. INTERACTIVE BUILDER ACTIONS (CURATION, DRAG & DROP, INSPECTOR, SAVE)
+    // =========================================================================
+    function selectVesselClass(classId) {
+      activeVesselClass = classId;
+      const vc = VESSEL_CLASSES.find(v => v.id === classId);
+      // Auto-equip first matching preset for this class so starting specs are valid
+      const matchingPreset = PREDEFINED_PRESETS.find(p => p.vesselClass === classId);
+      if (matchingPreset) {
+        selectedCards = { ...matchingPreset.cards };
+        activePresetId = matchingPreset.id;
+        if (vc) {
+          document.getElementById('ctrl-units').value = matchingPreset.units;
+          document.getElementById('ctrl-overhead-day').value = vc.defaultOverheadJt;
+        }
+      }
+      recalculateAll();
+    }
+
+    function onToggleCuration(checked) {
+      showIncompatibleCards = checked;
+      renderCatalogCards();
+    }
+
+    function setCatalogCategoryFilter(catId) {
+      catalogCategoryFilter = catId;
+      renderCatalogTabs();
+      renderCatalogCards();
+    }
+
+    function equipCard(cardId) {
+      const card = getCardById(cardId);
+      if (!card) return;
+      selectedCards[card.category] = card.id;
+      activePresetId = '';
+      recalculateAll();
+    }
+
+    // HTML5 Drag & Drop Handlers
+    function onCardDragStart(event, cardId) {
+      event.dataTransfer.setData('text/plain', cardId);
+      event.dataTransfer.effectAllowed = 'copyMove';
+    }
+
+    function onSlotDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'copy';
+      event.currentTarget.classList.add('drag-over');
+    }
+
+    function onSlotDragLeave(event) {
+      event.currentTarget.classList.remove('drag-over');
+    }
+
+    function onSlotDrop(event, slotCategory) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('drag-over');
+      const cardId = event.dataTransfer.getData('text/plain');
+      if (cardId) {
+        equipCard(cardId);
+      }
+    }
+
+    // Card Inspector Modal (Locked vs Editable)
+    function openInspectorModal(cardId) {
+      const card = getCardById(cardId);
+      if (!card) return;
+      inspectingCardId = cardId;
+      const cat = WBS_CATEGORIES.find(c => c.id === card.category);
+
+      document.getElementById('insp-wbs-tag').textContent = `${cat ? cat.code : ''} · ${cat ? cat.title : ''}`;
+      document.getElementById('insp-title').textContent = card.name;
+
+      const lk = card.locked;
+      document.getElementById('insp-locked-grid').innerHTML = `
+        <div class="p-2 rounded-lg bg-white border border-zinc-200/80">
+          <div class="text-[10px] text-zinc-400">Brand / Referensi</div>
+          <div class="font-semibold text-zinc-900 mt-0.5">${lk.brand}</div>
+        </div>
+        <div class="p-2 rounded-lg bg-white border border-zinc-200/80">
+          <div class="text-[10px] text-zinc-400">Tenaga / Dimensi</div>
+          <div class="font-semibold text-zinc-900 mt-0.5">${lk.powerLabel}</div>
+        </div>
+        <div class="p-2 rounded-lg bg-white border border-zinc-200/80">
+          <div class="text-[10px] text-zinc-400">Material / Siklus</div>
+          <div class="font-semibold text-zinc-900 mt-0.5">${lk.materialOrCycle}</div>
+        </div>
+        <div class="p-2 rounded-lg bg-white border border-zinc-200/80">
+          <div class="text-[10px] text-zinc-400">Spesifikasi Teknis</div>
+          <div class="font-semibold text-zinc-900 mt-0.5">${lk.dimensionsOrSpec}</div>
+        </div>
+      `;
+
+      document.getElementById('insp-cost').value = (card.cost / 1e6).toFixed(2).replace(/\.00$/, '');
+      document.getElementById('insp-dp-sup').value = card.dpSupplierPct;
+      document.getElementById('insp-extra-days').value = card.extraDays;
+
+      const isHull = card.category === 'hull';
+      document.getElementById('insp-hull-prep-wrap').classList.toggle('hidden', !isHull);
+      document.getElementById('insp-hull-rate-wrap').classList.toggle('hidden', !isHull);
+      if (isHull) {
+        document.getElementById('insp-prep-days').value = card.prepDays;
+        document.getElementById('insp-rate').value = card.unitsPerDay;
+      }
+
+      document.getElementById('inspector-modal').classList.remove('hidden');
+    }
+
+    function closeInspectorModal() {
+      inspectingCardId = null;
+      document.getElementById('inspector-modal').classList.add('hidden');
+    }
+
+    function saveInspectorChanges() {
+      const card = getCardById(inspectingCardId);
+      if (!card) return;
+      const costJt = parseFloat(document.getElementById('insp-cost').value);
+      const dpSup = parseFloat(document.getElementById('insp-dp-sup').value);
+      const extraD = parseFloat(document.getElementById('insp-extra-days').value);
+
+      if (!isNaN(costJt) && costJt >= 0) card.cost = Math.round(costJt * 1e6);
+      if (!isNaN(dpSup) && dpSup >= 0 && dpSup <= 100) card.dpSupplierPct = dpSup;
+      if (!isNaN(extraD) && extraD >= 0) card.extraDays = Math.round(extraD);
+
+      if (card.category === 'hull') {
+        const prep = parseFloat(document.getElementById('insp-prep-days').value);
+        const rate = parseFloat(document.getElementById('insp-rate').value);
+        if (!isNaN(prep) && prep >= 1) card.prepDays = Math.round(prep);
+        if (!isNaN(rate) && rate >= 0.05) card.unitsPerDay = rate;
+      }
+
+      selectedCards[card.category] = card.id;
+      closeInspectorModal();
+      recalculateAll();
+    }
+
+    function resetSingleCardFromInspector() {
+      const card = getCardById(inspectingCardId);
+      if (!card) return;
+      card.cost = card.defaultCost;
+      card.dpSupplierPct = card.defaultDpSupplierPct;
+      card.extraDays = card.defaultExtraDays;
+      if (card.category === 'hull') {
+        card.prepDays = card.defaultPrepDays;
+        card.unitsPerDay = card.defaultUnitsPerDay;
+      }
+      openInspectorModal(card.id);
+      recalculateAll();
+    }
+
+    function resetCatalogEdits() {
+      COMPONENT_CATALOG.forEach(c => {
+        c.cost = c.defaultCost;
+        c.dpSupplierPct = c.defaultDpSupplierPct;
+        c.extraDays = c.defaultExtraDays;
+        if (c.category === 'hull') {
+          c.prepDays = c.defaultPrepDays;
+          c.unitsPerDay = c.defaultUnitsPerDay;
+        }
+      });
+      recalculateAll();
+    }
+
+    // Preset Dropdown + Save to LocalStorage
+    function loadPresetById(presetId) {
+      const builtIn = PREDEFINED_PRESETS.find(p => p.id === presetId);
+      if (builtIn) {
+        activePresetId = builtIn.id;
+        activeVesselClass = builtIn.vesselClass;
+        selectedCards = { ...builtIn.cards };
+        document.getElementById('ctrl-units').value = builtIn.units;
+        const vc = VESSEL_CLASSES.find(v => v.id === builtIn.vesselClass);
+        if (vc) document.getElementById('ctrl-overhead-day').value = vc.defaultOverheadJt;
+        recalculateAll();
+        return;
+      }
+
+      const saved = loadSavedConfigs().find(s => s.id === presetId);
+      if (saved) {
+        activePresetId = saved.id;
+        activeVesselClass = saved.vesselClass;
+        selectedCards = { ...saved.cards };
+        if (saved.cardOverrides) {
+          Object.entries(saved.cardOverrides).forEach(([cid, ov]) => {
+            const c = getCardById(cid);
+            if (c) Object.assign(c, ov);
+          });
+        }
+        if (saved.params) {
+          document.getElementById('ctrl-units').value = saved.params.units;
+          document.getElementById('ctrl-markup').value = saved.params.markupPct;
+          document.getElementById('ctrl-dp').value = saved.params.dpPct;
+          document.getElementById('ctrl-overhead-day').value = saved.params.overheadPerDayJt;
+          document.getElementById('ctrl-accel-cost').value = saved.params.accelCostJt;
+          document.getElementById('ctrl-wapu').value = saved.params.wapuBgPct;
+          document.getElementById('ctrl-coc').value = saved.params.costOfCapitalPct;
+          spkCount = saved.params.spkCount || 1;
+          feeBase = saved.params.feeBase || 'netto';
+          delayDays = saved.params.delayDays || 0;
+          capacityMultiplier = saved.params.capacityMultiplier || 1;
+        }
+        recalculateAll();
+      }
+    }
+
+    function onPresetDropdownChange(val) {
+      if (!val) return;
+      loadPresetById(val);
+    }
+
+    function openSaveModal() {
+      const vc = VESSEL_CLASSES.find(v => v.id === activeVesselClass);
+      const units = document.getElementById('ctrl-units').value;
+      document.getElementById('save-config-name').value = `${vc ? vc.name : 'Kapal'} (${units} u)`;
+      document.getElementById('save-modal').classList.remove('hidden');
+    }
+
+    function closeSaveModal() {
+      document.getElementById('save-modal').classList.add('hidden');
+    }
+
+    function confirmSaveConfig() {
+      const name = (document.getElementById('save-config-name').value || '').trim();
+      if (!name) return;
+
+      const cardOverrides = {};
+      Object.values(selectedCards).forEach(cid => {
+        const c = getCardById(cid);
+        if (c) {
+          cardOverrides[cid] = {
+            cost: c.cost,
+            dpSupplierPct: c.dpSupplierPct,
+            extraDays: c.extraDays,
+            ...(c.category === 'hull' ? { prepDays: c.prepDays, unitsPerDay: c.unitsPerDay } : {})
+          };
+        }
+      });
+
+      const inp = readInputs();
+      const entry = {
+        id: 'saved-' + Date.now(),
+        name,
+        vesselClass: activeVesselClass,
+        cards: { ...selectedCards },
+        cardOverrides,
+        params: {
+          units: inp.units, markupPct: inp.markupPct, dpPct: inp.dpPct,
+          overheadPerDayJt: inp.overheadPerDayJt, accelCostJt: inp.accelCostJt,
+          wapuBgPct: inp.wapuBgPct, costOfCapitalPct: inp.costOfCapitalPct,
+          spkCount, feeBase, delayDays, capacityMultiplier
+        }
+      };
+
+      const list = loadSavedConfigs();
+      list.unshift(entry);
+      persistSavedConfigs(list);
+      activePresetId = entry.id;
+      closeSaveModal();
+      recalculateAll();
+    }
+
+    // =========================================================================
+    // 5. SIMULATION ENGINE & HELPERS
+    // =========================================================================
     function fmtRpShort(num) {
       const sign = num < 0 ? '-' : '';
       const abs = Math.abs(num);
@@ -1023,9 +1795,7 @@
       capacityMultiplier = mult;
       const mode = CAPACITY_MODES.find(c => c.mult === mult);
       const accelEl = document.getElementById('ctrl-accel-cost');
-      if (mode && accelEl) {
-        accelEl.value = mode.defaultAccelJt;
-      }
+      if (mode && accelEl) accelEl.value = mode.defaultAccelJt;
       updateSegGroup(['cap-1', 'cap-1.5', 'cap-2'], `cap-${mult}`);
       recalculateAll();
     }
@@ -1037,45 +1807,9 @@
       });
     }
 
-    function applyPreset(tierNum) {
-      SPEC_MODULES.forEach(m => { selectedTiers[m.id] = tierNum; });
-      recalculateAll();
-    }
-
-    function selectModuleTier(moduleId, tierNum) {
-      selectedTiers[moduleId] = tierNum;
-      recalculateAll();
-    }
-
-    function updateModuleCost(moduleId, tierNum, millionValStr) {
-      const numMillion = parseFloat(millionValStr);
-      if (isNaN(numMillion) || numMillion < 0) return;
-      const mod = SPEC_MODULES.find(m => m.id === moduleId);
-      if (!mod) return;
-      const opt = mod.options[tierNum - 1];
-      if (!opt) return;
-      opt.cost = Math.round(numMillion * 1e6);
-
-      const inpEl = document.getElementById(`price-inp-${moduleId}-${tierNum}`);
-      if (inpEl) {
-        inpEl.classList.toggle('is-modified', opt.cost !== opt.defaultCost);
-      }
-      recalculateAll({ skipMatrixRebuild: true });
-    }
-
-    function resetUnitPrices() {
-      SPEC_MODULES.forEach(m => {
-        m.options.forEach(opt => { opt.cost = opt.defaultCost; });
-      });
-      recalculateAll();
-    }
-
-    // =========================================================================
-    // 3. CORE SIMULATION ENGINE (TIME-DRIVEN COGS + SPK + WAPU + DELAY + COC)
-    // =========================================================================
-    function computeSimulation(tiersOverride = null, optsOverride = {}) {
+    function computeSimulation(cardsOverride = null, optsOverride = {}) {
       const inp = readInputs();
-      const tiers = tiersOverride || selectedTiers;
+      const cardIds = cardsOverride || selectedCards;
       const feeMode = optsOverride.feeMode || activeFeeMode;
       const effSpkCount = optsOverride.spkCount !== undefined ? optsOverride.spkCount : spkCount;
       const effFeeBase = optsOverride.feeBase || feeBase;
@@ -1084,30 +1818,31 @@
       const effOverheadJt = optsOverride.overheadPerDayJt !== undefined ? optsOverride.overheadPerDayJt : inp.overheadPerDayJt;
       const effAccelJt = optsOverride.accelCostJt !== undefined ? optsOverride.accelCostJt : inp.accelCostJt;
 
-      const chosen = {};
-      let baseUnitCost = 0;
-      SPEC_MODULES.forEach(m => {
-        const opt = m.options[tiers[m.id] - 1];
-        chosen[m.id] = opt;
-        baseUnitCost += opt.cost;
-      });
+      const hull = getCardById(cardIds.hull);
+      const engine = getCardById(cardIds.engine);
+      const outfitting = getCardById(cardIds.outfitting);
+      const nav = getCardById(cardIds.nav_elec);
+      const permit = getCardById(cardIds.permit_delivery);
 
+      const baseUnitCost = hull.cost + engine.cost + outfitting.cost + nav.cost + permit.cost;
       const baseComponentCOGS = baseUnitCost * inp.units;
-      const costHullTotal = chosen.hull.cost * inp.units;
-      const costEngineTotal = chosen.engine.cost * inp.units;
-      const costOutfittingTotal = (chosen.outfitting.cost + chosen.nav_elec.cost) * inp.units;
-      const costPermitTotal = chosen.permit_delivery.cost * inp.units;
+      const costHullTotal = hull.cost * inp.units;
+      const costEngineTotal = engine.cost * inp.units;
+      const costOutfittingTotal = (outfitting.cost + nav.cost) * inp.units;
+      const costPermitTotal = permit.cost * inp.units;
 
-      // 1. Compute Timeline Boundaries FIRST (Production + Delivery + SP2D Delay)
+      // 1. Timeline Boundaries (from active card specs + capacity + SP2D delay)
       const adminDpDays = 15 + Math.round(effDelayDays * 0.5);
-      const effectiveRate = chosen.hull.unitsPerDay * effCapacity;
-      const prepDays = inp.units === 1 ? Math.ceil(chosen.hull.prepDays * 0.35) : Math.ceil(chosen.hull.prepDays * (effCapacity > 1 ? 1.15 : 1));
-      const engineLeadAdd = chosen.engine.extraDays;
-      const outfitAdd = chosen.outfitting.extraDays + chosen.nav_elec.extraDays;
-      const permitAdd = chosen.permit_delivery.extraDays;
+      const effectiveRate = hull.unitsPerDay * effCapacity;
+      const prepDays = inp.units === 1
+        ? Math.max(7, Math.ceil(hull.prepDays * 0.4))
+        : Math.ceil(hull.prepDays * (effCapacity > 1 ? 1.15 : 1));
+      const engineLeadAdd = engine.extraDays;
+      const outfitAdd = outfitting.extraDays + nav.extraDays;
+      const permitAdd = permit.extraDays;
 
       const rawProdDays = inp.units === 1
-        ? Math.max(14, Math.ceil(180 / chosen.hull.unitsPerDay))
+        ? Math.max(14, Math.ceil(1 / effectiveRate))
         : Math.max(16, Math.ceil(inp.units / effectiveRate));
 
       const batch1Days = Math.ceil(rawProdDays * 0.28) + Math.ceil(outfitAdd * 0.25);
@@ -1127,13 +1862,13 @@
       const p7Start = p6End, p7End = p7Start + 14 + Math.round(effDelayDays * 0.5);
       const totalDays = p7End;
 
-      // 2. Time-Driven Overhead & Capacity Acceleration directly feed Total COGS
+      // 2. Time-Driven Overhead & Acceleration COGS
       const overheadCostTotal = Math.round(effOverheadJt * 1e6) * totalDays;
       const accelCostTotal = Math.round(effAccelJt * 1e6) * inp.units;
       const totalCOGS = baseComponentCOGS + overheadCostTotal + accelCostTotal;
       const cogsUnit = Math.round(totalCOGS / inp.units);
 
-      // 3. Project Value, Fee Basis (Netto vs Bruto PPN), and Government Cash Friction
+      // 3. Project Value, Fee Basis, and Gov Friction
       const projectValue = Math.round(totalCOGS * (1 + inp.markupPct / 100));
       const grossContractValue = Math.round(projectValue * 1.11);
       const feeBasisAmount = effFeeBase === 'bruto' ? grossContractValue : projectValue;
@@ -1238,17 +1973,38 @@
         f7Fee = totalFee - (f1Fee + f3Fee + f4Fee + f5Fee + f6Fee);
       }
 
-      // 5. Production + Overhead + Acceleration Outflows (Exact Sum === totalCOGS)
+      // 5. Ontology-Linked Supplier DP & Phase Outflows (Exact Sum === totalCOGS)
+      // Each card's dpSupplierPct directly drives F2 procurement outlay (capped safely so F1..F5 never exceed totalCOGS)
       const timeAndAccelTotal = overheadCostTotal + accelCostTotal;
-      const p1ProdOut = Math.round(costHullTotal * 0.10 + costPermitTotal * 0.10 + timeAndAccelTotal * 0.10);
-      const baseP2Comp = Math.round(costHullTotal * 0.25 + costEngineTotal * 0.30 + costOutfittingTotal * 0.20 + timeAndAccelTotal * 0.10);
       const spkProcFactor = effSpkCount === 1 ? 1.0 : Math.max(0.28, (1 + (effSpkCount - 1) * 0.12) / effSpkCount);
-      const p2ProdOut = Math.round(baseP2Comp * spkProcFactor);
-      const shiftedProc = baseP2Comp - p2ProdOut;
 
-      const p3ProdOut = Math.round(costHullTotal * 0.20 + costEngineTotal * 0.20 + costOutfittingTotal * 0.25 + costPermitTotal * 0.20 + timeAndAccelTotal * 0.20) + Math.round(shiftedProc * 0.35);
-      const p4ProdOut = Math.round(costHullTotal * 0.20 + costEngineTotal * 0.25 + costOutfittingTotal * 0.25 + costPermitTotal * 0.20 + timeAndAccelTotal * 0.20) + Math.round(shiftedProc * 0.35);
-      const p5ProdOut = Math.round(costHullTotal * 0.15 + costEngineTotal * 0.20 + costOutfittingTotal * 0.20 + costPermitTotal * 0.20 + timeAndAccelTotal * 0.20) + (shiftedProc - Math.round(shiftedProc * 0.35) * 2);
+      const hullDpRate = Math.min(0.6, Math.max(0, hull.dpSupplierPct / 100));
+      const engDpRate = Math.min(0.7, Math.max(0, engine.dpSupplierPct / 100));
+      const outDpRate = Math.min(0.6, Math.max(0, outfitting.dpSupplierPct / 100));
+      const navDpRate = Math.min(0.6, Math.max(0, nav.dpSupplierPct / 100));
+      const permDpRate = Math.min(0.5, Math.max(0, permit.dpSupplierPct / 100));
+
+      const p1ProdOut = Math.round(costHullTotal * 0.10 + costPermitTotal * (permDpRate * 0.5) + timeAndAccelTotal * 0.10);
+      const rawP2Comp = Math.round(
+        costHullTotal * hullDpRate +
+        costEngineTotal * engDpRate +
+        (outfitting.cost * inp.units) * outDpRate +
+        (nav.cost * inp.units) * navDpRate +
+        timeAndAccelTotal * 0.10
+      );
+      const p2ProdOut = Math.round(rawP2Comp * spkProcFactor);
+
+      // Remaining pool per category distributed cleanly across F3, F4, F5, and F6
+      const remHull = costHullTotal - Math.round(costHullTotal * 0.10) - Math.round(costHullTotal * hullDpRate * spkProcFactor);
+      const remEng = costEngineTotal - Math.round(costEngineTotal * engDpRate * spkProcFactor);
+      const remOut = (outfitting.cost * inp.units) - Math.round((outfitting.cost * inp.units) * outDpRate * spkProcFactor);
+      const remNav = (nav.cost * inp.units) - Math.round((nav.cost * inp.units) * navDpRate * spkProcFactor);
+      const remPerm = costPermitTotal - Math.round(costPermitTotal * (permDpRate * 0.5));
+      const remTimeAccel = timeAndAccelTotal - Math.round(timeAndAccelTotal * 0.10) - Math.round(timeAndAccelTotal * 0.10 * spkProcFactor);
+
+      const p3ProdOut = Math.round(remHull * 0.28 + remEng * 0.28 + (remOut + remNav) * 0.30 + remPerm * 0.25 + remTimeAccel * 0.25);
+      const p4ProdOut = Math.round(remHull * 0.28 + remEng * 0.30 + (remOut + remNav) * 0.30 + remPerm * 0.25 + remTimeAccel * 0.25);
+      const p5ProdOut = Math.round(remHull * 0.26 + remEng * 0.28 + (remOut + remNav) * 0.25 + remPerm * 0.25 + remTimeAccel * 0.25);
       const usedProd = p1ProdOut + p2ProdOut + p3ProdOut + p4ProdOut + p5ProdOut;
       const p6ProdOut = Math.max(0, totalCOGS - usedProd);
 
@@ -1260,59 +2016,59 @@
       const phases = [
         {
           key: 'sign', code: 'F0', category: 'fee',
-          name: effSpkCount > 1 ? `Teken SPK #1 (1/${effSpkCount}) & Tunggu SP2D DP` : 'Teken Kontrak Penuh & Tunggu SP2D DP',
+          name: effSpkCount > 1 ? `Teken SPK #1 (1/${effSpkCount}) & Tunggu SP2D DP` : 'Teken Kontrak & Tunggu SP2D DP',
           detail: effSpkCount > 1
-            ? `Teken SPK batch 1 (${Math.round(inp.units/effSpkCount)} u), bayar fee awal 1/${effSpkCount} & proses administrasi SP2D DP.`
-            : 'Penandatanganan SPK penuh, jaminan pelaksanaan, bayar fee awal & tunggu SP2D DP cair.',
+            ? `Teken SPK batch 1, bayar fee awal 1/${effSpkCount} & proses administrasi SP2D DP.`
+            : 'Penandatanganan kontrak, jaminan pelaksanaan, bayar fee awal & tunggu SP2D DP.',
           startDay: f0Start, endDay: f0End, cashEventDay: 0,
           inflow: 0, feeOut: f0Fee, prodOut: 0
         },
         {
           key: 'dp', code: 'F1', category: 'prep',
-          name: effSpkCount > 1 ? 'DP SPK #1 Cair & Cetakan/Jig' : `Pencairan DP (${dpPct}%) & Cetakan/Jig`,
-          detail: `SP2D DP cair bersih (potong WAPU/BG ${inp.wapuBgPct}%), fee pasca-DP, pembuatan cetakan/jig (${chosen.hull.label}).`,
+          name: effSpkCount > 1 ? 'DP SPK #1 Cair & Persiapan Mould/Jig' : `Pencairan DP (${dpPct}%) & Mould/Jig`,
+          detail: `DP cair bersih (potong WAPU/BG ${inp.wapuBgPct}%), fee pasca-DP, & mould ${hull.name}.`,
           startDay: p1Start, endDay: p1End, cashEventDay: p1Start,
           inflow: f1DpIn, feeOut: f1Fee, prodOut: p1ProdOut
         },
         {
           key: 'proc', code: 'F2', category: 'prep',
-          name: 'Pengadaan Material & DP Mesin Yamaha 15 PK',
-          detail: `Belanja resin/fiber/alu & kayu 6×8 + DP kuota ${effSpkCount > 1 ? 'batch awal' : inp.units.toLocaleString('id-ID') + ' unit'} Yamaha 15 PK.`,
+          name: `Pengadaan & DP Supplier (Mesin ${engine.dpSupplierPct}% · Hull ${hull.dpSupplierPct}%)`,
+          detail: `DP supplier sesuai ontologi kartu: ${engine.name} & material awal.`,
           startDay: p2Start, endDay: p2End, cashEventDay: Math.round((p2Start + p2End) / 2),
           inflow: 0, feeOut: 0, prodOut: p2ProdOut
         },
         {
           key: 'b1', code: 'F3', category: 'prod',
           name: `Produksi Batch 1 (${inp.units === 1 ? 'Hull & Rangka' : b1Units.toLocaleString('id-ID') + ' Unit'}) → Termin 1`,
-          detail: `Fabrikasi batch 1, pasang Yamaha 15 PK & overhead operasional${effDelayDays > 0 ? ` (SP2D delay +${effDelayDays}h)` : ''}.`,
+          detail: `Fabrikasi batch 1 & pasang mesin${effDelayDays > 0 ? ` (SP2D delay +${effDelayDays}h)` : ''}.`,
           startDay: p3Start, endDay: p3End, cashEventDay: p3End,
           inflow: f3In, feeOut: f3Fee, prodOut: p3ProdOut
         },
         {
           key: 'b2', code: 'F4', category: 'prod',
           name: `Produksi Batch 2 (${inp.units === 1 ? 'Outfitting' : b2Units.toLocaleString('id-ID') + ' Unit'}) → Termin 2`,
-          detail: 'Produksi batch 2, pembayaran mesin tahap 2, uji apung & penerimaan termin bersih.',
+          detail: 'Produksi batch 2, outfitting, pembayaran supplier tahap 2 & terima termin.',
           startDay: p4Start, endDay: p4End, cashEventDay: p4End,
           inflow: f4In, feeOut: f4Fee, prodOut: p4ProdOut
         },
         {
           key: 'b3', code: 'F5', category: 'prod',
-          name: `Produksi Batch 3 (${inp.units === 1 ? 'Mesin & Nav' : b3Units.toLocaleString('id-ID') + ' Unit'}) → Termin 3`,
-          detail: 'Produksi batch 3, instalasi navigasi/listrik & safety SOLAS, penerimaan termin.',
+          name: `Produksi Batch 3 (${inp.units === 1 ? 'Nav & Listrik' : b3Units.toLocaleString('id-ID') + ' Unit'}) → Termin 3`,
+          detail: 'Produksi batch 3, instalasi navigasi/listrik & safety SOLAS, cair termin 3.',
           startDay: p5Start, endDay: p5End, cashEventDay: p5End,
           inflow: f5In, feeOut: f5Fee, prodOut: p5ProdOut
         },
         {
           key: 'b4', code: 'F6', category: 'qc',
           name: `Batch 4 Final (${inp.units === 1 ? 'Sea Trial' : b4Units.toLocaleString('id-ID') + ' Unit'}), QC & Dokumen`,
-          detail: `Penyelesaian unit akhir, ${chosen.permit_delivery.label}, sea trial & distribusi lokasi.`,
+          detail: `Penyelesaian unit akhir, ${permit.name}, sea trial & distribusi.`,
           startDay: p6Start, endDay: p6End, cashEventDay: p6End,
           inflow: f6In, feeOut: f6Fee, prodOut: p6ProdOut
         },
         {
           key: 'bast', code: 'F7', category: 'qc',
           name: `BAST 100% & Pelunasan Retensi (${retensiPct}%)`,
-          detail: `Serah terima final ${inp.units.toLocaleString('id-ID')} unit & pencairan retensi akhir.`,
+          detail: `Serah terima final ${inp.units.toLocaleString('id-ID')} unit & pencairan retensi.`,
           startDay: p7Start, endDay: p7End, cashEventDay: p7End,
           inflow: f7In, feeOut: f7Fee, prodOut: 0
         }
@@ -1332,9 +2088,7 @@
         }
       });
 
-      const events = phases.map(p => ({ day: p.cashEventDay, delta: p.netCash }))
-        .sort((a, b) => a.day - b.day);
-
+      const events = phases.map(p => ({ day: p.cashEventDay, delta: p.netCash })).sort((a, b) => a.day - b.day);
       let runningBal = 0, prevDay = 0, deficitRpDays = 0;
       events.forEach(ev => {
         const dt = Math.max(0, ev.day - prevDay);
@@ -1359,7 +2113,8 @@
         ...inp,
         feeMode, spkCount: effSpkCount, feeBase: effFeeBase, delayDays: effDelayDays,
         capacityMultiplier: effCapacity, overheadPerDayJt: effOverheadJt, accelCostJt: effAccelJt,
-        totalFeePct, signPct, dpFeePct, chosen,
+        totalFeePct, signPct, dpFeePct,
+        hull, engine, outfitting, nav, permit,
         baseUnitCost, baseComponentCOGS, overheadCostTotal, accelCostTotal, totalCOGS, cogsUnit,
         valUnit: Math.round(projectValue / inp.units),
         projectValue, grossContractValue, feeBasisAmount, totalFee, ppnFeeDiff,
@@ -1369,45 +2124,257 @@
     }
 
     // =========================================================================
-    // 4. UI RENDERERS ACROSS 3 PAGES
+    // 6. UI RENDERERS
     // =========================================================================
-    function renderLiveStatusStrip(sim) {
-      const vals = Object.values(selectedTiers);
-      const allSame = vals.every(v => v === vals[0]);
-      const scenLabel = allSame ? `Skenario ${vals[0]}` : 'Custom Spec';
-      const statusCls = sim.safetyStatus === 'DANGER' ? 'text-rose-700' : (sim.safetyStatus === 'CAUTION' ? 'text-amber-700' : 'text-emerald-700');
+    function renderPresetDropdown() {
+      const dd = document.getElementById('preset-dropdown');
+      const saved = loadSavedConfigs();
+      const groups = {};
+      PREDEFINED_PRESETS.forEach(p => {
+        if (!groups[p.group]) groups[p.group] = [];
+        groups[p.group].push(p);
+      });
 
-      document.getElementById('live-status-strip').innerHTML = `
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-zinc-600">
-          <span>Spec: <strong class="text-zinc-950">${scenLabel}</strong></span>
-          <span>Volume: <strong class="text-zinc-950">${sim.units.toLocaleString('id-ID')} u</strong></span>
-          <span>Lini: <strong class="text-zinc-950">${sim.capacityMultiplier}× (${sim.totalDays} hari)</strong></span>
-          <span>COGS/u: <strong class="text-zinc-950">${fmtRpShort(sim.cogsUnit)}</strong></span>
-        </div>
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span class="text-zinc-600">Nilai (DPP): <strong class="text-brand-700">${fmtRpShort(sim.projectValue)}</strong></span>
-          <span class="text-zinc-600">Risiko H-0: <strong class="${statusCls}">${sim.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(sim.cashAtRiskDay0) : 'Rp 0'}</strong></span>
-          <span class="text-zinc-600">Net Profit Riil: <strong class="${sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'}">${fmtRpShort(sim.realNetProfit)}</strong></span>
-        </div>
-      `;
+      let html = `<option value="">-- Pilih Preset / Setting Kapal --</option>`;
+      Object.entries(groups).forEach(([gName, items]) => {
+        html += `<optgroup label="${gName}">`;
+        items.forEach(p => {
+          html += `<option value="${p.id}" ${activePresetId === p.id ? 'selected' : ''}>${p.name}</option>`;
+        });
+        html += `</optgroup>`;
+      });
 
-      document.getElementById('p1-assumption-pill').innerHTML =
-        `Asumsi aktif: <strong>${sim.spkCount} SPK</strong> · Fee <strong>${sim.feeBase.toUpperCase()}</strong> · Overhead <strong>Rp ${sim.overheadPerDayJt} Jt/hari</strong> · Kapasitas <strong>${sim.capacityMultiplier}×</strong> · Delay SP2D <strong>+${sim.delayDays}h</strong> · WAPU/BG <strong>${sim.wapuBgPct}%</strong>`;
-
-      document.getElementById('lbl-spk-units').textContent =
-        sim.spkCount === 1 ? `1 SPK (${sim.units.toLocaleString('id-ID')} u)` : `${sim.spkCount} SPK (@ ±${Math.round(sim.units / sim.spkCount)} u)`;
-      document.getElementById('lbl-fee-base-delta').textContent =
-        sim.feeBase === 'bruto' ? `+${fmtRpShort(sim.ppnFeeDiff)} ekstra` : `Hemat ${fmtRpShort(sim.ppnFeeDiff)}`;
-      document.getElementById('lbl-total-fee-pct').textContent = sim.totalFeePct;
+      if (saved.length > 0) {
+        html += `<optgroup label="Tersimpan di Browser (Saved)">`;
+        saved.forEach(s => {
+          html += `<option value="${s.id}" ${activePresetId === s.id ? 'selected' : ''}>★ ${s.name}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+      dd.innerHTML = html;
     }
 
-    function renderVerdictAndKPIs(sim, singleSpkSim) {
+    function renderVesselClasses() {
+      document.getElementById('vessel-class-grid').innerHTML = VESSEL_CLASSES.map(vc => {
+        const isSel = vc.id === activeVesselClass;
+        return `
+          <button type="button" onclick="selectVesselClass('${vc.id}')"
+            class="vessel-class-btn text-left p-3 border ${isSel ? 'is-selected' : 'border-zinc-200 bg-white hover:bg-zinc-50'}">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-bold ${isSel ? 'text-brand-800' : 'text-zinc-950'}">${vc.name}</span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${isSel ? 'bg-brand-100 text-brand-800' : 'bg-zinc-100 text-zinc-600'} tnum">${vc.badge}</span>
+            </div>
+            <div class="text-[11px] text-zinc-500 mt-1">${vc.desc}</div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderCatalogTabs() {
+      const container = document.getElementById('catalog-filter-tabs');
+      const tabs = [{ id: 'all', label: 'Semua Kategori' }, ...WBS_CATEGORIES.map(c => ({ id: c.id, label: `${c.code} · ${c.title.split(' ')[0]}` }))];
+      container.innerHTML = tabs.map(t => {
+        const active = catalogCategoryFilter === t.id;
+        return `
+          <button type="button" onclick="setCatalogCategoryFilter('${t.id}')"
+            class="text-[11px] font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition ${active ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}">
+            ${t.label}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderCatalogCards() {
+      const anyModified = COMPONENT_CATALOG.some(c =>
+        c.cost !== c.defaultCost || c.extraDays !== c.defaultExtraDays || c.dpSupplierPct !== c.defaultDpSupplierPct ||
+        (c.category === 'hull' && (c.prepDays !== c.defaultPrepDays || c.unitsPerDay !== c.defaultUnitsPerDay))
+      );
+      document.getElementById('btn-reset-cards').classList.toggle('hidden', !anyModified);
+
+      const catsToShow = catalogCategoryFilter === 'all'
+        ? WBS_CATEGORIES
+        : WBS_CATEGORIES.filter(c => c.id === catalogCategoryFilter);
+
+      const container = document.getElementById('catalog-cards-container');
+      container.innerHTML = catsToShow.map(cat => {
+        const cards = COMPONENT_CATALOG.filter(c => {
+          if (c.category !== cat.id) return false;
+          if (showIncompatibleCards) return true;
+          return c.compatibleClasses.includes(activeVesselClass) || selectedCards[cat.id] === c.id;
+        });
+
+        return `
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold text-zinc-800 px-0.5">
+              <span class="flex items-center gap-1.5"><i class="ph ${cat.icon} text-brand-700"></i> ${cat.code} — ${cat.title}</span>
+              <span class="text-[11px] font-normal text-zinc-400 tnum">${cards.length} opsi</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              ${cards.map(card => {
+                const isEquipped = selectedCards[card.category] === card.id;
+                const isCompatible = card.compatibleClasses.includes(activeVesselClass);
+                const leadTxt = card.category === 'hull' ? `Prep ${card.prepDays}h · ${card.unitsPerDay} u/h` : (card.extraDays > 0 ? `+${card.extraDays}h` : '+0h');
+                return `
+                  <div draggable="true" ondragstart="onCardDragStart(event, '${card.id}')"
+                    class="catalog-card p-3 border bg-white ${isEquipped ? 'is-equipped' : 'border-zinc-200 hover:border-zinc-300'} flex flex-col justify-between gap-2.5">
+                    <div>
+                      <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                          <i class="ph ph-dots-six-vertical text-zinc-300 shrink-0 text-sm"></i>
+                          <span class="text-xs font-bold text-zinc-950 leading-snug">${card.name}</span>
+                        </div>
+                        ${!isCompatible ? '<span class="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Luar Kelas</span>' : ''}
+                      </div>
+                      <div class="mt-1.5 flex flex-wrap items-center gap-1 text-[10px]">
+                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 font-medium">
+                          <i class="ph-fill ph-lock-simple text-[9px] text-zinc-400"></i> ${card.locked.brand}
+                        </span>
+                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 font-medium tnum">
+                          <i class="ph-fill ph-lock-simple text-[9px] text-zinc-400"></i> ${card.locked.powerLabel}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-zinc-200/70 flex items-center justify-between gap-2">
+                      <div class="tnum">
+                        <div class="text-xs font-bold text-zinc-950">${fmtRpShort(card.cost)}<span class="text-[10px] font-normal text-zinc-400">/u</span></div>
+                        <div class="text-[10px] text-zinc-500">${leadTxt} · DP ${card.dpSupplierPct}%</div>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <button type="button" onclick="openInspectorModal('${card.id}')" title="Edit Harga, Lead Time & DP Supplier"
+                          class="p-1.5 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 text-xs">
+                          <i class="ph ph-sliders-horizontal"></i>
+                        </button>
+                        <button type="button" onclick="equipCard('${card.id}')"
+                          class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${isEquipped ? 'bg-brand-700 text-white' : 'bg-zinc-950 hover:bg-zinc-800 text-white'}">
+                          ${isEquipped ? 'Terpasang ✓' : '(+) Pasang'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderOntologyAndBlueprint(sim, ontology) {
+      // 1. Ontology Panel
+      const ontPanel = document.getElementById('ontology-alert-panel');
+      let headerBg, iconCls, titleTxt;
+      if (ontology.status === 'critical') {
+        headerBg = 'bg-rose-50 border-rose-300';
+        iconCls = 'ph-fill ph-warning-octagon text-rose-600';
+        titleTxt = `Peringatan Ontologi (${ontology.criticalCount} Kritis, ${ontology.warningCount} Peringatan)`;
+      } else if (ontology.status === 'warning') {
+        headerBg = 'bg-amber-50 border-amber-300';
+        iconCls = 'ph-fill ph-warning text-amber-600';
+        titleTxt = `Catatan Korelasi Teknis (${ontology.warningCount} Peringatan)`;
+      } else {
+        headerBg = 'bg-emerald-50 border-emerald-300';
+        iconCls = 'ph-fill ph-check-circle text-emerald-600';
+        titleTxt = 'Ontologi & Korelasi Kapal Valid (100% Sesuai)';
+      }
+
+      ontPanel.className = `panel p-4 space-y-2.5 border ${headerBg}`;
+      ontPanel.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 text-xs font-bold text-zinc-950">
+            <i class="${iconCls} text-base"></i>
+            <span>${titleTxt}</span>
+          </div>
+          <span class="text-[10px] font-semibold text-zinc-500">Auto-Check</span>
+        </div>
+        ${ontology.alerts.length === 0
+          ? `<p class="text-[11px] text-emerald-900">Korelasi Lambung, Mesin (${sim.engine.locked.powerLabel}), Outfitting, Kelistrikan, dan Dokumen sesuai dengan kelas <strong>${VESSEL_CLASSES.find(v=>v.id===activeVesselClass).name}</strong>.</p>`
+          : `<div class="space-y-1.5">${ontology.alerts.map(a => `
+              <div class="p-2.5 rounded-lg bg-white border ${a.level === 'critical' ? 'border-rose-200' : 'border-amber-200'} text-[11px]">
+                <div class="font-bold ${a.level === 'critical' ? 'text-rose-800' : 'text-amber-800'}">${a.title}</div>
+                <div class="text-zinc-700 mt-0.5 leading-snug">${a.msg}</div>
+              </div>
+            `).join('')}</div>`
+        }
+      `;
+
+      // 2. Blueprint 5 Drop Slots
+      document.getElementById('bp-unit-cogs').textContent = `${fmtRpShort(sim.baseUnitCost)} / unit (Fisik)`;
+      const extraDaysSum = sim.engine.extraDays + sim.outfitting.extraDays + sim.nav.extraDays + sim.permit.extraDays;
+      document.getElementById('bp-extra-days').textContent = `+${extraDaysSum} hari (Prep ${sim.hull.prepDays}h)`;
+
+      document.getElementById('blueprint-slots-container').innerHTML = WBS_CATEGORIES.map(cat => {
+        const card = getCardById(selectedCards[cat.id]);
+        const isMismatch = card && !card.compatibleClasses.includes(activeVesselClass);
+        return `
+          <div onclick="openInspectorModal('${card.id}')"
+            ondragover="onSlotDragOver(event)" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, '${cat.id}')"
+            class="drop-slot cursor-pointer p-3 bg-white border ${isMismatch ? 'border-rose-300 bg-rose-50/30' : 'border-zinc-200 hover:border-brand-700'} flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 text-[10px] font-semibold text-zinc-500">
+                <span>${cat.code} · ${cat.title}</span>
+                ${isMismatch ? '<span class="text-rose-700 font-bold">· Perlu Review</span>' : ''}
+              </div>
+              <div class="text-xs font-bold text-zinc-950 truncate mt-0.5">${card.name}</div>
+              <div class="text-[10px] text-zinc-500 mt-0.5 flex items-center gap-2 tnum">
+                <span><i class="ph-fill ph-lock-simple text-zinc-400"></i> ${card.locked.brand} · ${card.locked.powerLabel}</span>
+                <span>DP Sup: ${card.dpSupplierPct}%</span>
+              </div>
+            </div>
+            <div class="text-right shrink-0 tnum">
+              <div class="text-xs font-bold text-brand-700">${fmtRpShort(card.cost)}</div>
+              <div class="text-[10px] text-zinc-400">Klik untuk Edit</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('bp-reference-photos').classList.toggle('hidden', activeVesselClass !== 'fishing-3gt');
+    }
+
+    function renderSidebarTelemetry(sim, ontology) {
+      const vc = VESSEL_CLASSES.find(v => v.id === activeVesselClass);
+      document.getElementById('sb-class-pill').textContent = vc ? vc.name : 'Custom';
+
+      const ontBadge = document.getElementById('nav-ontology-badge');
+      if (ontology.status === 'critical') {
+        ontBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-800';
+        ontBadge.textContent = `${ontology.criticalCount}!`;
+      } else if (ontology.status === 'warning') {
+        ontBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
+        ontBadge.textContent = `${ontology.warningCount}`;
+      } else {
+        ontBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+        ontBadge.textContent = 'OK';
+      }
+
+      const riskDot = document.getElementById('nav-risk-dot');
+      riskDot.className = `w-2 h-2 rounded-full ${sim.safetyStatus === 'DANGER' ? 'bg-rose-600' : (sim.safetyStatus === 'CAUTION' ? 'bg-amber-500' : 'bg-emerald-500')}`;
+
+      document.getElementById('sb-telemetry').innerHTML = `
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Mesin</span><span class="font-semibold text-zinc-900 truncate">${sim.engine.locked.brand} ${sim.engine.locked.powerLabel.split(' ')[0]}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Volume / Durasi</span><span class="font-semibold text-zinc-900">${sim.units.toLocaleString('id-ID')} u · ${sim.totalDays}h</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">COGS All-In / Unit</span><span class="font-semibold text-zinc-900">${fmtRpShort(sim.cogsUnit)}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Nilai Proyek (DPP)</span><span class="font-bold text-brand-700">${fmtRpShort(sim.projectValue)}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Risiko Hari ke-0</span><span class="font-bold ${sim.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'}">${sim.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(sim.cashAtRiskDay0) : 'Rp 0'}</span></div>
+        <div class="flex justify-between gap-2 pt-1.5 border-t border-zinc-200"><span class="text-zinc-600 font-semibold">Net Profit Riil</span><span class="font-bold ${sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'}">${fmtRpShort(sim.realNetProfit)}</span></div>
+      `;
+    }
+
+    function renderExecutivePage(sim, singleSpkSim, safeSim) {
+      const vc = VESSEL_CLASSES.find(v => v.id === activeVesselClass);
+      document.getElementById('p1-vessel-subtitle').innerHTML =
+        `Konfigurasi aktif: <strong>${vc ? vc.name : ''}</strong> (${sim.hull.name} + <strong>${sim.engine.name}</strong>).`;
+
+      document.getElementById('p1-assumption-pill').innerHTML =
+        `Asumsi aktif: <strong>${sim.spkCount} SPK</strong> · Fee <strong>${sim.feeBase.toUpperCase()}</strong> · Overhead <strong>Rp ${sim.overheadPerDayJt} Jt/h</strong> · Lini <strong>${sim.capacityMultiplier}×</strong> · Delay <strong>+${sim.delayDays}h</strong> · WAPU/BG <strong>${sim.wapuBgPct}%</strong>`;
+      document.getElementById('lbl-total-fee-pct').textContent = sim.totalFeePct;
+
+      // Verdict Banner
       const banner = document.getElementById('verdict-banner');
       let bgCls, dotCls, badgeCls, badgeText, title, desc;
-
       const spkDeltaText = sim.spkCount > 1 && singleSpkSim.cashAtRiskDay0 > 0
-        ? ` Pemecahan <strong>${sim.spkCount} SPK</strong> memangkas risiko Hari ke-0 dari ${fmtRpShort(singleSpkSim.cashAtRiskDay0)} menjadi ${fmtRpShort(sim.cashAtRiskDay0)}.`
-        : '';
+        ? ` Pemecahan <strong>${sim.spkCount} SPK</strong> memangkas risiko Hari ke-0 dari ${fmtRpShort(singleSpkSim.cashAtRiskDay0)} menjadi ${fmtRpShort(sim.cashAtRiskDay0)}.` : '';
 
       if (sim.safetyStatus === 'DANGER') {
         bgCls = 'bg-rose-50/80'; dotCls = 'bg-rose-600'; badgeCls = 'bg-rose-100 text-rose-800 border-rose-200';
@@ -1418,12 +2385,12 @@
         bgCls = 'bg-amber-50/70'; dotCls = 'bg-amber-600'; badgeCls = 'bg-amber-100 text-amber-800 border-amber-200';
         badgeText = 'WASPADA · PERLU MODAL TALANGAN';
         title = `Risiko Hari ke-0 nol, namun butuh modal kerja ${fmtRpShort(Math.abs(sim.peakDeficit))}`;
-        desc = `Tanpa risiko di hari ke-0, namun friksi WAPU/BG (${sim.wapuBgPct}%), delay SP2D (+${sim.delayDays}h), dan beban waktu memicu defisit kas dengan biaya bunga ${fmtRpShort(sim.financingCost)}.`;
+        desc = `Tanpa risiko di hari ke-0, namun friksi WAPU/BG (${sim.wapuBgPct}%), delay SP2D (+${sim.delayDays}h), dan DP supplier memicu defisit dengan biaya bunga ${fmtRpShort(sim.financingCost)}.`;
       } else {
         bgCls = 'bg-emerald-50/70'; dotCls = 'bg-emerald-600'; badgeCls = 'bg-emerald-100 text-emerald-800 border-emerald-200';
         badgeText = 'AMAN · SELF-FUNDING';
         title = 'Arus kas kumulatif positif dari awal hingga BAST 100%';
-        desc = `Tidak ada eksposur kas di Hari ke-0 dan proyek membiayai dirinya sendiri selama ${sim.totalDays} hari dengan Net Profit Riil ${fmtRpShort(sim.realNetProfit)} (${sim.realNetMarginPct.toFixed(1)}%).`;
+        desc = `Tidak ada eksposur kas di Hari ke-0 dan proyek membiayai dirinya sendiri selama ${sim.totalDays} hari dengan Net Profit Riil ${fmtRpShort(sim.realNetProfit)}.`;
       }
 
       banner.className = `p-5 border-b border-zinc-200 transition-colors ${bgCls}`;
@@ -1454,14 +2421,13 @@
       `;
 
       const kpis = [
-        { label: `Total COGS (${sim.units.toLocaleString('id-ID')} u)`, val: fmtRpShort(sim.totalCOGS), sub: `${fmtRpShort(sim.cogsUnit)} / unit (inc. waktu)`, cls: 'text-zinc-950' },
+        { label: `Total COGS (${sim.units.toLocaleString('id-ID')} u)`, val: fmtRpShort(sim.totalCOGS), sub: `${fmtRpShort(sim.cogsUnit)} / unit`, cls: 'text-zinc-950' },
         { label: `Nilai Proyek (DPP)`, val: fmtRpShort(sim.projectValue), sub: `Bruto PPN: ${fmtRpShort(sim.grossContractValue)}`, cls: 'text-brand-700' },
         { label: `Fee ${sim.totalFeePct}% (${sim.feeBase === 'bruto' ? 'Bruto' : 'Netto'})`, val: fmtRpShort(sim.totalFee), sub: `Hari-0: ${fmtRpShort(sim.cashAtRiskDay0)}`, cls: 'text-rose-700' },
-        { label: `Overhead Waktu + Aksel.`, val: fmtRpShort(sim.overheadCostTotal + sim.accelCostTotal), sub: `${sim.totalDays}h × ${sim.overheadPerDayJt}Jt + Aksel`, cls: 'text-zinc-800' },
-        { label: `Net Profit Riil (After Bunga)`, val: fmtRpShort(sim.realNetProfit), sub: `Bunga Talangan: -${fmtRpShort(sim.financingCost)}`, cls: sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700' },
+        { label: `Overhead + Akselerasi`, val: fmtRpShort(sim.overheadCostTotal + sim.accelCostTotal), sub: `${sim.totalDays}h × ${sim.overheadPerDayJt}Jt + Aksel`, cls: 'text-zinc-800' },
+        { label: `Net Profit Riil`, val: fmtRpShort(sim.realNetProfit), sub: `Bunga Talangan: -${fmtRpShort(sim.financingCost)}`, cls: sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700' },
         { label: 'Total Durasi', val: `${sim.totalDays} Hari`, sub: `± ${(sim.totalDays / 30).toFixed(1)} Bln · ${sim.capacityMultiplier}× Lini`, cls: 'text-zinc-950' }
       ];
-
       document.getElementById('kpi-strip').innerHTML = kpis.map(k => `
         <div class="p-4">
           <div class="text-[11px] font-medium text-zinc-500">${k.label}</div>
@@ -1469,59 +2435,41 @@
           <div class="text-[11px] text-zinc-500 tnum mt-0.5">${k.sub}</div>
         </div>
       `).join('');
-    }
 
-    function renderScenarioComparison() {
-      const vals = Object.values(selectedTiers);
-      const allSame = vals.every(v => v === vals[0]);
-      const activePreset = allSame ? vals[0] : 0;
-
-      const tbody = document.getElementById('scenario-compare-body');
-      tbody.innerHTML = PRESET_META.map(p => {
-        const presetTiers = { hull: p.tier, engine: p.tier, outfitting: p.tier, nav_elec: p.tier, permit_delivery: p.tier };
-        const s = computeSimulation(presetTiers);
-        const isActive = activePreset === p.tier;
-
+      // 3-Scenario 3 GT Comparison
+      const gtPresets = PREDEFINED_PRESETS.slice(0, 3);
+      document.getElementById('scenario-compare-body').innerHTML = gtPresets.map(p => {
+        const s = computeSimulation(p.cards);
+        const isActive = activePresetId === p.id;
         return `
-          <tr onclick="applyPreset(${p.tier})" class="scenario-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
+          <tr onclick="loadPresetById('${p.id}')" class="scenario-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
             <td class="py-3 px-4">
               <div class="flex items-center gap-2.5">
                 <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-brand-700 bg-brand-700' : 'border-zinc-300 bg-white'}">
                   ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}
                 </span>
-                <div>
-                  <div class="font-semibold text-zinc-950">${p.name}</div>
-                  <div class="text-[11px] text-zinc-500">${p.sub}</div>
-                </div>
+                <span class="font-semibold text-zinc-950">${p.name}</span>
               </div>
             </td>
             <td class="py-3 px-3 text-right font-medium tnum text-zinc-700 whitespace-nowrap">${fmtRpShort(s.cogsUnit)}</td>
             <td class="py-3 px-3 text-right font-medium tnum text-zinc-900 whitespace-nowrap">${fmtRpShort(s.valUnit)}</td>
             <td class="py-3 px-3 text-right font-bold tnum text-brand-700 whitespace-nowrap">${fmtRpShort(s.projectValue)}</td>
-            <td class="py-3 px-3 text-right font-semibold tnum ${s.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">
-              ${s.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(s.cashAtRiskDay0) : 'Rp 0'}
-            </td>
+            <td class="py-3 px-3 text-right font-semibold tnum ${s.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">${s.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(s.cashAtRiskDay0) : 'Rp 0'}</td>
             <td class="py-3 px-3 text-right font-medium tnum text-rose-700 whitespace-nowrap">-${fmtRpShort(s.financingCost)}</td>
             <td class="py-3 px-3 text-right font-semibold tnum ${s.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'} whitespace-nowrap">${fmtRpShort(s.realNetProfit)}</td>
-            <td class="py-3 px-4 text-right font-semibold tnum text-zinc-900 whitespace-nowrap">${s.totalDays} hari <span class="text-zinc-400 font-normal">(${(s.totalDays/30).toFixed(1)} bln)</span></td>
+            <td class="py-3 px-4 text-right font-semibold tnum text-zinc-900 whitespace-nowrap">${s.totalDays} hari</td>
           </tr>
         `;
       }).join('');
-    }
 
-    function renderCeoWalkAwayBox(sim, safeSim) {
+      // CEO Walk-Away Box
       const plafonRp = sim.ceoPlafonM * 1e9;
       const isWithinPlafon = sim.cashAtRiskDay0 <= plafonRp;
       const overPlafonRp = Math.max(0, sim.cashAtRiskDay0 - plafonRp);
-
       const maxSafeSignPct = sim.feeBasisAmount > 0 ? Math.min(100, (plafonRp * sim.spkCount / sim.feeBasisAmount) * 100) : 0;
       const maxSafeSign1Spk = sim.feeBasisAmount > 0 ? Math.min(100, (plafonRp / sim.feeBasisAmount) * 100) : 0;
       const interestSaved = Math.max(0, sim.financingCost - safeSim.financingCost);
-      const engineCostTotal = sim.chosen.engine.cost * sim.units;
-      const unitsPerBatch = Math.ceil(sim.units / sim.spkCount / 4);
-      const engineStatus = sim.units >= 100
-        ? `Wajib Kontrak Indent & Back-to-Back (${unitsPerBatch.toLocaleString('id-ID')} u/batch)`
-        : `Ready Stock Dealer (${sim.units} u)`;
+      const engineCostTotal = sim.engine.cost * sim.units;
 
       const badge = document.getElementById('ceo-plafon-badge');
       if (sim.cashAtRiskDay0 === 0) {
@@ -1541,79 +2489,47 @@
             <span class="font-semibold text-zinc-900">1. Maks. % Fee Teken Kontrak yang Aman</span>
             <span class="font-bold tnum ${isWithinPlafon ? 'text-emerald-700' : 'text-rose-700'}">${maxSafeSignPct.toFixed(2)}%</span>
           </div>
-          <p class="text-[11px] text-zinc-600 mt-1">
-            Plafon <strong class="tnum">Rp ${sim.ceoPlafonM} M</strong>: pada 1 SPK hanya sanggup <strong class="tnum">${maxSafeSign1Spk.toFixed(2)}%</strong>; dengan <strong>${sim.spkCount} SPK</strong> naik ke <strong class="tnum">${maxSafeSignPct.toFixed(2)}%</strong> (vs tuntutan <strong class="tnum">${sim.signPct}%</strong>).
-          </p>
+          <p class="text-[11px] text-zinc-600 mt-1">Plafon <strong class="tnum">Rp ${sim.ceoPlafonM} M</strong>: 1 SPK hanya sanggup <strong class="tnum">${maxSafeSign1Spk.toFixed(2)}%</strong>; dengan <strong>${sim.spkCount} SPK</strong> naik ke <strong class="tnum">${maxSafeSignPct.toFixed(2)}%</strong> (vs <strong class="tnum">${sim.signPct}%</strong>).</p>
         </div>
         <div class="p-3 rounded-lg bg-white border border-zinc-200">
           <div class="flex items-center justify-between gap-2">
             <span class="font-semibold text-zinc-900">2. Selisih Fee Netto (DPP) vs Bruto PPN 11%</span>
             <span class="font-bold tnum text-brand-700">${fmtRpShort(sim.ppnFeeDiff)}</span>
           </div>
-          <p class="text-[11px] text-zinc-600 mt-1">
-            Kunci fee <strong>dari DPP / Excl. PPN</strong> agar tidak tergerus ekstra <strong class="tnum">${fmtRpShort(sim.ppnFeeDiff)}</strong>.
-          </p>
+          <p class="text-[11px] text-zinc-600 mt-1">Kunci fee dari DPP / Excl. PPN agar hemat ekstra <strong class="tnum">${fmtRpShort(sim.ppnFeeDiff)}</strong>.</p>
         </div>
         <div class="p-3 rounded-lg bg-white border border-zinc-200">
           <div class="flex items-center justify-between gap-2">
             <span class="font-semibold text-zinc-900">3. Penghematan Bunga Talangan (Pro-Rata)</span>
             <span class="font-bold tnum text-emerald-700">${fmtRpShort(interestSaved)}</span>
           </div>
-          <p class="text-[11px] text-zinc-600 mt-1">
-            Bunga skema aktif <strong class="tnum">${fmtRpShort(sim.financingCost)}</strong> vs Pro-Rata Netto <strong class="tnum">${fmtRpShort(safeSim.financingCost)}</strong>.
-          </p>
+          <p class="text-[11px] text-zinc-600 mt-1">Bunga skema aktif <strong class="tnum">${fmtRpShort(sim.financingCost)}</strong> vs Pro-Rata Netto <strong class="tnum">${fmtRpShort(safeSim.financingCost)}</strong>.</p>
         </div>
         <div class="p-3 rounded-lg bg-white border border-zinc-200">
           <div class="flex items-center justify-between gap-2">
-            <span class="font-semibold text-zinc-900">4. Kuota Mesin Yamaha 15 PK (${sim.units.toLocaleString('id-ID')} u)</span>
+            <span class="font-semibold text-zinc-900">4. Komitmen Mesin (${sim.engine.locked.brand} · DP ${sim.engine.dpSupplierPct}%)</span>
             <span class="font-bold tnum text-zinc-900">${fmtRpShort(engineCostTotal)}</span>
           </div>
-          <p class="text-[11px] text-zinc-600 mt-1">${engineStatus}.</p>
+          <p class="text-[11px] text-zinc-600 mt-1">${sim.units >= 100 ? `Wajib kontrak indent & pengiriman bertahap (${Math.ceil(sim.units/sim.spkCount/4)} u/batch).` : `Pengadaan ${sim.units} unit sesuai jadwal batch.`}</p>
         </div>
       `;
     }
 
-    function renderPage2CostAndTradeoff(sim) {
-      // COGS Breakdown Strip
+    function renderCostAndCapacityPage(sim) {
       document.getElementById('cogs-breakdown-strip').innerHTML = `
-        <div class="p-4">
-          <div class="text-[11px] font-medium text-zinc-500">1. COGS Komponen Fisik &amp; Kirim</div>
-          <div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.baseComponentCOGS)}</div>
-          <div class="text-[11px] text-zinc-500 tnum mt-0.5">${fmtRpShort(sim.baseUnitCost)} / unit × ${sim.units.toLocaleString('id-ID')}</div>
-        </div>
-        <div class="p-4">
-          <div class="text-[11px] font-medium text-zinc-500">2. Overhead Waktu Produksi</div>
-          <div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.overheadCostTotal)}</div>
-          <div class="text-[11px] text-zinc-500 tnum mt-0.5">${sim.totalDays} hari × Rp ${sim.overheadPerDayJt} Jt/hari</div>
-        </div>
-        <div class="p-4">
-          <div class="text-[11px] font-medium text-zinc-500">3. Biaya Akselerasi Lini (${sim.capacityMultiplier}×)</div>
-          <div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.accelCostTotal)}</div>
-          <div class="text-[11px] text-zinc-500 tnum mt-0.5">Rp ${sim.accelCostJt} Jt / unit</div>
-        </div>
-        <div class="p-4 bg-brand-50/40">
-          <div class="text-[11px] font-semibold text-brand-800">TOTAL COGS PROYEK</div>
-          <div class="text-base sm:text-lg font-bold tnum text-brand-700 mt-1">${fmtRpShort(sim.totalCOGS)}</div>
-          <div class="text-[11px] text-brand-800 tnum mt-0.5 font-medium">${fmtRpShort(sim.cogsUnit)} / unit (all-in)</div>
-        </div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">1. COGS Komponen Fisik &amp; Kirim</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.baseComponentCOGS)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${fmtRpShort(sim.baseUnitCost)} / u × ${sim.units.toLocaleString('id-ID')}</div></div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">2. Overhead Waktu Produksi</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.overheadCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${sim.totalDays} hari × Rp ${sim.overheadPerDayJt} Jt/h</div></div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">3. Biaya Akselerasi Lini (${sim.capacityMultiplier}×)</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.accelCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">Rp ${sim.accelCostJt} Jt / unit</div></div>
+        <div class="p-4 bg-brand-50/40"><div class="text-[11px] font-semibold text-brand-800">TOTAL COGS PROYEK</div><div class="text-base sm:text-lg font-bold tnum text-brand-700 mt-1">${fmtRpShort(sim.totalCOGS)}</div><div class="text-[11px] text-brand-800 tnum mt-0.5 font-medium">${fmtRpShort(sim.cogsUnit)} / unit (all-in)</div></div>
       `;
 
-      // Sweet Spot Trade-Off Comparison Table across 1x, 1.5x, 2x
       const rows = CAPACITY_MODES.map(mode => {
         const useAccel = mode.mult === capacityMultiplier ? sim.accelCostJt : mode.defaultAccelJt;
         const s = computeSimulation(null, { capacityMultiplier: mode.mult, accelCostJt: useAccel });
         return { mode, s };
       });
-
-      // Find best realNetProfit (tie-breaker: shortest duration)
-      let bestMult = rows[0].mode.mult;
-      let bestProfit = rows[0].s.realNetProfit;
-      rows.forEach(r => {
-        if (r.s.realNetProfit > bestProfit) {
-          bestProfit = r.s.realNetProfit;
-          bestMult = r.mode.mult;
-        }
-      });
+      let bestMult = rows[0].mode.mult, bestProfit = rows[0].s.realNetProfit;
+      rows.forEach(r => { if (r.s.realNetProfit > bestProfit) { bestProfit = r.s.realNetProfit; bestMult = r.mode.mult; } });
 
       document.getElementById('tradeoff-table-body').innerHTML = rows.map(({ mode, s }) => {
         const isActive = mode.mult === capacityMultiplier;
@@ -1622,9 +2538,7 @@
           <tr onclick="setCapacity(${mode.mult})" class="tradeoff-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
             <td class="py-3 px-4">
               <div class="flex items-center gap-2">
-                <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-brand-700 bg-brand-700' : 'border-zinc-300 bg-white'}">
-                  ${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}
-                </span>
+                <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-brand-700 bg-brand-700' : 'border-zinc-300 bg-white'}">${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}</span>
                 <span class="font-semibold text-zinc-950">${mode.label}</span>
                 ${isOptimum ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">SWEET SPOT</span>' : ''}
               </div>
@@ -1640,117 +2554,106 @@
         `;
       }).join('');
 
-      document.getElementById('capacity-note').textContent =
-        `Output efektif: ${sim.effectiveRate.toFixed(1)} unit/hari · Overhead waktu: ${fmtRpShort(sim.overheadCostTotal)}`;
-    }
+      document.getElementById('capacity-note').textContent = `Output efektif: ${sim.effectiveRate.toFixed(1)} unit/hari · Overhead waktu: ${fmtRpShort(sim.overheadCostTotal)}`;
 
-    function renderSpecMatrix() {
-      const vals = Object.values(selectedTiers);
-      const allSame = vals.every(v => v === vals[0]);
-      document.getElementById('custom-badge').classList.toggle('hidden', allSame);
-
-      const anyModified = SPEC_MODULES.some(m => m.options.some(o => o.cost !== o.defaultCost));
-      document.getElementById('price-override-badge').classList.toggle('hidden', !anyModified);
-      document.getElementById('btn-reset-prices').classList.toggle('hidden', !anyModified);
-
-      const container = document.getElementById('spec-matrix');
-      container.innerHTML = SPEC_MODULES.map(m => {
-        const currentTier = selectedTiers[m.id];
+      document.getElementById('active-wbs-table-body').innerHTML = WBS_CATEGORIES.map(cat => {
+        const card = getCardById(selectedCards[cat.id]);
+        const leadTxt = cat.id === 'hull' ? `Prep ${card.prepDays}h · ${card.unitsPerDay} u/h` : `+${card.extraDays} hari`;
         return `
-          <div class="p-4 grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-center bg-white">
-            <div class="lg:col-span-4 pr-2">
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 tnum">${m.wbs}</span>
-                <span class="text-xs font-semibold text-zinc-950">${m.name}</span>
-              </div>
-              <p class="text-[11px] text-zinc-500 mt-1">${m.desc}</p>
-            </div>
-            <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-2">
-              ${m.options.map(opt => {
-                const isSelected = currentTier === opt.tier;
-                const isModified = opt.cost !== opt.defaultCost;
-                const costMillion = (opt.cost / 1e6).toFixed(1);
-                const timeText = m.id === 'hull'
-                  ? `Prep ${opt.prepDays}h · ${(opt.unitsPerDay * capacityMultiplier).toFixed(1)} u/h`
-                  : (opt.extraDays > 0 ? `+${opt.extraDays} hari` : '+0 hari');
-                return `
-                  <div role="button" tabindex="0" onclick="selectModuleTier('${m.id}', ${opt.tier})"
-                    onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault();selectModuleTier('${m.id}', ${opt.tier});}"
-                    class="tier-opt cursor-pointer text-left p-3 border ${isSelected ? 'is-selected' : 'border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50/70'} flex flex-col justify-between gap-2">
-                    <div>
-                      <div class="flex items-center justify-between gap-1">
-                        <span class="text-xs font-semibold ${isSelected ? 'text-brand-800' : 'text-zinc-900'}">${opt.label}</span>
-                        ${isSelected ? '<i class="ph-fill ph-check-circle text-brand-700 text-sm shrink-0"></i>' : ''}
-                      </div>
-                      <div class="text-[11px] text-zinc-600 leading-snug mt-1">${opt.spec}</div>
-                    </div>
-                    <div class="pt-2 border-t border-zinc-200/70 flex items-center justify-between gap-1 text-[11px] tnum">
-                      <div class="inline-flex items-center gap-1" onclick="event.stopPropagation()">
-                        <span class="text-zinc-500 font-medium">Rp</span>
-                        <input id="price-inp-${m.id}-${opt.tier}" type="number" min="0" step="0.1" value="${costMillion}"
-                          oninput="updateModuleCost('${m.id}', ${opt.tier}, this.value)"
-                          title="Edit harga satuan dalam Juta Rp"
-                          class="unit-price-input tnum ${isModified ? 'is-modified' : ''}" />
-                        <span class="text-zinc-500 font-medium">Jt</span>
-                      </div>
-                      <span class="text-zinc-500 font-medium text-[10px]">${timeText}</span>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
+          <tr onclick="openInspectorModal('${card.id}')" class="hover:bg-zinc-50 cursor-pointer transition">
+            <td class="py-3 px-4"><div class="text-[10px] text-zinc-400 font-semibold">${cat.code}</div><div class="font-semibold text-zinc-950">${card.name}</div></td>
+            <td class="py-3 px-3 text-zinc-600"><i class="ph-fill ph-lock-simple text-zinc-400"></i> ${card.locked.brand} · ${card.locked.powerLabel} · ${card.locked.materialOrCycle}</td>
+            <td class="py-3 px-3 text-right tnum font-semibold text-zinc-900 whitespace-nowrap">${fmtRpShort(card.cost)}</td>
+            <td class="py-3 px-3 text-right tnum font-bold text-brand-700 whitespace-nowrap">${fmtRpShort(card.cost * sim.units)}</td>
+            <td class="py-3 px-3 text-right tnum text-zinc-700 whitespace-nowrap">${card.dpSupplierPct}%</td>
+            <td class="py-3 px-4 text-right tnum text-zinc-700 whitespace-nowrap">${leadTxt}</td>
+          </tr>
         `;
       }).join('');
     }
 
-    function renderGantt(sim) {
-      const container = document.getElementById('gantt-container');
+    function renderTimelineAndLedgerPage(sim) {
+      document.getElementById('lbl-spk-units').textContent =
+        sim.spkCount === 1 ? `1 SPK (${sim.units.toLocaleString('id-ID')} u)` : `${sim.spkCount} SPK (@ ±${Math.round(sim.units / sim.spkCount)} u)`;
+      document.getElementById('lbl-fee-base-delta').textContent =
+        sim.feeBase === 'bruto' ? `+${fmtRpShort(sim.ppnFeeDiff)} ekstra` : `Hemat ${fmtRpShort(sim.ppnFeeDiff)}`;
+
       const total = sim.totalDays;
       const colorMap = { fee: 'bg-rose-600', prep: 'bg-zinc-700', prod: 'bg-brand-700', qc: 'bg-emerald-600' };
       const ticks = [0, 0.2, 0.4, 0.6, 0.8, 1.0].map(r => Math.round(total * r));
 
-      const headerHtml = `
+      document.getElementById('gantt-container').innerHTML = `
         <div class="grid grid-cols-12 gap-3 items-center pb-2.5 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
           <div class="col-span-4">Fase &amp; Deliverable</div>
           <div class="col-span-6 flex justify-between tnum px-1">${ticks.map(d => `<span>Hari ${d}</span>`).join('')}</div>
           <div class="col-span-2 text-right">Durasi / Net Kas</div>
         </div>
+        ${sim.phases.map(p => {
+          const leftPct = (p.startDay / total) * 100;
+          const dur = Math.max(1, p.endDay - p.startDay);
+          const widthPct = Math.max(2.2, (dur / total) * 100);
+          const netCls = p.netCash < 0 ? 'text-rose-700' : 'text-emerald-700';
+          return `
+            <div class="grid grid-cols-12 gap-3 items-center py-1.5 hover:bg-zinc-50 rounded-lg px-1 transition">
+              <div class="col-span-4 pr-2">
+                <div class="text-xs font-semibold text-zinc-900 flex items-center gap-1.5">
+                  <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 tnum">${p.code}</span>
+                  <span class="truncate" title="${p.name}">${p.name}</span>
+                </div>
+                <div class="text-[11px] text-zinc-500 truncate mt-0.5" title="${p.detail}">${p.detail}</div>
+              </div>
+              <div class="col-span-6 relative h-7 bg-zinc-100 rounded-md overflow-hidden">
+                <div class="gantt-bar absolute top-1 bottom-1 rounded ${colorMap[p.category]} flex items-center justify-center text-[10px] font-semibold text-white tnum px-1.5 truncate"
+                     style="left: ${leftPct.toFixed(2)}%; width: ${Math.min(100 - leftPct, widthPct).toFixed(2)}%;">
+                  ${dur > 10 ? `H${p.startDay}–${p.endDay}` : ''}
+                </div>
+              </div>
+              <div class="col-span-2 text-right tnum">
+                <div class="text-xs font-semibold text-zinc-900">${dur} hari</div>
+                <div class="text-[11px] font-medium ${netCls}">${p.netCash >= 0 ? '+' : ''}${fmtRpShort(p.netCash)}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
       `;
 
-      const rowsHtml = sim.phases.map(p => {
-        const leftPct = (p.startDay / total) * 100;
-        const dur = Math.max(1, p.endDay - p.startDay);
-        const widthPct = Math.max(2.2, (dur / total) * 100);
-        const netCls = p.netCash < 0 ? 'text-rose-700' : 'text-emerald-700';
+      document.getElementById('timeline-subtitle').innerHTML =
+        `Total durasi <strong>${sim.units.toLocaleString('id-ID')} unit</strong> (${sim.spkCount} SPK): <strong class="tnum text-zinc-900">${sim.totalDays} hari (± ${(sim.totalDays / 30).toFixed(1)} bulan)</strong> · Delay SP2D +${sim.delayDays}h.`;
 
+      document.getElementById('table-unit-badge').textContent =
+        `${sim.units.toLocaleString('id-ID')} Unit · ${sim.spkCount} SPK · Kas Masuk Bersih ${fmtRpShort(sim.netCashInTotal)}`;
+
+      document.getElementById('cashflow-table-body').innerHTML = sim.phases.map(p => {
+        const isNeg = p.cumCash < 0;
+        const badge = isNeg
+          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800">DEFISIT</span>`
+          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">SURPLUS</span>`;
         return `
-          <div class="grid grid-cols-12 gap-3 items-center py-1.5 hover:bg-zinc-50 rounded-lg px-1 transition">
-            <div class="col-span-4 pr-2">
-              <div class="text-xs font-semibold text-zinc-900 flex items-center gap-1.5">
-                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 tnum">${p.code}</span>
-                <span class="truncate" title="${p.name}">${p.name}</span>
-              </div>
-              <div class="text-[11px] text-zinc-500 truncate mt-0.5" title="${p.detail}">${p.detail}</div>
-            </div>
-            <div class="col-span-6 relative h-7 bg-zinc-100 rounded-md overflow-hidden">
-              <div class="gantt-bar absolute top-1 bottom-1 rounded ${colorMap[p.category]} flex items-center justify-center text-[10px] font-semibold text-white tnum px-1.5 truncate"
-                   style="left: ${leftPct.toFixed(2)}%; width: ${Math.min(100 - leftPct, widthPct).toFixed(2)}%;"
-                   title="${p.name} (Hari ${p.startDay} s/d Hari ${p.endDay})">
-                ${dur > 10 ? `H${p.startDay}–${p.endDay}` : ''}
-              </div>
-            </div>
-            <div class="col-span-2 text-right tnum">
-              <div class="text-xs font-semibold text-zinc-900">${dur} hari</div>
-              <div class="text-[11px] font-medium ${netCls}">${p.netCash >= 0 ? '+' : ''}${fmtRpShort(p.netCash)}</div>
-            </div>
-          </div>
+          <tr class="${isNeg ? 'bg-rose-50/40' : 'bg-white'} hover:bg-zinc-50 transition">
+            <td class="py-3 px-4"><div class="font-semibold text-zinc-950"><span class="tnum text-zinc-400 mr-1.5">${p.code}</span>${p.name}</div><div class="text-[11px] text-zinc-500 mt-0.5">${p.detail}</div></td>
+            <td class="py-3 px-3 tnum text-zinc-700 whitespace-nowrap">H-${p.startDay}–H-${p.endDay}<div class="text-[10px] text-zinc-400">${Math.max(1, p.endDay - p.startDay)} hari</div></td>
+            <td class="py-3 px-3 text-right tnum font-medium ${p.inflow > 0 ? 'text-brand-700' : 'text-zinc-400'} whitespace-nowrap">${p.inflow > 0 ? '+' + fmtRpShort(p.inflow) : '—'}</td>
+            <td class="py-3 px-3 text-right tnum font-medium ${p.feeOut > 0 ? 'text-rose-700' : 'text-zinc-400'} whitespace-nowrap">${p.feeOut > 0 ? '-' + fmtRpShort(p.feeOut) : '—'}</td>
+            <td class="py-3 px-3 text-right tnum font-medium ${p.prodOut > 0 ? 'text-zinc-800' : 'text-zinc-400'} whitespace-nowrap">${p.prodOut > 0 ? '-' + fmtRpShort(p.prodOut) : '—'}</td>
+            <td class="py-3 px-3 text-right tnum font-semibold ${p.netCash < 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">${p.netCash >= 0 ? '+' : ''}${fmtRpShort(p.netCash)}</td>
+            <td class="py-3 px-3 text-right tnum font-bold ${isNeg ? 'text-rose-700' : 'text-zinc-950'} whitespace-nowrap">${fmtRpShort(p.cumCash)}</td>
+            <td class="py-3 px-4 text-center whitespace-nowrap">${badge}</td>
+          </tr>
         `;
       }).join('');
 
-      container.innerHTML = headerHtml + rowsHtml;
-      document.getElementById('timeline-subtitle').innerHTML =
-        `Total durasi <strong>${sim.units.toLocaleString('id-ID')} unit</strong> (${sim.spkCount} SPK): <strong class="tnum text-zinc-900">${sim.totalDays} hari (± ${(sim.totalDays / 30).toFixed(1)} bulan)</strong> · Delay SP2D +${sim.delayDays}h.`;
+      document.getElementById('cashflow-table-foot').innerHTML = `
+        <tr>
+          <td class="py-3 px-4">TOTAL OPERASIONAL (${sim.units.toLocaleString('id-ID')} UNIT)<div class="text-[10px] font-normal text-zinc-400 mt-0.5">Dikurangi Bunga Talangan (${sim.costOfCapitalPct}% p.a.): -${fmtRpShort(sim.financingCost)} → Net Profit Riil: ${fmtRpShort(sim.realNetProfit)}</div></td>
+          <td class="py-3 px-3 tnum">${sim.totalDays} Hari</td>
+          <td class="py-3 px-3 text-right tnum text-blue-300">+${fmtRpShort(sim.netCashInTotal)}</td>
+          <td class="py-3 px-3 text-right tnum text-rose-300">-${fmtRpShort(sim.totalFee)}</td>
+          <td class="py-3 px-3 text-right tnum text-zinc-300">-${fmtRpShort(sim.totalCOGS)}</td>
+          <td class="py-3 px-3 text-right tnum text-emerald-300">+${fmtRpShort(sim.netProfitBeforeFinancing)}</td>
+          <td class="py-3 px-3 text-right tnum text-emerald-300">${fmtRpShort(sim.netProfitBeforeFinancing)}</td>
+          <td class="py-3 px-4 text-center tnum">RIIL ${sim.realNetMarginPct.toFixed(1)}%</td>
+        </tr>
+      `;
     }
 
     function renderCashflowChart(sim, safeSim) {
@@ -1774,151 +2677,57 @@
           labels,
           datasets: [
             {
-              label: 'Skema Aktif',
-              data: activeSeries,
-              borderColor: activeColor,
-              backgroundColor: activeFill,
-              borderWidth: 2.5,
-              fill: true,
-              tension: 0.22,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              pointBackgroundColor: '#ffffff',
-              pointBorderWidth: 2
+              label: 'Skema Aktif', data: activeSeries,
+              borderColor: activeColor, backgroundColor: activeFill,
+              borderWidth: 2.5, fill: true, tension: 0.22,
+              pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#ffffff', pointBorderWidth: 2
             },
             {
-              label: 'Benchmark Aman (Pro-Rata Netto)',
-              data: safeSeries,
-              borderColor: '#1d4ed8',
-              borderWidth: 2,
-              borderDash: [5, 4],
-              fill: false,
-              tension: 0.22,
-              pointRadius: 3.5,
-              pointBackgroundColor: '#ffffff',
-              pointBorderWidth: 2
+              label: 'Benchmark Aman (Pro-Rata Netto)', data: safeSeries,
+              borderColor: '#1d4ed8', borderWidth: 2, borderDash: [5, 4], fill: false, tension: 0.22,
+              pointRadius: 3.5, pointBackgroundColor: '#ffffff', pointBorderWidth: 2
             },
             {
-              label: 'Batas Kas Rp 0',
-              data: labels.map(() => 0),
-              borderColor: '#a1a1aa',
-              borderWidth: 1,
-              borderDash: [3, 3],
-              pointRadius: 0,
-              fill: false
+              label: 'Batas Kas Rp 0', data: labels.map(() => 0),
+              borderColor: '#a1a1aa', borderWidth: 1, borderDash: [3, 3], pointRadius: 0, fill: false
             }
           ]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { boxWidth: 12, usePointStyle: true, padding: 14, font: { size: 11, family: 'Inter', weight: '500' } }
-            },
+            legend: { position: 'bottom', labels: { boxWidth: 12, usePointStyle: true, padding: 14, font: { size: 11, family: 'Inter', weight: '500' } } },
             tooltip: {
-              backgroundColor: '#09090b',
-              titleFont: { family: 'Inter', size: 12, weight: '600' },
-              bodyFont: { family: 'Inter', size: 11 },
-              padding: 10,
-              cornerRadius: 8,
-              callbacks: {
-                label: (c) => ` ${c.dataset.label}: Rp ${c.parsed.y.toLocaleString('id-ID')} ${useBillion ? 'M' : 'Jt'}`
-              }
+              backgroundColor: '#09090b', titleFont: { family: 'Inter', size: 12, weight: '600' }, bodyFont: { family: 'Inter', size: 11 },
+              padding: 10, cornerRadius: 8,
+              callbacks: { label: (c) => ` ${c.dataset.label}: Rp ${c.parsed.y.toLocaleString('id-ID')} ${useBillion ? 'M' : 'Jt'}` }
             }
           },
           scales: {
-            y: {
-              title: { display: true, text: `Kas Kumulatif (${unitLabel})`, font: { size: 11, family: 'Inter', weight: '600' }, color: '#52525b' },
-              grid: { color: '#f4f4f5' },
-              ticks: { font: { family: 'Inter', size: 11 }, color: '#71717a' }
-            },
-            x: {
-              grid: { display: false },
-              ticks: { font: { family: 'Inter', size: 11 }, color: '#71717a' }
-            }
+            y: { title: { display: true, text: `Kas Kumulatif (${unitLabel})`, font: { size: 11, family: 'Inter', weight: '600' }, color: '#52525b' }, grid: { color: '#f4f4f5' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#71717a' } },
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#71717a' } }
           }
         }
       });
     }
 
-    function renderCashflowTable(sim) {
-      document.getElementById('table-unit-badge').textContent =
-        `${sim.units.toLocaleString('id-ID')} Unit · ${sim.spkCount} SPK · Kas Masuk Bersih ${fmtRpShort(sim.netCashInTotal)}`;
-      const tbody = document.getElementById('cashflow-table-body');
-      const tfoot = document.getElementById('cashflow-table-foot');
-
-      tbody.innerHTML = sim.phases.map(p => {
-        const isNeg = p.cumCash < 0;
-        const badge = isNeg
-          ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-800">DEFISIT</span>`
-          : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">SURPLUS</span>`;
-
-        return `
-          <tr class="${isNeg ? 'bg-rose-50/40' : 'bg-white'} hover:bg-zinc-50 transition">
-            <td class="py-3 px-4">
-              <div class="font-semibold text-zinc-950"><span class="tnum text-zinc-400 mr-1.5">${p.code}</span>${p.name}</div>
-              <div class="text-[11px] text-zinc-500 mt-0.5">${p.detail}</div>
-            </td>
-            <td class="py-3 px-3 tnum text-zinc-700 whitespace-nowrap">
-              H-${p.startDay}–H-${p.endDay}
-              <div class="text-[10px] text-zinc-400">${Math.max(1, p.endDay - p.startDay)} hari</div>
-            </td>
-            <td class="py-3 px-3 text-right tnum font-medium ${p.inflow > 0 ? 'text-brand-700' : 'text-zinc-400'} whitespace-nowrap">
-              ${p.inflow > 0 ? '+' + fmtRpShort(p.inflow) : '—'}
-            </td>
-            <td class="py-3 px-3 text-right tnum font-medium ${p.feeOut > 0 ? 'text-rose-700' : 'text-zinc-400'} whitespace-nowrap">
-              ${p.feeOut > 0 ? '-' + fmtRpShort(p.feeOut) : '—'}
-            </td>
-            <td class="py-3 px-3 text-right tnum font-medium ${p.prodOut > 0 ? 'text-zinc-800' : 'text-zinc-400'} whitespace-nowrap">
-              ${p.prodOut > 0 ? '-' + fmtRpShort(p.prodOut) : '—'}
-            </td>
-            <td class="py-3 px-3 text-right tnum font-semibold ${p.netCash < 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">
-              ${p.netCash >= 0 ? '+' : ''}${fmtRpShort(p.netCash)}
-            </td>
-            <td class="py-3 px-3 text-right tnum font-bold ${isNeg ? 'text-rose-700' : 'text-zinc-950'} whitespace-nowrap">
-              ${fmtRpShort(p.cumCash)}
-            </td>
-            <td class="py-3 px-4 text-center whitespace-nowrap">${badge}</td>
-          </tr>
-        `;
-      }).join('');
-
-      tfoot.innerHTML = `
-        <tr>
-          <td class="py-3 px-4">
-            TOTAL OPERASIONAL (${sim.units.toLocaleString('id-ID')} UNIT)
-            <div class="text-[10px] font-normal text-zinc-400 mt-0.5">Dikurangi Bunga Talangan (${sim.costOfCapitalPct}% p.a.): -${fmtRpShort(sim.financingCost)} → Net Profit Riil: ${fmtRpShort(sim.realNetProfit)}</div>
-          </td>
-          <td class="py-3 px-3 tnum">${sim.totalDays} Hari</td>
-          <td class="py-3 px-3 text-right tnum text-blue-300">+${fmtRpShort(sim.netCashInTotal)}</td>
-          <td class="py-3 px-3 text-right tnum text-rose-300">-${fmtRpShort(sim.totalFee)}</td>
-          <td class="py-3 px-3 text-right tnum text-zinc-300">-${fmtRpShort(sim.totalCOGS)}</td>
-          <td class="py-3 px-3 text-right tnum text-emerald-300">+${fmtRpShort(sim.netProfitBeforeFinancing)}</td>
-          <td class="py-3 px-3 text-right tnum text-emerald-300">${fmtRpShort(sim.netProfitBeforeFinancing)}</td>
-          <td class="py-3 px-4 text-center tnum">RIIL ${sim.realNetMarginPct.toFixed(1)}%</td>
-        </tr>
-      `;
-    }
-
-    function recalculateAll(options = {}) {
+    function recalculateAll() {
       const sim = computeSimulation();
       const singleSpkSim = computeSimulation(null, { spkCount: 1 });
       const safeSim = computeSimulation(null, { feeMode: 'nego-prorata', feeBase: 'netto' });
+      const ontology = evaluateOntology();
 
-      renderLiveStatusStrip(sim);
-      renderVerdictAndKPIs(sim, singleSpkSim);
-      renderScenarioComparison();
+      renderPresetDropdown();
+      renderVesselClasses();
+      renderCatalogTabs();
+      renderCatalogCards();
+      renderOntologyAndBlueprint(sim, ontology);
+      renderSidebarTelemetry(sim, ontology);
+      renderExecutivePage(sim, singleSpkSim, safeSim);
       renderCashflowChart(sim, safeSim);
-      renderCeoWalkAwayBox(sim, safeSim);
-      renderPage2CostAndTradeoff(sim);
-      if (!options.skipMatrixRebuild) {
-        renderSpecMatrix();
-      }
-      renderGantt(sim);
-      renderCashflowTable(sim);
+      renderCostAndCapacityPage(sim);
+      renderTimelineAndLedgerPage(sim);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
