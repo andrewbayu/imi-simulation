@@ -288,6 +288,14 @@
 
     <!-- Sidebar Footer Actions -->
     <div class="p-4 border-t border-zinc-200 space-y-2">
+      <button type="button" id="sb-cloud-status" onclick="openCloudSyncModal()" title="Status Sinkronisasi Database Supabase"
+        class="w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-[11px] font-medium text-zinc-700 transition">
+        <span class="flex items-center gap-1.5 min-w-0">
+          <span id="sb-cloud-dot" class="w-2 h-2 rounded-full bg-zinc-400 shrink-0"></span>
+          <span id="sb-cloud-label" class="truncate">Menghubungkan Cloud...</span>
+        </span>
+        <i class="ph ph-cloud-arrow-up text-xs text-zinc-500 shrink-0"></i>
+      </button>
       <button type="button" id="sb-next-btn" onclick="goToNextPage()" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
         <span>Lanjut ke Simulasi</span>
         <i class="ph-bold ph-arrow-right text-xs"></i>
@@ -1384,12 +1392,82 @@
           <div class="input-shell px-3 py-2">
             <input id="save-config-name" type="text" placeholder="Contoh: Kapal Ikan 3 GT Hybrid · Yamaha 28 Jt" class="w-full text-sm font-medium bg-transparent focus:outline-none" />
           </div>
-          <p class="text-[11px] text-zinc-500 mt-1.5">Konfigurasi tersimpan di browser ini dan langsung muncul di dropdown pilihan preset.</p>
+          <p class="text-[11px] text-zinc-500 mt-1.5">Konfigurasi tersimpan ke Cloud Supabase IMI (dan cache browser ini) sehingga langsung muncul di dropdown preset tim.</p>
         </div>
       </div>
       <div class="px-5 py-3 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-2">
         <button type="button" onclick="closeSaveModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
         <button type="button" onclick="confirmSaveConfig()" class="px-4 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold">Simpan Konfigurasi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- CLOUD SYNC & SUPABASE STATUS MODAL                                    -->
+  <!-- ===================================================================== -->
+  <div id="cloud-sync-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeCloudSyncModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50 shrink-0">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-50 text-brand-700">Supabase Cloud Database</span>
+          <h3 class="text-base font-bold text-zinc-950 mt-1">Sinkronisasi Database Tim IMI</h3>
+          <p class="text-[11px] text-zinc-500">Project ID: <code class="font-mono text-zinc-700">cjcjlkmsygjggiqcopbb</code> · DB Material, Kartu Custom &amp; Preset Tersimpan.</p>
+        </div>
+        <button type="button" onclick="closeCloudSyncModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-lg"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-4 overflow-y-auto text-xs">
+        <div id="cloud-modal-banner" class="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50 flex items-start justify-between gap-3">
+          <div class="space-y-1">
+            <div id="cloud-modal-status-title" class="font-bold text-zinc-950">Status: Memeriksa...</div>
+            <p id="cloud-modal-status-desc" class="text-[11px] text-zinc-600"></p>
+          </div>
+          <button type="button" onclick="syncAllFromSupabase({ forcePushLocal: false, notify: true })"
+            class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-[11px] font-semibold">
+            <i class="ph ph-arrows-clockwise text-xs"></i> Sync Sekarang
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5 tnum">
+          <div class="p-3 rounded-xl border border-zinc-200 bg-white">
+            <div class="text-[10px] font-semibold text-zinc-500 uppercase">DB Material</div>
+            <div id="cloud-count-materials" class="text-base font-bold text-zinc-950 mt-0.5">—</div>
+          </div>
+          <div class="p-3 rounded-xl border border-zinc-200 bg-white">
+            <div class="text-[10px] font-semibold text-zinc-500 uppercase">Kartu Custom</div>
+            <div id="cloud-count-cards" class="text-base font-bold text-zinc-950 mt-0.5">—</div>
+          </div>
+          <div class="p-3 rounded-xl border border-zinc-200 bg-white">
+            <div class="text-[10px] font-semibold text-zinc-500 uppercase">Preset Tersimpan</div>
+            <div id="cloud-count-configs" class="text-base font-bold text-zinc-950 mt-0.5">—</div>
+          </div>
+        </div>
+
+        <div id="cloud-sql-setup-box" class="space-y-2 pt-2 border-t border-zinc-200">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="font-bold text-zinc-950">Setup Awal Tabel Supabase (Cukup Sekali)</div>
+              <p class="text-[11px] text-zinc-500">Salin SQL di bawah lalu jalankan di Supabase Dashboard → SQL Editor project IMI (<code class="font-mono">cjcjlkmsygjggiqcopbb</code>).</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="copySupabaseSchemaSql()" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-800">
+                <i class="ph ph-copy text-xs"></i> Salin SQL
+              </button>
+              <a href="https://supabase.com/dashboard/project/cjcjlkmsygjggiqcopbb/sql/new" target="_blank" rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-[11px] font-semibold">
+                Buka SQL Editor <i class="ph ph-arrow-square-out text-xs"></i>
+              </a>
+            </div>
+          </div>
+          <pre id="cloud-sql-preview" class="p-3 rounded-xl bg-zinc-950 text-zinc-100 text-[10px] font-mono overflow-x-auto max-h-44 leading-relaxed select-all"></pre>
+        </div>
+      </div>
+      <div class="px-5 py-3 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-2 shrink-0">
+        <button type="button" onclick="pushLocalCacheToSupabase()" class="text-[11px] font-semibold text-brand-700 hover:text-brand-800">
+          Upload Cache Browser Lokal ke Cloud
+        </button>
+        <button type="button" onclick="closeCloudSyncModal()" class="px-4 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold">Tutup</button>
       </div>
     </div>
   </div>
@@ -1741,6 +1819,290 @@
     const STORAGE_KEY = 'imi_saved_vessel_configs_v1';
     const MATERIAL_STORAGE_KEY = 'imi_material_db_v1';
     const CUSTOM_CARDS_STORAGE_KEY = 'imi_custom_cards_v1';
+    const SUPABASE_MIGRATED_KEY = 'imi_supabase_migrated_v1';
+
+    // Supabase Project PT Inovasi Maritim Indonesia (cjcjlkmsygjggiqcopbb)
+    const SUPABASE_URL = 'https://cjcjlkmsygjggiqcopbb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqY2psa21zeWdqZ2dpcWNvcGJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NzY0MTIsImV4cCI6MjA4MzI1MjQxMn0.EuhqpjQL9KJtLwtF8YmL6c_Y4CXvnLEbN-B3hkHX0Mw';
+
+    const supabaseSyncState = {
+      status: 'connecting', // 'connecting' | 'connected' | 'needs_schema' | 'offline'
+      lastSyncAt: null,
+      detail: 'Menghubungkan ke Supabase IMI...',
+      counts: { materials: 0, customCards: 0, savedConfigs: 0 }
+    };
+
+    const SUPABASE_SCHEMA_SQL = [
+      '-- Jalankan sekali di Supabase Dashboard -> SQL Editor (cjcjlkmsygjggiqcopbb)',
+      'CREATE TABLE IF NOT EXISTS public.sim_materials (',
+      '  id text PRIMARY KEY, cat text NOT NULL, name text NOT NULL, unit text NOT NULL,',
+      '  price numeric NOT NULL DEFAULT 0 CHECK (price >= 0), updated_at timestamptz NOT NULL DEFAULT now()',
+      ');',
+      'CREATE TABLE IF NOT EXISTS public.sim_custom_cards (',
+      '  id text PRIMARY KEY, category text NOT NULL, name text NOT NULL, card_data jsonb NOT NULL,',
+      '  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()',
+      ');',
+      'CREATE TABLE IF NOT EXISTS public.sim_saved_configs (',
+      '  id text PRIMARY KEY, name text NOT NULL, vessel_class text NOT NULL, config_data jsonb NOT NULL,',
+      '  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()',
+      ');',
+      'ALTER TABLE public.sim_materials ENABLE ROW LEVEL SECURITY;',
+      'ALTER TABLE public.sim_custom_cards ENABLE ROW LEVEL SECURITY;',
+      'ALTER TABLE public.sim_saved_configs ENABLE ROW LEVEL SECURITY;',
+      'DROP POLICY IF EXISTS "sim_materials_team_rw" ON public.sim_materials;',
+      'CREATE POLICY "sim_materials_team_rw" ON public.sim_materials FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);',
+      'DROP POLICY IF EXISTS "sim_custom_cards_team_rw" ON public.sim_custom_cards;',
+      'CREATE POLICY "sim_custom_cards_team_rw" ON public.sim_custom_cards FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);',
+      'DROP POLICY IF EXISTS "sim_saved_configs_team_rw" ON public.sim_saved_configs;',
+      'CREATE POLICY "sim_saved_configs_team_rw" ON public.sim_saved_configs FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);',
+      'GRANT SELECT, INSERT, UPDATE, DELETE ON public.sim_materials, public.sim_custom_cards, public.sim_saved_configs TO anon, authenticated;'
+    ].join('\n');
+
+    function updateCloudStatus(status, detail) {
+      supabaseSyncState.status = status;
+      supabaseSyncState.detail = detail;
+      if (status === 'connected') supabaseSyncState.lastSyncAt = new Date();
+      renderCloudSyncUi();
+    }
+
+    function renderCloudSyncUi() {
+      const dot = document.getElementById('sb-cloud-dot');
+      const lbl = document.getElementById('sb-cloud-label');
+      const { status, lastSyncAt, detail, counts } = supabaseSyncState;
+      const dotCls = status === 'connected' ? 'bg-emerald-500'
+        : status === 'needs_schema' ? 'bg-amber-500'
+        : status === 'connecting' ? 'bg-brand-600 animate-pulse'
+        : 'bg-zinc-400';
+      const labelTxt = status === 'connected' ? 'Cloud: Supabase Aktif'
+        : status === 'needs_schema' ? 'Cloud: Perlu Setup SQL'
+        : status === 'connecting' ? 'Sinkronisasi Cloud...'
+        : 'Cloud: Mode Cache Lokal';
+      if (dot) dot.className = `w-2 h-2 rounded-full ${dotCls} shrink-0`;
+      if (lbl) lbl.textContent = labelTxt;
+
+      const titleEl = document.getElementById('cloud-modal-status-title');
+      const descEl = document.getElementById('cloud-modal-status-desc');
+      const bannerEl = document.getElementById('cloud-modal-banner');
+      const sqlBox = document.getElementById('cloud-sql-setup-box');
+      if (titleEl) {
+        const timeStr = lastSyncAt ? ` · ${lastSyncAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : '';
+        titleEl.textContent = labelTxt + timeStr;
+      }
+      if (descEl) descEl.textContent = detail;
+      if (bannerEl) {
+        bannerEl.className = 'p-3.5 rounded-xl border flex items-start justify-between gap-3 ' + (
+          status === 'connected' ? 'border-emerald-200 bg-emerald-50'
+            : status === 'needs_schema' ? 'border-amber-300 bg-amber-50'
+            : 'border-zinc-200 bg-zinc-50'
+        );
+      }
+      if (sqlBox) sqlBox.classList.toggle('hidden', status === 'connected');
+      const cMat = document.getElementById('cloud-count-materials');
+      const cCard = document.getElementById('cloud-count-cards');
+      const cCfg = document.getElementById('cloud-count-configs');
+      if (cMat) cMat.textContent = status === 'connected' ? String(counts.materials) : `${MATERIAL_DB.length} (lokal)`;
+      if (cCard) cCard.textContent = status === 'connected' ? String(counts.customCards) : `${loadCustomCardsFromStorage().length} (lokal)`;
+      if (cCfg) cCfg.textContent = status === 'connected' ? String(counts.savedConfigs) : `${loadSavedConfigs().length} (lokal)`;
+    }
+
+    async function supabaseRest(path, options = {}) {
+      if (typeof fetch !== 'function') {
+        throw Object.assign(new Error('Fetch unavailable'), { code: 'OFFLINE' });
+      }
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        method: options.method || 'GET',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          ...(options.prefer ? { Prefer: options.prefer } : {}),
+          ...(options.headers || {})
+        },
+        body: options.body !== undefined ? JSON.stringify(options.body) : undefined
+      });
+      const text = await res.text();
+      let json = null;
+      try { json = text ? JSON.parse(text) : null; } catch (e) {}
+      if (!res.ok) {
+        const msg = (json && (json.message || json.error || json.hint)) || text || `HTTP ${res.status}`;
+        const code = (json && json.code) || String(res.status);
+        const isSchemaMissing = res.status === 404 || code === 'PGRST205' || code === '42P01' || /does not exist|schema cache/i.test(msg);
+        throw Object.assign(new Error(msg), { code, status: res.status, isSchemaMissing });
+      }
+      return json;
+    }
+
+    function stripCardRuntimeFields(card) {
+      const clone = { ...card };
+      delete clone._hydrated;
+      return clone;
+    }
+
+    async function upsertMaterialsToSupabase(rows) {
+      if (!rows || rows.length === 0) return;
+      const payload = rows.map(m => ({ id: m.id, cat: m.cat, name: m.name, unit: m.unit, price: Math.round(Number(m.price) || 0) }));
+      await supabaseRest('sim_materials?on_conflict=id', {
+        method: 'POST',
+        prefer: 'resolution=merge-duplicates,return=minimal',
+        body: payload
+      });
+    }
+
+    async function upsertCustomCardToSupabase(card) {
+      if (!card) return;
+      const clean = stripCardRuntimeFields(card);
+      await supabaseRest('sim_custom_cards?on_conflict=id', {
+        method: 'POST',
+        prefer: 'resolution=merge-duplicates,return=minimal',
+        body: [{ id: clean.id, category: clean.category, name: clean.name, card_data: clean }]
+      });
+    }
+
+    async function deleteCustomCardFromSupabase(cardId) {
+      if (!cardId) return;
+      await supabaseRest(`sim_custom_cards?id=eq.${encodeURIComponent(cardId)}`, { method: 'DELETE' });
+    }
+
+    async function upsertSavedConfigToSupabase(entry) {
+      if (!entry) return;
+      await supabaseRest('sim_saved_configs?on_conflict=id', {
+        method: 'POST',
+        prefer: 'resolution=merge-duplicates,return=minimal',
+        body: [{ id: entry.id, name: entry.name, vessel_class: entry.vesselClass || 'fishing-3gt', config_data: entry }]
+      });
+    }
+
+    async function deleteSavedConfigFromSupabase(configId) {
+      if (!configId) return;
+      await supabaseRest(`sim_saved_configs?id=eq.${encodeURIComponent(configId)}`, { method: 'DELETE' });
+    }
+
+    function syncFireAndForget(promise, label) {
+      promise
+        .then(() => {
+          if (supabaseSyncState.status === 'connected') {
+            supabaseSyncState.lastSyncAt = new Date();
+            renderCloudSyncUi();
+          }
+        })
+        .catch(err => {
+          if (err && err.isSchemaMissing) {
+            updateCloudStatus('needs_schema', `Tabel belum dibuat di Supabase (${label}). Jalankan SQL setup sekali.`);
+          } else {
+            console.warn('Supabase sync pending:', label, err);
+          }
+        });
+    }
+
+    async function syncAllFromSupabase({ forcePushLocal = false, notify = false } = {}) {
+      updateCloudStatus('connecting', 'Menarik data terbaru dari Supabase IMI...');
+      try {
+        const [matRows, cardRows, cfgRows] = await Promise.all([
+          supabaseRest('sim_materials?select=id,cat,name,unit,price&order=id.asc'),
+          supabaseRest('sim_custom_cards?select=id,card_data&order=updated_at.desc'),
+          supabaseRest('sim_saved_configs?select=id,config_data&order=updated_at.desc')
+        ]);
+
+        const firstMigration = !localStorage.getItem(SUPABASE_MIGRATED_KEY) || forcePushLocal;
+
+        // 1. Sync Material DB
+        const remoteMats = Array.isArray(matRows) ? matRows : [];
+        if (remoteMats.length === 0 || forcePushLocal) {
+          await upsertMaterialsToSupabase(MATERIAL_DB);
+        }
+        if (remoteMats.length > 0 && !forcePushLocal) {
+          const missingDefs = MATERIAL_DB.filter(m => !remoteMats.some(r => r.id === m.id));
+          if (missingDefs.length > 0) await upsertMaterialsToSupabase(missingDefs);
+          MATERIAL_DB = DEFAULT_MATERIALS.map(def => {
+            const rm = remoteMats.find(x => x.id === def.id);
+            return rm && Number.isFinite(Number(rm.price)) ? { ...def, price: Math.max(0, Number(rm.price)) } : { ...def };
+          });
+          remoteMats.forEach(rm => {
+            if (!MATERIAL_DB.some(m => m.id === rm.id)) {
+              MATERIAL_DB.push({ id: rm.id, cat: rm.cat, name: rm.name, unit: rm.unit, price: Math.max(0, Number(rm.price) || 0) });
+            }
+          });
+          persistMaterialDb();
+        }
+
+        // 2. Sync Custom Cards
+        const remoteCards = (Array.isArray(cardRows) ? cardRows : []).map(r => r.card_data).filter(Boolean);
+        const localCards = loadCustomCardsFromStorage();
+        if (firstMigration && localCards.length > 0) {
+          const toPush = forcePushLocal ? localCards : localCards.filter(lc => !remoteCards.some(rc => rc.id === lc.id));
+          for (const lc of toPush) await upsertCustomCardToSupabase(lc);
+        }
+        const finalCardRows = (firstMigration && localCards.length > 0)
+          ? (await supabaseRest('sim_custom_cards?select=id,card_data&order=updated_at.desc')).map(r => r.card_data).filter(Boolean)
+          : remoteCards;
+
+        // Replace custom cards in COMPONENT_CATALOG cleanly (newest first)
+        for (let i = COMPONENT_CATALOG.length - 1; i >= 0; i--) {
+          if (COMPONENT_CATALOG[i].isCustom) COMPONENT_CATALOG.splice(i, 1);
+        }
+        const normalizedRemoteCards = finalCardRows.map(cc => ({ ...cc, isCustom: true }));
+        COMPONENT_CATALOG.unshift(...normalizedRemoteCards);
+        persistCustomCards(normalizedRemoteCards);
+
+        // 3. Sync Saved Configs
+        const remoteConfigs = (Array.isArray(cfgRows) ? cfgRows : []).map(r => r.config_data).filter(Boolean);
+        const localConfigs = loadSavedConfigs();
+        if (firstMigration && localConfigs.length > 0) {
+          const toPush = forcePushLocal ? localConfigs : localConfigs.filter(lc => !remoteConfigs.some(rc => rc.id === lc.id));
+          for (const lc of toPush) await upsertSavedConfigToSupabase(lc);
+        }
+        const finalConfigs = (firstMigration && localConfigs.length > 0)
+          ? (await supabaseRest('sim_saved_configs?select=id,config_data&order=updated_at.desc')).map(r => r.config_data).filter(Boolean)
+          : remoteConfigs;
+        persistSavedConfigs(finalConfigs);
+
+        try { localStorage.setItem(SUPABASE_MIGRATED_KEY, '1'); } catch (e) {}
+
+        recomputeAllBomCards();
+        supabaseSyncState.counts = {
+          materials: MATERIAL_DB.length,
+          customCards: finalCardRows.length,
+          savedConfigs: finalConfigs.length
+        };
+        updateCloudStatus('connected', 'Tersinkron dengan database Supabase IMI (cjcjlkmsygjggiqcopbb). Semua tim melihat data yang sama.');
+        recalculateAll();
+        if (notify) showToast('Sinkronisasi Supabase IMI berhasil.');
+      } catch (err) {
+        if (err && err.isSchemaMissing) {
+          updateCloudStatus('needs_schema', 'Tabel sim_materials / sim_custom_cards / sim_saved_configs belum ada di project cjcjlkmsygjggiqcopbb. Jalankan script SQL setup di bawah.');
+        } else {
+          updateCloudStatus('offline', `Mode cache lokal aktif (${err && err.message ? err.message : 'offline'}). Perubahan tetap tersimpan di browser ini.`);
+        }
+        if (notify) showToast(supabaseSyncState.detail);
+      }
+    }
+
+    async function pushLocalCacheToSupabase() {
+      await syncAllFromSupabase({ forcePushLocal: true, notify: true });
+    }
+
+    function openCloudSyncModal() {
+      const pre = document.getElementById('cloud-sql-preview');
+      if (pre) pre.textContent = SUPABASE_SCHEMA_SQL;
+      renderCloudSyncUi();
+      document.getElementById('cloud-sync-modal').classList.remove('hidden');
+    }
+
+    function closeCloudSyncModal() {
+      document.getElementById('cloud-sync-modal').classList.add('hidden');
+    }
+
+    function copySupabaseSchemaSql() {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(SUPABASE_SCHEMA_SQL).then(() => {
+          showToast('Script SQL disalin. Paste & Run di Supabase SQL Editor.');
+        }).catch(() => {
+          showToast('Silakan blok & copy script SQL di kotak preview.');
+        });
+      } else {
+        showToast('Silakan blok & copy script SQL di kotak preview.');
+      }
+    }
 
     const DEFAULT_MATERIALS = [
       { id: 'res-ortho',    cat: 'Komposit FRP',    name: 'Resin Orthophthalic Marine Grade',       unit: 'kg',    price: 45000 },
@@ -2998,6 +3360,7 @@
       if (card.isCustom) {
         const customs = loadCustomCardsFromStorage().map(c => c.id === card.id ? card : c);
         persistCustomCards(customs);
+        syncFireAndForget(upsertCustomCardToSupabase(card), 'update kartu custom');
       }
 
       selectedCards[card.category] = card.id;
@@ -3029,6 +3392,7 @@
       const idx = COMPONENT_CATALOG.findIndex(c => c.id === card.id);
       if (idx > -1) COMPONENT_CATALOG.splice(idx, 1);
       persistCustomCards(loadCustomCardsFromStorage().filter(c => c.id !== card.id));
+      syncFireAndForget(deleteCustomCardFromSupabase(card.id), 'hapus kartu custom');
       if (selectedCards[card.category] === card.id) selectedCards[card.category] = null;
       closeInspectorModal();
       recalculateAll();
@@ -3155,6 +3519,7 @@
       if (!m) return;
       m.price = Math.round(val);
       persistMaterialDb();
+      syncFireAndForget(upsertMaterialsToSupabase([m]), 'update harga material');
       recomputeAllBomCards();
       recalculateAll();
       showToast(`Tarif ${m.name} diperbarui ke Rp ${m.price.toLocaleString('id-ID')}/${m.unit}.`);
@@ -3163,6 +3528,7 @@
     function resetMaterialDb() {
       MATERIAL_DB = DEFAULT_MATERIALS.map(m => ({ ...m }));
       persistMaterialDb();
+      syncFireAndForget(upsertMaterialsToSupabase(MATERIAL_DB), 'reset harga material');
       recomputeAllBomCards();
       renderMaterialDbTable();
       recalculateAll();
@@ -3494,6 +3860,7 @@
       const list = loadCustomCardsFromStorage();
       list.unshift(card);
       persistCustomCards(list);
+      syncFireAndForget(upsertCustomCardToSupabase(card), 'simpan kartu custom');
 
       catalogCategoryFilter = cat;
       selectedCards[cat] = card.id;
@@ -3565,7 +3932,9 @@
       const list = loadSavedConfigs();
       const target = list.find(s => s.id === activePresetId);
       const next = list.filter(s => s.id !== activePresetId);
+      const removedId = activePresetId;
       persistSavedConfigs(next);
+      syncFireAndForget(deleteSavedConfigFromSupabase(removedId), 'hapus konfigurasi');
       activePresetId = '';
       recalculateAll();
       showToast(`Konfigurasi "${target ? target.name : 'tersimpan'}" dihapus.`);
@@ -3620,6 +3989,7 @@
       const list = loadSavedConfigs();
       list.unshift(entry);
       persistSavedConfigs(list);
+      syncFireAndForget(upsertSavedConfigToSupabase(entry), 'simpan konfigurasi');
       activePresetId = entry.id;
       closeSaveModal();
       recalculateAll();
@@ -5084,6 +5454,8 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       recalculateAll();
+      renderCloudSyncUi();
+      syncAllFromSupabase();
     });
   </script>
 </body>
