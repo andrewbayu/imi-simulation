@@ -317,9 +317,17 @@
 
         <div class="flex flex-wrap items-center gap-2 shrink-0 no-print">
           <select id="preset-dropdown" onchange="onPresetDropdownChange(this.value)" aria-label="Pilih Preset Kapal"
-            class="min-w-[250px] text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
+            class="min-w-[230px] text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
             <!-- Populated dynamically -->
           </select>
+          <button id="btn-delete-preset" type="button" onclick="deleteActiveSavedPreset()" title="Hapus konfigurasi tersimpan ini"
+            class="hidden inline-flex items-center gap-1 px-2.5 py-2 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition whitespace-nowrap">
+            <i class="ph ph-trash text-sm"></i>
+          </button>
+          <button type="button" onclick="startBlankSpec()" title="Kosongkan semua slot untuk membuat spesifikasi baru dari nol"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-semibold transition whitespace-nowrap">
+            <i class="ph ph-file-plus text-sm"></i> Buat Spec Baru
+          </button>
           <button type="button" onclick="openSaveModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition whitespace-nowrap">
             <i class="ph ph-floppy-disk text-sm"></i> Simpan
           </button>
@@ -1354,7 +1362,36 @@
     // 2. ONTOLOGY & CORRELATION ENGINE
     // =========================================================================
     function getCardById(id) {
-      return COMPONENT_CATALOG.find(c => c.id === id);
+      return id ? COMPONENT_CATALOG.find(c => c.id === id) || null : null;
+    }
+
+    function getEmptyCardFallback(catId) {
+      const vc = VESSEL_CLASSES.find(v => v.id === activeVesselClass) || VESSEL_CLASSES[0];
+      return {
+        id: null,
+        isEmpty: true,
+        category: catId,
+        name: 'Belum Dipasang',
+        cost: 0,
+        dpSupplierPct: 0,
+        extraDays: 0,
+        prepDays: 0,
+        unitsPerDay: catId === 'hull' ? (vc && vc.id === 'fishing-3gt' ? 5 : 0.05) : 0,
+        totalHp: 0,
+        hasCabin: false,
+        requiresCabin: false,
+        hasHeavyAcOrGenset: false,
+        requiresBkiOrRina: false,
+        isYamaha15Pk: false,
+        hullGrade: 'none',
+        compatibleClasses: [],
+        locked: { brand: 'Slot Kosong', powerLabel: '-', materialOrCycle: '-', dimensionsOrSpec: '-' }
+      };
+    }
+
+    function getSafeCard(catId, cardMap = selectedCards) {
+      const cid = cardMap ? cardMap[catId] : null;
+      return getCardById(cid) || getEmptyCardFallback(catId);
     }
 
     function evaluateOntology(vesselClassId = activeVesselClass, cardMap = selectedCards) {
@@ -1365,19 +1402,49 @@
       const nav = getCardById(cardMap.nav_elec);
       const permit = getCardById(cardMap.permit_delivery);
 
+      const equippedList = [hull, engine, outfitting, nav, permit];
+      const equippedCount = equippedList.filter(Boolean).length;
+
       const alerts = [];
       const slotIssues = {
-        hull: 'ok',
-        engine: 'ok',
-        outfitting: 'ok',
-        nav_elec: 'ok',
-        permit_delivery: 'ok'
+        hull: hull ? 'ok' : 'empty',
+        engine: engine ? 'ok' : 'empty',
+        outfitting: outfitting ? 'ok' : 'empty',
+        nav_elec: nav ? 'ok' : 'empty',
+        permit_delivery: permit ? 'ok' : 'empty'
       };
       const bumpIssue = (slot, level) => {
-        if (!slotIssues[slot]) return;
+        if (!slotIssues[slot] || slotIssues[slot] === 'empty') return;
         if (level === 'critical') slotIssues[slot] = 'critical';
         else if (level === 'warning' && slotIssues[slot] === 'ok') slotIssues[slot] = 'warning';
       };
+
+      // Rule 0: Missing core slots (Empty / Scratch Spec Mode)
+      if (equippedCount === 0) {
+        alerts.push({
+          level: 'warning',
+          slot: 'hull',
+          title: 'Mode Spec Kosong (0/5 Slot Terpasang)',
+          msg: 'Silakan pilih jenis kapal di atas, lalu pasang atau tarik komponen Body & Mesin dari panel kanan.'
+        });
+      } else {
+        if (!hull) {
+          alerts.push({
+            level: 'warning',
+            slot: 'hull',
+            title: 'Slot Body & Lambung Kosong',
+            msg: 'Pasang komponen Body & Lambung agar estimasi durasi produksi, laju lini, dan HPP utama terhitung.'
+          });
+        }
+        if (!engine) {
+          alerts.push({
+            level: 'warning',
+            slot: 'engine',
+            title: 'Slot Mesin & Propulsi Kosong',
+            msg: `Pasang paket mesin agar daya dorong (${vc.minHp}–${vc.maxHp} HP) dan DP supplier mesin masuk ke simulasi.`
+          });
+        }
+      }
 
       // Rule 1: Engine Power vs Vessel Class / Hull Geometry
       if (engine && vc) {
@@ -1469,7 +1536,7 @@
       const warningCount = alerts.filter(a => a.level === 'warning').length;
       const status = criticalCount > 0 ? 'critical' : (warningCount > 0 ? 'warning' : 'valid');
 
-      return { status, criticalCount, warningCount, alerts, slotIssues };
+      return { status, criticalCount, warningCount, alerts, slotIssues, equippedCount };
     }
 
     // =========================================================================
@@ -1538,9 +1605,11 @@
     function selectVesselClass(classId) {
       activeVesselClass = classId;
       const vc = VESSEL_CLASSES.find(v => v.id === classId);
-      // Auto-equip first matching preset for this class so starting specs are valid
       const matchingPreset = PREDEFINED_PRESETS.find(p => p.vesselClass === classId);
-      if (matchingPreset) {
+      if (activePresetId === '__blank__') {
+        if (matchingPreset) document.getElementById('ctrl-units').value = matchingPreset.units;
+        if (vc) document.getElementById('ctrl-overhead-day').value = vc.defaultOverheadJt;
+      } else if (matchingPreset) {
         selectedCards = { ...matchingPreset.cards };
         activePresetId = matchingPreset.id;
         if (vc) {
@@ -1578,6 +1647,30 @@
       selectedCards[card.category] = card.id;
       activePresetId = '';
       recalculateAll();
+    }
+
+    function unequipSlot(catId) {
+      if (!selectedCards[catId]) return;
+      const cat = WBS_CATEGORIES.find(c => c.id === catId);
+      selectedCards[catId] = null;
+      const remaining = Object.values(selectedCards).filter(Boolean).length;
+      activePresetId = remaining === 0 ? '__blank__' : '';
+      recalculateAll();
+      showToast(`Komponen slot ${cat ? cat.title : catId} dilepas.`);
+    }
+
+    function startBlankSpec() {
+      selectedCards = {
+        hull: null,
+        engine: null,
+        outfitting: null,
+        nav_elec: null,
+        permit_delivery: null
+      };
+      activePresetId = '__blank__';
+      catalogCategoryFilter = 'hull';
+      recalculateAll();
+      showToast('Mode Spec Baru aktif — 5 slot kosong siap dirakit dari awal.');
     }
 
     // HTML5 Drag & Drop Handlers
@@ -1762,7 +1855,22 @@
 
     function onPresetDropdownChange(val) {
       if (!val) return;
+      if (val === '__blank__') {
+        startBlankSpec();
+        return;
+      }
       loadPresetById(val);
+    }
+
+    function deleteActiveSavedPreset() {
+      if (!activePresetId || !activePresetId.startsWith('saved-')) return;
+      const list = loadSavedConfigs();
+      const target = list.find(s => s.id === activePresetId);
+      const next = list.filter(s => s.id !== activePresetId);
+      persistSavedConfigs(next);
+      activePresetId = '';
+      recalculateAll();
+      showToast(`Konfigurasi "${target ? target.name : 'tersimpan'}" dihapus.`);
     }
 
     function openSaveModal() {
@@ -1927,11 +2035,11 @@
       const effOverheadJt = optsOverride.overheadPerDayJt !== undefined ? optsOverride.overheadPerDayJt : inp.overheadPerDayJt;
       const effAccelJt = optsOverride.accelCostJt !== undefined ? optsOverride.accelCostJt : inp.accelCostJt;
 
-      const hull = getCardById(cardIds.hull);
-      const engine = getCardById(cardIds.engine);
-      const outfitting = getCardById(cardIds.outfitting);
-      const nav = getCardById(cardIds.nav_elec);
-      const permit = getCardById(cardIds.permit_delivery);
+      const hull = getSafeCard('hull', cardIds);
+      const engine = getSafeCard('engine', cardIds);
+      const outfitting = getSafeCard('outfitting', cardIds);
+      const nav = getSafeCard('nav_elec', cardIds);
+      const permit = getSafeCard('permit_delivery', cardIds);
 
       const baseUnitCost = hull.cost + engine.cost + outfitting.cost + nav.cost + permit.cost;
       const baseComponentCOGS = baseUnitCost * inp.units;
@@ -1942,10 +2050,13 @@
 
       // 1. Timeline Boundaries (from active card specs + capacity + SP2D delay)
       const adminDpDays = 15 + Math.round(effDelayDays * 0.5);
-      const effectiveRate = hull.unitsPerDay * effCapacity;
-      const prepDays = inp.units === 1
-        ? Math.max(7, Math.ceil(hull.prepDays * 0.4))
-        : Math.ceil(hull.prepDays * (effCapacity > 1 ? 1.15 : 1));
+      const rawRate = hull.isEmpty ? (inp.units > 10 ? 5 : 0.05) : hull.unitsPerDay;
+      const effectiveRate = Math.max(0.01, rawRate * effCapacity);
+      const prepDays = hull.isEmpty
+        ? 0
+        : (inp.units === 1
+          ? Math.max(7, Math.ceil(hull.prepDays * 0.4))
+          : Math.ceil(hull.prepDays * (effCapacity > 1 ? 1.15 : 1)));
       const engineLeadAdd = engine.extraDays;
       const outfitAdd = outfitting.extraDays + nav.extraDays;
       const permitAdd = permit.extraDays;
@@ -2245,6 +2356,7 @@
       });
 
       let html = `<option value="">-- Pilih Preset / Setting Kapal --</option>`;
+      html += `<option value="__blank__" ${activePresetId === '__blank__' ? 'selected' : ''}>+ Mulai dari Kosong (Spec Baru)</option>`;
       Object.entries(groups).forEach(([gName, items]) => {
         html += `<optgroup label="${gName}">`;
         items.forEach(p => {
@@ -2261,6 +2373,11 @@
         html += `</optgroup>`;
       }
       dd.innerHTML = html;
+
+      const delBtn = document.getElementById('btn-delete-preset');
+      if (delBtn) {
+        delBtn.classList.toggle('hidden', !(activePresetId && activePresetId.startsWith('saved-')));
+      }
     }
 
     function renderVesselClasses() {
@@ -2367,10 +2484,17 @@
                           class="p-1.5 rounded-md text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 text-xs transition">
                           <i class="ph ph-sliders-horizontal"></i>
                         </button>
-                        <button type="button" onclick="equipCard('${card.id}')"
-                          class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${isEquipped ? 'bg-brand-700 text-white' : 'bg-zinc-100 hover:bg-zinc-950 text-zinc-800 hover:text-white'}">
-                          ${isEquipped ? 'Terpasang ✓' : '(+) Pasang'}
-                        </button>
+                        ${isEquipped ? `
+                          <button type="button" onclick="unequipSlot('${card.category}')" title="Lepas komponen ini dari slot"
+                            class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-200 transition">
+                            Lepas ×
+                          </button>
+                        ` : `
+                          <button type="button" onclick="equipCard('${card.id}')"
+                            class="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-zinc-100 hover:bg-zinc-950 text-zinc-800 hover:text-white transition">
+                            (+) Pasang
+                          </button>
+                        `}
                       </div>
                     </div>
                   </div>
@@ -2458,6 +2582,8 @@
         const isActive = activeCat === h.id;
         let fill = '#475569';
         let stroke = '#ffffff';
+        let textFill = '#ffffff';
+        let dashAttr = '';
         let halo = '';
         if (issue === 'critical') {
           fill = '#e11d48';
@@ -2465,16 +2591,22 @@
         } else if (issue === 'warning') {
           fill = '#d97706';
           halo = `<circle cx="${h.x}" cy="${h.y}" r="11" fill="#d97706" fill-opacity="0.18"/>`;
+        } else if (issue === 'empty') {
+          fill = '#ffffff';
+          stroke = isActive ? '#1d4ed8' : '#94a3b8';
+          textFill = isActive ? '#1d4ed8' : '#64748b';
+          dashAttr = 'stroke-dasharray="2.5 1.5"';
+          if (isActive) halo = `<circle cx="${h.x}" cy="${h.y}" r="11" fill="#1d4ed8" fill-opacity="0.12"/>`;
         } else if (isActive) {
           fill = '#1d4ed8';
           halo = `<circle cx="${h.x}" cy="${h.y}" r="11" fill="#1d4ed8" fill-opacity="0.18"/>`;
         }
         return `
           <g class="cursor-pointer" onclick="focusSlot('${h.id}')">
-            <title>${h.title}</title>
+            <title>${h.title}${issue === 'empty' ? ' (Kosong)' : ''}</title>
             ${halo}
-            <circle cx="${h.x}" cy="${h.y}" r="7.5" fill="${fill}" stroke="${stroke}" stroke-width="1.6"/>
-            <text x="${h.x}" y="${h.y + 3}" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff" font-family="Inter, sans-serif">${h.code}</text>
+            <circle cx="${h.x}" cy="${h.y}" r="7.5" fill="${fill}" stroke="${stroke}" stroke-width="1.6" ${dashAttr}/>
+            <text x="${h.x}" y="${h.y + 3}" text-anchor="middle" font-size="8" font-weight="700" fill="${textFill}" font-family="Inter, sans-serif">${h.code}</text>
           </g>
         `;
       }).join('');
@@ -2500,7 +2632,7 @@
     function renderEquipmentSlotCard(catId, ontology) {
       const cat = WBS_CATEGORIES.find(c => c.id === catId);
       const card = getCardById(selectedCards[catId]);
-      if (!cat || !card) return '';
+      if (!cat) return '';
 
       const slotMeta = {
         nav_elec: { label: 'Navigasi & Listrik', icon: 'ph-compass' },
@@ -2510,8 +2642,64 @@
         permit_delivery: { label: 'Perizinan, BKI & Kirim', icon: 'ph-certificate' }
       }[catId] || { label: cat.title, icon: 'ph-cube' };
 
-      const issue = (ontology.slotIssues && ontology.slotIssues[catId]) || 'ok';
+      const issue = (ontology.slotIssues && ontology.slotIssues[catId]) || (card ? 'ok' : 'empty');
       const isFocused = catalogCategoryFilter === catId;
+      const isBottom = catId === 'permit_delivery';
+
+      if (!card) {
+        const emptyCls = isFocused
+          ? 'is-focused border-dashed'
+          : 'border-dashed border-zinc-300 bg-white/65 hover:border-brand-400';
+        const emptyBadge = isFocused
+          ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-brand-100 text-brand-800">Aktif</span>'
+          : '<span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500">Kosong</span>';
+
+        if (isBottom) {
+          return `
+            <div onclick="focusSlot('${catId}')"
+              ondragover="onSlotDragOver(event)" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, '${catId}')"
+              class="equip-slot cursor-pointer rounded-xl border p-3 ${emptyCls} flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-zinc-100/80 text-zinc-400 flex items-center justify-center shrink-0">
+                  <i class="ph ${slotMeta.icon} text-base"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-semibold text-zinc-500">${slotMeta.label}</span>
+                    ${emptyBadge}
+                  </div>
+                  <div class="text-xs font-medium text-zinc-400 italic">Slot kosong — belum dipasang</div>
+                  <div class="text-[10px] text-zinc-400">Tarik komponen atau pilih dari panel kanan</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 shrink-0 tnum">
+                <span class="text-xs font-semibold text-zinc-400">Rp 0</span>
+                <span class="text-[11px] font-semibold text-brand-700">+ Pilih</span>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div onclick="focusSlot('${catId}')"
+            ondragover="onSlotDragOver(event)" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, '${catId}')"
+            class="equip-slot cursor-pointer rounded-xl border p-2.5 ${emptyCls} space-y-1.5">
+            <div class="flex items-center justify-between gap-1.5">
+              <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-500 truncate">
+                <i class="ph ${slotMeta.icon} text-xs text-zinc-400 shrink-0"></i>
+                <span class="truncate">${slotMeta.label}</span>
+              </span>
+              ${emptyBadge}
+            </div>
+            <div class="text-xs font-medium text-zinc-400 italic">Belum dipasang</div>
+            <div class="text-[10px] text-zinc-400 truncate">Tarik kartu / klik pilih</div>
+            <div class="pt-1.5 border-t border-zinc-200/70 flex items-center justify-between gap-2 tnum">
+              <span class="text-[11px] font-semibold text-zinc-400">Rp 0</span>
+              <span class="text-[10px] font-semibold text-brand-700">+ Pilih</span>
+            </div>
+          </div>
+        `;
+      }
 
       let stateClass = 'border-zinc-200 bg-white';
       let badgeHtml = '';
@@ -2526,7 +2714,6 @@
         badgeHtml = '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-brand-100 text-brand-800">Aktif</span>';
       }
 
-      const isBottom = catId === 'permit_delivery';
       if (isBottom) {
         return `
           <div onclick="focusSlot('${catId}')"
@@ -2545,14 +2732,18 @@
                 <div class="text-[10px] text-zinc-500 truncate tnum">${card.locked.brand} · ${card.locked.powerLabel} · DP ${card.dpSupplierPct}%</div>
               </div>
             </div>
-            <div class="flex items-center gap-3 shrink-0 tnum">
-              <div class="text-right">
+            <div class="flex items-center gap-2 shrink-0 tnum">
+              <div class="text-right mr-1">
                 <div class="text-xs font-bold text-brand-700">${fmtRpShort(card.cost)}</div>
                 <div class="text-[10px] text-zinc-400">+${card.extraDays} hr</div>
               </div>
               <button type="button" onclick="event.stopPropagation(); openInspectorModal('${card.id}')"
                 class="px-2.5 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-[11px] font-semibold text-zinc-700 transition">
                 Ubah
+              </button>
+              <button type="button" onclick="event.stopPropagation(); unequipSlot('${catId}')" title="Lepas komponen dari slot"
+                class="px-2 py-1 rounded-md border border-rose-200 bg-rose-50 hover:bg-rose-600 text-rose-700 hover:text-white text-[11px] font-semibold transition">
+                Lepas
               </button>
             </div>
           </div>
@@ -2574,10 +2765,16 @@
           <div class="text-[10px] text-zinc-500 truncate tnum">${card.locked.brand} · ${card.locked.powerLabel}</div>
           <div class="pt-1.5 border-t border-zinc-100 flex items-center justify-between gap-2 tnum">
             <span class="text-[11px] font-bold text-brand-700">${fmtRpShort(card.cost)}</span>
-            <button type="button" onclick="event.stopPropagation(); openInspectorModal('${card.id}')"
-              class="text-[10px] font-semibold text-zinc-600 hover:text-zinc-950 underline underline-offset-2">
-              Ubah
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="event.stopPropagation(); openInspectorModal('${card.id}')"
+                class="text-[10px] font-semibold text-zinc-600 hover:text-zinc-950 underline underline-offset-2">
+                Ubah
+              </button>
+              <button type="button" onclick="event.stopPropagation(); unequipSlot('${catId}')" title="Lepas komponen dari slot"
+                class="text-[10px] font-semibold text-rose-600 hover:text-rose-800">
+                Lepas
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -2588,6 +2785,7 @@
       const ontPanel = document.getElementById('ontology-alert-panel');
       const vc = VESSEL_CLASSES.find(v => v.id === activeVesselClass) || VESSEL_CLASSES[0];
       const vcName = vc.name;
+      const eqCount = ontology.equippedCount !== undefined ? ontology.equippedCount : 5;
 
       if (ontology.alerts.length === 0) {
         ontPanel.className = 'rounded-xl px-3.5 py-2.5 border border-emerald-200 bg-emerald-50/70 flex items-center justify-between gap-2 text-xs';
@@ -2596,7 +2794,7 @@
             <i class="ph-fill ph-check-circle text-emerald-600 text-base shrink-0"></i>
             <span>Kecocokan Teknis: <strong>Sesuai</strong> untuk ${vcName}</span>
           </div>
-          <span class="text-[10px] text-emerald-700 font-semibold shrink-0">5/5 Valid</span>
+          <span class="text-[10px] text-emerald-700 font-semibold shrink-0">${eqCount}/5 Terpasang</span>
         `;
       } else {
         const isCrit = ontology.status === 'critical';
@@ -2605,8 +2803,9 @@
           <div class="flex items-center justify-between gap-2 text-xs font-bold ${isCrit ? 'text-rose-900' : 'text-amber-900'}">
             <span class="flex items-center gap-1.5">
               <i class="ph-fill ${isCrit ? 'ph-warning-octagon text-rose-600' : 'ph-warning text-amber-600'} text-base"></i>
-              ${isCrit ? `Peringatan Kecocokan (${ontology.criticalCount} Kritis)` : `Catatan Kecocokan (${ontology.warningCount})`}
+              ${isCrit ? `Peringatan Kecocokan (${ontology.criticalCount} Kritis)` : `Catatan Konfigurasi (${ontology.warningCount})`}
             </span>
+            <span class="text-[10px] font-semibold">${eqCount}/5 Terpasang</span>
           </div>
           <div class="space-y-1.5">${ontology.alerts.map(a => `
             <div onclick="${a.slot ? `focusSlot('${a.slot}')` : ''}" class="cursor-pointer p-2 rounded-lg bg-white border ${a.level === 'critical' ? 'border-rose-200 hover:border-rose-400' : 'border-amber-200 hover:border-amber-400'} text-[11px] transition">
@@ -2637,10 +2836,12 @@
       // 5. Vessel Character Stats Grid
       const statusTxt = ontology.status === 'critical'
         ? `${ontology.criticalCount} Kritis`
-        : (ontology.status === 'warning' ? `${ontology.warningCount} Catatan` : '5/5 Valid');
+        : (ontology.status === 'warning' ? `${eqCount}/5 · Cek` : `${eqCount}/5 Valid`);
       const statusCls = ontology.status === 'critical'
         ? 'text-rose-700'
         : (ontology.status === 'warning' ? 'text-amber-700' : 'text-emerald-700');
+
+      const rateDisplay = sim.hull.isEmpty ? '0 u/hr' : `${sim.hull.unitsPerDay} u/hr`;
 
       document.getElementById('vessel-stats-grid').innerHTML = `
         <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
@@ -2649,7 +2850,7 @@
         </div>
         <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
           <div class="text-[9px] font-medium text-zinc-400">Laju Lini</div>
-          <div class="text-xs font-bold text-zinc-950">${sim.hull.unitsPerDay} u/hr</div>
+          <div class="text-xs font-bold text-zinc-950">${rateDisplay}</div>
         </div>
         <div class="rounded-lg bg-white border border-zinc-200 px-2.5 py-1.5">
           <div class="text-[9px] font-medium text-zinc-400">HPP Fisik/u</div>
@@ -2901,7 +3102,19 @@
       document.getElementById('capacity-note').textContent = `Output efektif: ${sim.effectiveRate.toFixed(1)} unit/hari · Overhead waktu: ${fmtRpShort(sim.overheadCostTotal)}`;
 
       document.getElementById('active-wbs-table-body').innerHTML = WBS_CATEGORIES.map(cat => {
-        const card = getCardById(selectedCards[cat.id]);
+        const card = getSafeCard(cat.id);
+        if (card.isEmpty) {
+          return `
+            <tr onclick="focusSlot('${cat.id}'); switchPage('page-spec')" class="hover:bg-zinc-50 cursor-pointer transition text-zinc-400">
+              <td class="py-3 px-4"><div class="text-[10px] text-zinc-400 font-semibold">${cat.code}</div><div class="font-medium italic">Slot Kosong (Belum dipasang)</div></td>
+              <td class="py-3 px-3">—</td>
+              <td class="py-3 px-3 text-right tnum">Rp 0</td>
+              <td class="py-3 px-3 text-right tnum">Rp 0</td>
+              <td class="py-3 px-3 text-right tnum">0%</td>
+              <td class="py-3 px-4 text-right text-brand-700 font-semibold">+ Pilih di Langkah 1</td>
+            </tr>
+          `;
+        }
         const leadTxt = cat.id === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} unit/hr` : `+${card.extraDays} hari`;
         return `
           <tr onclick="openInspectorModal('${card.id}')" class="hover:bg-zinc-50 cursor-pointer transition">
