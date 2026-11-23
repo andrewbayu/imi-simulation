@@ -527,12 +527,15 @@
             </div>
           </div>
 
-          <!-- Custom Multi-Installment Payment Termin Builder -->
+          <!-- Custom Multi-Installment Payment Termin Builder (% + Exact Day H-X) -->
           <div class="md:col-span-2 xl:col-span-4 space-y-1.5">
-            <div class="flex items-center justify-between gap-2">
-              <label class="block text-xs font-semibold text-zinc-700">Termin Pembayaran Klien / Pemerintah</label>
-              <div class="flex items-center gap-1">
-                <span class="text-[10px] text-zinc-400">Dipecah:</span>
+            <div class="flex flex-wrap items-center justify-between gap-1.5">
+              <label class="block text-xs font-semibold text-zinc-700">Termin Pembayaran &amp; Hari Cair (H-X)</label>
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="btn-termin-auto-day" onclick="resetTerminDaysToAuto()" title="Kembalikan hari cair T1–BAST otomatis mengikuti jadwal produksi"
+                  class="hidden text-[10px] font-semibold px-1.5 py-0.5 rounded border border-brand-200 bg-brand-50 text-brand-700 hover:bg-brand-100">
+                  Auto-Fase
+                </button>
                 <div class="inline-flex rounded-md bg-zinc-200/80 p-0.5 text-[10px] font-semibold tnum">
                   <button type="button" id="term-cnt-1" onclick="setTerminCount(1)" class="seg-btn px-1.5 py-0.5 text-zinc-600">1×</button>
                   <button type="button" id="term-cnt-2" onclick="setTerminCount(2)" class="seg-btn px-1.5 py-0.5 text-zinc-600">2×</button>
@@ -547,10 +550,17 @@
             <div id="termin-inputs-row" class="grid grid-cols-5 gap-1.5">
               <!-- Populated dynamically by renderTerminInputs() -->
             </div>
-            <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-0.5">
-              <span id="termin-summary-hint">DP 30% + 3 Termin Progres + BAST 5%</span>
+            <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-zinc-500 pt-0.5">
+              <div class="inline-flex items-center gap-1">
+                <span class="font-semibold text-zinc-600">Start Kerja:</span>
+                <div class="inline-flex rounded-md bg-zinc-200/70 p-0.5 text-[10px] font-semibold">
+                  <button type="button" id="start-mode-after-dp" onclick="setStartAfterDp(true)" class="seg-btn active px-1.5 py-0.5 text-zinc-700">Tunggu DP</button>
+                  <button type="button" id="start-mode-day0" onclick="setStartAfterDp(false)" class="seg-btn px-1.5 py-0.5 text-zinc-700">H-0 (Talangan)</button>
+                </div>
+              </div>
               <span id="termin-sum-badge" class="font-bold text-emerald-700 tnum">Total: 100%</span>
             </div>
+            <div id="termin-summary-hint" class="text-[10px] text-zinc-400 truncate tnum">DP 30% @ H-15 · T1–BAST otomatis mengikuti jadwal</div>
           </div>
 
           <div class="md:col-span-2 xl:col-span-4 space-y-1.5">
@@ -726,83 +736,181 @@
     <div id="page-2" class="page-view hidden space-y-6 print-page-break">
       <div class="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 3 · Struktur Biaya &amp; Kapasitas Lini</p>
-          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Dampak Waktu Produksi ke COGS &amp; Sweet Spot Galangan</h2>
-          <p class="text-xs text-zinc-500 mt-1">Durasi proyek memicu <strong>Overhead Harian</strong>; ekspansi lini mempercepat produksi dengan <strong>Biaya Akselerasi</strong>.</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1">Langkah 3 · Lini Produksi Mould &amp; Struktur Biaya</p>
+          <h2 class="text-2xl font-bold tracking-tight text-zinc-950">Kapasitas Mould Paralel, Bottleneck &amp; Sweet Spot Galangan</h2>
+          <p class="text-xs text-zinc-500 mt-1"><strong>1 Mould = 1 Lini Cetak Paralel</strong>. Menambah mould mempercepat durasi &amp; memangkas overhead harian, namun menaikkan <strong>Capex F1</strong> dan kebutuhan yard/tenaga kerja.</p>
         </div>
         <button type="button" onclick="switchPage('page-spec')" class="no-print text-xs font-semibold px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700">
           ← Ubah Komponen di Builder
         </button>
       </div>
 
-      <!-- Time-Driven Cost Controls + COGS Strip -->
+      <!-- Mould = Production Line Configurator + Telemetry + COGS Strip -->
       <section class="panel overflow-hidden">
-        <div class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-12 gap-4 items-start bg-zinc-50/70 border-b border-zinc-200 no-print">
-          <div class="md:col-span-3 space-y-1.5">
-            <label for="ctrl-overhead-day" class="block text-xs font-semibold text-zinc-700">Overhead Harian Galangan</label>
+        <!-- Row 1: Primary Mould Production Line Controls -->
+        <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-start bg-zinc-50/70 border-b border-zinc-200 no-print">
+          <div class="lg:col-span-4 space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <label for="ctrl-mould-count" class="block text-xs font-semibold text-zinc-700">Jumlah Mould Aktif (Lini Paralel)</label>
+              <button type="button" onclick="autoOptimizeMouldCount()" title="Hitung otomatis jumlah mould terbaik yang lolos target deadline"
+                class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-brand-700 hover:bg-brand-800 text-white transition">
+                Auto-Optimal
+              </button>
+            </div>
             <div class="input-shell flex items-center px-3 py-2 bg-white">
-              <span class="text-xs text-zinc-400 pr-1.5">Rp</span>
+              <input id="ctrl-mould-count" type="number" min="1" max="100" step="1" value="10"
+                oninput="onProdLineInputChange()"
+                class="w-full text-sm font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">set mould</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1 pt-0.5">
+              <button type="button" onclick="setMouldCount(2)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/80 hover:bg-zinc-300 text-zinc-700 tnum">2</button>
+              <button type="button" onclick="setMouldCount(5)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/80 hover:bg-zinc-300 text-zinc-700 tnum">5</button>
+              <button type="button" onclick="setMouldCount(10)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/80 hover:bg-zinc-300 text-zinc-700 tnum">10</button>
+              <button type="button" onclick="setMouldCount(15)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/80 hover:bg-zinc-300 text-zinc-700 tnum">15</button>
+              <button type="button" onclick="setMouldCount(20)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/80 hover:bg-zinc-300 text-zinc-700 tnum">20</button>
+              <button type="button" onclick="setMouldCount(30)" class="chip-btn text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-200/80 hover:bg-zinc-300 text-zinc-700 tnum">30</button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 space-y-1.5">
+            <label for="ctrl-mould-cycle" class="block text-xs font-semibold text-zinc-700">Siklus / Mould</label>
+            <div class="input-shell flex items-center px-2.5 py-2 bg-white">
+              <input id="ctrl-mould-cycle" type="number" min="0.5" max="90" step="0.5" value="3"
+                oninput="onProdLineInputChange()"
+                class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">hr/u</span>
+            </div>
+            <div class="flex items-center gap-1 text-[10px] text-zinc-500">
+              <span>Eff:</span>
+              <input id="ctrl-mould-eff" type="number" min="30" max="100" step="5" value="85"
+                oninput="onProdLineInputChange()"
+                class="w-11 px-1 py-0.5 rounded border border-zinc-300 bg-white text-zinc-900 font-semibold tnum text-center" />
+              <span>%</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 space-y-1.5">
+            <label for="ctrl-overhead-day" class="block text-xs font-semibold text-zinc-700">Overhead Yard Utama</label>
+            <div class="input-shell flex items-center px-2.5 py-2 bg-white">
+              <span class="text-[11px] text-zinc-400 pr-1">Rp</span>
               <input id="ctrl-overhead-day" type="number" min="0" max="200" step="0.5" value="10"
                 oninput="recalculateAll()"
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
-              <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">Jt / hari</span>
+              <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">Jt/hr</span>
             </div>
-            <p class="text-[11px] text-zinc-500">Sewa slipway, listrik, keamanan &amp; tim tetap per hari kalender.</p>
+            <p class="text-[10px] text-zinc-500">Tetap/hari untuk 1 yard.</p>
           </div>
 
-          <div class="md:col-span-4 space-y-1.5">
-            <label class="block text-xs font-semibold text-zinc-700">Kapasitas Lini Galangan</label>
-            <div class="grid grid-cols-3 gap-1.5 p-1 rounded-lg bg-zinc-200/70">
-              <button type="button" id="cap-1" onclick="setCapacity(1)" class="seg-btn active text-xs py-2 px-2 text-zinc-700 tnum">1× Standar</button>
-              <button type="button" id="cap-1.5" onclick="setCapacity(1.5)" class="seg-btn text-xs py-2 px-2 text-zinc-700 tnum">1,5× Ekspansi</button>
-              <button type="button" id="cap-2" onclick="setCapacity(2)" class="seg-btn text-xs py-2 px-2 text-zinc-700 tnum">2× Konsorsium</button>
-            </div>
-            <p id="capacity-note" class="text-[11px] text-zinc-500 tnum"></p>
-          </div>
-
-          <div class="md:col-span-3 space-y-1.5">
-            <label for="ctrl-accel-cost" class="block text-xs font-semibold text-zinc-700">Biaya Akselerasi Lini</label>
-            <div class="input-shell flex items-center px-3 py-2 bg-white">
-              <span class="text-xs text-zinc-400 pr-1.5">Rp</span>
-              <input id="ctrl-accel-cost" type="number" min="0" max="100" step="0.5" value="0"
-                oninput="recalculateAll()"
+          <div class="lg:col-span-2 space-y-1.5">
+            <label for="ctrl-target-deadline" class="block text-xs font-semibold text-zinc-700">Target Deadline</label>
+            <div class="input-shell flex items-center px-2.5 py-2 bg-white">
+              <input id="ctrl-target-deadline" type="number" min="15" max="1500" step="15" value="180"
+                oninput="onProdLineInputChange()"
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
-              <span class="text-xs font-medium text-zinc-400 pl-1.5 shrink-0">Jt / unit</span>
+              <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">hari</span>
             </div>
-            <p class="text-[11px] text-zinc-500">Default 0 Jt (1×), 2,5 Jt (1,5×), 5,5 Jt (2×).</p>
+            <p class="text-[10px] text-zinc-500">Batas waktu kontrak.</p>
           </div>
 
-          <div class="md:col-span-2 space-y-1.5">
-            <label for="ctrl-coc-p2" class="block text-xs font-semibold text-zinc-700">Bunga Talangan</label>
-            <div class="input-shell flex items-center px-3 py-2 bg-white">
-              <input id="ctrl-coc-p2" type="number" min="0" max="36" step="0.5" value="14"
-                oninput="syncSharedInput('coc', this.value)"
+          <div class="lg:col-span-2 space-y-1.5">
+            <label for="ctrl-engine-cap" class="block text-xs font-semibold text-zinc-700">Batas Suplai Mesin</label>
+            <div class="input-shell flex items-center px-2.5 py-2 bg-white">
+              <input id="ctrl-engine-cap" type="number" min="0" max="2000" step="10" value="0"
+                oninput="onProdLineInputChange()"
                 class="w-full text-sm font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
-              <span class="text-xs font-medium text-zinc-400 pl-1 shrink-0">%/thn</span>
+              <span class="text-[11px] font-medium text-zinc-400 pl-1 shrink-0">u/bln</span>
             </div>
-            <p class="text-[11px] text-zinc-500">Basis bunga defisit kas.</p>
+            <p class="text-[10px] text-zinc-500">0 = tanpa batas kuota.</p>
           </div>
         </div>
-        <div id="cogs-breakdown-strip" class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 bg-white"></div>
+
+        <!-- Collapsible Row 2: Mould Capex, Lifespan, Yard Limit & Extra Cost Parameters -->
+        <details class="bg-zinc-50/40 border-b border-zinc-200 no-print">
+          <summary class="px-4 sm:px-5 py-2.5 text-[11px] font-semibold text-zinc-600 hover:text-zinc-950 cursor-pointer flex items-center justify-between select-none">
+            <span class="flex items-center gap-1.5"><i class="ph ph-sliders-horizontal text-brand-700"></i> Parameter Detail: Capex Plug/Mould, Umur Pakai (Lifespan), Batas 1 Galangan &amp; Bunga</span>
+            <span id="capacity-note" class="text-[11px] font-medium text-zinc-500 tnum"></span>
+          </summary>
+          <div class="px-4 sm:px-5 pb-4 pt-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 text-xs">
+            <div class="space-y-1">
+              <label for="ctrl-plug-cost" class="block text-[11px] font-semibold text-zinc-600">Master Plug (F1)</label>
+              <div class="input-shell flex items-center px-2 py-1.5 bg-white">
+                <input id="ctrl-plug-cost" type="number" min="0" max="2000" step="5" value="45" oninput="onProdLineInputChange()" class="w-full text-xs font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-[10px] text-zinc-400 pl-1">Jt</span>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="ctrl-mould-cost" class="block text-[11px] font-semibold text-zinc-600">Biaya / 1 Mould</label>
+              <div class="input-shell flex items-center px-2 py-1.5 bg-white">
+                <input id="ctrl-mould-cost" type="number" min="0" max="1000" step="5" value="35" oninput="onProdLineInputChange()" class="w-full text-xs font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-[10px] text-zinc-400 pl-1">Jt</span>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="ctrl-mould-lifespan" class="block text-[11px] font-semibold text-zinc-600">Umur Mould</label>
+              <div class="input-shell flex items-center px-2 py-1.5 bg-white">
+                <input id="ctrl-mould-lifespan" type="number" min="5" max="500" step="5" value="50" oninput="onProdLineInputChange()" class="w-full text-xs font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-[10px] text-zinc-400 pl-1">pulls</span>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="ctrl-max-mould-yard" class="block text-[11px] font-semibold text-zinc-600">Maks Mould / Yard</label>
+              <div class="input-shell flex items-center px-2 py-1.5 bg-white">
+                <input id="ctrl-max-mould-yard" type="number" min="1" max="50" step="1" value="10" oninput="onProdLineInputChange()" class="w-full text-xs font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-[10px] text-zinc-400 pl-1">set</span>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="ctrl-extra-yard-oh" class="block text-[11px] font-semibold text-zinc-600">Overhead Yard Mitra</label>
+              <div class="input-shell flex items-center px-2 py-1.5 bg-white">
+                <input id="ctrl-extra-yard-oh" type="number" min="0" max="200" step="0.5" value="6" oninput="onProdLineInputChange()" class="w-full text-xs font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-[10px] text-zinc-400 pl-1">Jt/hr</span>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="ctrl-accel-cost" class="block text-[11px] font-semibold text-zinc-600">Lembur / Ekstra</label>
+              <div class="input-shell flex items-center px-2 py-1.5 bg-white">
+                <input id="ctrl-accel-cost" type="number" min="0" max="100" step="0.5" value="0" oninput="recalculateAll()" class="w-full text-xs font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-[10px] text-zinc-400 pl-1">Jt/u</span>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="ctrl-coc-p2" class="block text-[11px] font-semibold text-zinc-600">Bunga Talangan</label>
+              <div class="input-shell flex items-center px-2 py-1.5 bg-white">
+                <input id="ctrl-coc-p2" type="number" min="0" max="36" step="0.5" value="14" oninput="syncSharedInput('coc', this.value)" class="w-full text-xs font-bold tnum bg-transparent focus:outline-none" />
+                <span class="text-[10px] text-zinc-400 pl-1">%/th</span>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Live Production Line Telemetry Strip (4 Industrial Engineering KPIs) -->
+        <div id="mould-telemetry-strip" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-zinc-200 bg-white border-b border-zinc-200"></div>
+
+        <!-- COGS Breakdown Strip -->
+        <div id="cogs-breakdown-strip" class="grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200 bg-zinc-50/40"></div>
       </section>
 
-      <!-- Sweet Spot Trade-Off Table -->
+      <!-- Sweet Spot Trade-Off Table (Dynamic Mould Count Scenarios) -->
       <section class="panel overflow-hidden">
-        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200">
-          <h3 class="text-sm font-bold text-zinc-950">Analisa Sweet Spot: Kecepatan Produksi vs Total Biaya &amp; Profit Riil</h3>
-          <p class="text-[11px] text-zinc-500">Klik baris kapasitas untuk mengganti kecepatan lini produksi.</p>
+        <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-zinc-950">Analisa Sweet Spot: Jumlah Mould Paralel vs Durasi, Capex F1 &amp; Profit Riil</h3>
+            <p class="text-[11px] text-zinc-500">Klik baris skenario mould untuk langsung menerapkannya ke lini produksi &amp; Gantt jadwal.</p>
+          </div>
+          <span id="sweetspot-deadline-badge" class="text-[11px] font-semibold text-zinc-600 tnum"></span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-zinc-50/50 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
-                <th class="py-2.5 px-4">Mode Kapasitas Lini</th>
-                <th class="py-2.5 px-3 text-right">Total Durasi</th>
-                <th class="py-2.5 px-3 text-right">COGS Fisik</th>
+                <th class="py-2.5 px-4">Skenario Lini Mould</th>
+                <th class="py-2.5 px-3 text-right">Output Efektif</th>
+                <th class="py-2.5 px-3 text-right">Galangan &amp; Tim</th>
+                <th class="py-2.5 px-3 text-right">Durasi Proyek</th>
+                <th class="py-2.5 px-3 text-right">Capex Mould (F1)</th>
                 <th class="py-2.5 px-3 text-right">Overhead Waktu</th>
-                <th class="py-2.5 px-3 text-right">Biaya Akselerasi</th>
-                <th class="py-2.5 px-3 text-right">Total COGS</th>
-                <th class="py-2.5 px-3 text-right">Bunga Talangan</th>
+                <th class="py-2.5 px-3 text-right">Peak Defisit</th>
                 <th class="py-2.5 px-4 text-right">Net Profit Riil</th>
               </tr>
             </thead>
@@ -1371,6 +1479,63 @@
           <button type="button" onclick="closePhaseScheduleModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
           <button type="button" onclick="savePhaseScheduleModal()" class="px-4 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold">Simpan Tanggal</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAYMENT TERMIN DAY EDITOR MODAL (CLICK PAYMENT PIN ON GANTT PAGE 4)   -->
+  <!-- ===================================================================== -->
+  <div id="termin-day-modal" class="hidden fixed inset-0 z-50 bg-zinc-950/40 backdrop-blur-[1px] flex items-center justify-center p-4 no-print" onclick="if(event.target===this) closeTerminDayModal()">
+    <div class="bg-white border border-zinc-200 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+      <div class="px-5 py-4 border-b border-zinc-200 flex items-center justify-between bg-zinc-50">
+        <div>
+          <span id="tm-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">Termin Pembayaran</span>
+          <h3 class="text-sm font-bold text-zinc-950 mt-1">Atur Hari Cair &amp; Persentase Pembayaran</h3>
+        </div>
+        <button type="button" onclick="closeTerminDayModal()" class="text-zinc-400 hover:text-zinc-700 p-1">
+          <i class="ph ph-x text-base"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="tm-label" class="block font-semibold text-zinc-700 mb-1">Nama Termin</label>
+            <div class="input-shell px-3 py-2">
+              <input id="tm-label" type="text" class="w-full text-xs font-semibold text-zinc-950 bg-transparent focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label for="tm-pct" class="block font-semibold text-zinc-700 mb-1">Porsi Pembayaran (%)</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <input id="tm-pct" type="number" min="0" max="100" step="1" class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-zinc-400 pl-1">%</span>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="tm-day" class="block font-semibold text-zinc-700 mb-1">Hari Cair (Hari ke-)</label>
+            <div class="input-shell flex items-center px-3 py-2">
+              <span class="text-zinc-400 pr-1 font-bold">H-</span>
+              <input id="tm-day" type="number" min="0" max="2000" step="1" oninput="onTerminModalDayChange()" class="w-full text-xs font-bold text-brand-700 tnum bg-transparent focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label for="tm-date" class="block font-semibold text-zinc-700 mb-1">Tanggal Kalender</label>
+            <div class="input-shell px-2.5 py-2">
+              <input id="tm-date" type="date" onchange="onTerminModalDateChange()" class="w-full text-xs font-semibold text-zinc-950 tnum bg-transparent focus:outline-none" />
+            </div>
+          </div>
+        </div>
+        <label class="inline-flex items-center gap-2 pt-1 text-xs text-zinc-700 cursor-pointer select-none">
+          <input id="tm-auto" type="checkbox" class="rounded border-zinc-300 text-brand-700 focus:ring-brand-700" />
+          <span>Otomatis ikuti tanggal selesai fase produksi terkait</span>
+        </label>
+      </div>
+      <div class="px-5 py-3 border-t border-zinc-200 bg-zinc-50 flex items-center justify-end gap-2">
+        <button type="button" onclick="closeTerminDayModal()" class="px-3 py-1.5 rounded-lg border border-zinc-300 bg-white text-xs font-semibold text-zinc-700">Batal</button>
+        <button type="button" onclick="saveTerminDayModal()" class="px-4 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold">Simpan Jadwal Cair</button>
       </div>
     </div>
   </div>
@@ -2157,55 +2322,187 @@
     let spkCount = 1;
     let feeBase = 'netto';
     let delayDays = 0;
-    let capacityMultiplier = 1;
+    let capacityMultiplier = 1; // legacy alias kept for saved config fallback
     let inspectingCardId = null;
     let procEditingCatId = null;
     let draftCustomBom = [];
     let cashflowChartInstance = null;
 
-    // Customizable Client / Government Payment Termins (1x to 5x installments)
+    // =========================================================================
+    // MOULD = PRODUCTION LINE ENGINE CONFIG (Per Vessel Class Defaults)
+    // =========================================================================
+    const VESSEL_MOULD_DEFAULTS = {
+      'fishing-3gt': {
+        mouldCount: 10, cycleDays: 3, effPct: 85,
+        plugCostJt: 45, mouldCostJt: 35, lifespanPulls: 50,
+        maxPerYard: 10, extraYardOverheadJt: 6,
+        workersPerMould: 5, areaPerMouldM2: 35,
+        plugDays: 14, mouldBuildDays: 3,
+        engineSupplyCapPerMonth: 0, targetDeadlineDays: 180
+      },
+      'patrol-fast': {
+        mouldCount: 2, cycleDays: 14, effPct: 85,
+        plugCostJt: 140, mouldCostJt: 95, lifespanPulls: 35,
+        maxPerYard: 4, extraYardOverheadJt: 8,
+        workersPerMould: 10, areaPerMouldM2: 90,
+        plugDays: 22, mouldBuildDays: 7,
+        engineSupplyCapPerMonth: 0, targetDeadlineDays: 150
+      },
+      'crew-workboat': {
+        mouldCount: 1, cycleDays: 22, effPct: 85,
+        plugCostJt: 220, mouldCostJt: 150, lifespanPulls: 30,
+        maxPerYard: 3, extraYardOverheadJt: 10,
+        workersPerMould: 14, areaPerMouldM2: 140,
+        plugDays: 28, mouldBuildDays: 10,
+        engineSupplyCapPerMonth: 0, targetDeadlineDays: 180
+      },
+      'passenger-boat': {
+        mouldCount: 2, cycleDays: 20, effPct: 85,
+        plugCostJt: 200, mouldCostJt: 140, lifespanPulls: 30,
+        maxPerYard: 3, extraYardOverheadJt: 10,
+        workersPerMould: 14, areaPerMouldM2: 135,
+        plugDays: 26, mouldBuildDays: 9,
+        engineSupplyCapPerMonth: 0, targetDeadlineDays: 180
+      }
+    };
+
+    let prodLineConfig = { ...VESSEL_MOULD_DEFAULTS['fishing-3gt'] };
+    let startAfterDp = true; // true = F1 Moulding starts after DP lands; false = Start Day 0 (Pre-finance / Talangan)
+
+    function applyMouldDefaultsForClass(classId) {
+      const def = VESSEL_MOULD_DEFAULTS[classId] || VESSEL_MOULD_DEFAULTS['fishing-3gt'];
+      prodLineConfig = { ...def };
+      syncProdLineInputsToDom();
+    }
+
+    function syncProdLineInputsToDom() {
+      const map = {
+        'ctrl-mould-count': prodLineConfig.mouldCount,
+        'ctrl-mould-cycle': prodLineConfig.cycleDays,
+        'ctrl-mould-eff': prodLineConfig.effPct,
+        'ctrl-plug-cost': prodLineConfig.plugCostJt,
+        'ctrl-mould-cost': prodLineConfig.mouldCostJt,
+        'ctrl-mould-lifespan': prodLineConfig.lifespanPulls,
+        'ctrl-max-mould-yard': prodLineConfig.maxPerYard,
+        'ctrl-extra-yard-oh': prodLineConfig.extraYardOverheadJt,
+        'ctrl-engine-cap': prodLineConfig.engineSupplyCapPerMonth,
+        'ctrl-target-deadline': prodLineConfig.targetDeadlineDays
+      };
+      Object.entries(map).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && String(el.value) !== String(val)) el.value = val;
+      });
+    }
+
+    function onProdLineInputChange() {
+      const readNum = (id, fb, min, max) => {
+        const el = document.getElementById(id);
+        const v = el ? parseFloat(el.value) : NaN;
+        if (isNaN(v)) return fb;
+        return Math.max(min, Math.min(max, v));
+      };
+      prodLineConfig.mouldCount = Math.round(readNum('ctrl-mould-count', prodLineConfig.mouldCount, 1, 100));
+      prodLineConfig.cycleDays = readNum('ctrl-mould-cycle', prodLineConfig.cycleDays, 0.5, 90);
+      prodLineConfig.effPct = readNum('ctrl-mould-eff', prodLineConfig.effPct, 30, 100);
+      prodLineConfig.plugCostJt = readNum('ctrl-plug-cost', prodLineConfig.plugCostJt, 0, 2000);
+      prodLineConfig.mouldCostJt = readNum('ctrl-mould-cost', prodLineConfig.mouldCostJt, 0, 1000);
+      prodLineConfig.lifespanPulls = Math.round(readNum('ctrl-mould-lifespan', prodLineConfig.lifespanPulls, 5, 500));
+      prodLineConfig.maxPerYard = Math.round(readNum('ctrl-max-mould-yard', prodLineConfig.maxPerYard, 1, 50));
+      prodLineConfig.extraYardOverheadJt = readNum('ctrl-extra-yard-oh', prodLineConfig.extraYardOverheadJt, 0, 200);
+      prodLineConfig.engineSupplyCapPerMonth = Math.round(readNum('ctrl-engine-cap', prodLineConfig.engineSupplyCapPerMonth, 0, 2000));
+      prodLineConfig.targetDeadlineDays = Math.round(readNum('ctrl-target-deadline', prodLineConfig.targetDeadlineDays, 15, 1500));
+      recalculateAll();
+    }
+
+    function setMouldCount(n) {
+      prodLineConfig.mouldCount = Math.max(1, Math.min(100, Math.round(Number(n) || 1)));
+      syncProdLineInputsToDom();
+      recalculateAll();
+    }
+
+    function setStartAfterDp(flag) {
+      startAfterDp = Boolean(flag);
+      updateSegGroup(['start-mode-after-dp', 'start-mode-day0'], startAfterDp ? 'start-mode-after-dp' : 'start-mode-day0');
+      recalculateAll();
+    }
+
+    function autoOptimizeMouldCount() {
+      const inp = readInputs();
+      const maxCand = Math.min(50, Math.max(1, inp.units));
+      const target = prodLineConfig.targetDeadlineDays || 180;
+      let bestMeeting = null;
+      let bestOverall = null;
+      for (let m = 1; m <= maxCand; m++) {
+        const s = computeSimulation(null, { mouldCount: m });
+        const execCost = s.totalCOGS + s.financingCost;
+        if (!bestOverall || execCost < bestOverall.execCost) {
+          bestOverall = { m, s, execCost };
+        }
+        if (s.prodFinishDay <= target) {
+          if (!bestMeeting || execCost < bestMeeting.execCost) {
+            bestMeeting = { m, s, execCost };
+          }
+        }
+      }
+      const chosen = bestMeeting || bestOverall;
+      if (chosen) {
+        setMouldCount(chosen.m);
+        if (bestMeeting) {
+          showToast(`Optimal: ${chosen.m} Mould (${chosen.s.yardsNeeded} Yard) → selesai produksi H-${chosen.s.prodFinishDay} (lolos ${target} hr), biaya eksekusi terendah ${fmtRpShort(chosen.execCost)}.`);
+        } else {
+          showToast(`Deadline ${target} hr belum tercapai (cek batas suplai/siklus). Dipilih biaya terendah: ${chosen.m} Mould (H-${chosen.s.prodFinishDay}).`);
+        }
+      }
+    }
+
+    // Customizable Client / Government Payment Termins (1x to 5x installments, each with % AND exact Day H-X)
     let clientTermins = [
-      { label: 'DP',   pct: 30, phase: 'F1' },
-      { label: 'T1',   pct: 21, phase: 'F3' },
-      { label: 'T2',   pct: 22, phase: 'F4' },
-      { label: 'T3',   pct: 22, phase: 'F5' },
-      { label: 'BAST', pct: 5,  phase: 'F7' }
+      { label: 'DP',   pct: 30, phase: 'F1', day: 15,  autoDay: false },
+      { label: 'T1',   pct: 21, phase: 'F3', day: 120, autoDay: true },
+      { label: 'T2',   pct: 22, phase: 'F4', day: 215, autoDay: true },
+      { label: 'T3',   pct: 22, phase: 'F5', day: 300, autoDay: true },
+      { label: 'BAST', pct: 5,  phase: 'F7', day: 410, autoDay: true }
     ];
 
     // Interactive Project Calendar & Phase Schedule Overrides (Page 4)
     let projectStartDate = '2026-12-01';
     let phaseScheduleOverrides = {}; // { [phaseKey]: { startDay, endDay, customName } }
     let editingPhaseKey = null;
+    let editingTerminIdx = null;
 
     const TERMIN_PRESETS = {
-      1: [{ label: 'BAST 100%', pct: 100, phase: 'F7' }],
+      1: [{ label: 'BAST 100%', pct: 100, phase: 'F7', day: 180, autoDay: true }],
       2: [
-        { label: 'DP Awal', pct: 30, phase: 'F1' },
-        { label: 'Lunas BAST', pct: 70, phase: 'F7' }
+        { label: 'DP Awal',    pct: 30, phase: 'F1', day: 15,  autoDay: false },
+        { label: 'Lunas BAST', pct: 70, phase: 'F7', day: 180, autoDay: true }
       ],
       3: [
-        { label: 'DP Awal', pct: 30, phase: 'F1' },
-        { label: 'Termin 1', pct: 50, phase: 'F4' },
-        { label: 'BAST', pct: 20, phase: 'F7' }
+        { label: 'DP Awal',  pct: 30, phase: 'F1', day: 15,  autoDay: false },
+        { label: 'Termin 1', pct: 50, phase: 'F4', day: 95,  autoDay: true },
+        { label: 'BAST',     pct: 20, phase: 'F7', day: 180, autoDay: true }
       ],
       4: [
-        { label: 'DP', pct: 30, phase: 'F1' },
-        { label: 'Termin 1', pct: 30, phase: 'F3' },
-        { label: 'Termin 2', pct: 30, phase: 'F5' },
-        { label: 'BAST', pct: 10, phase: 'F7' }
+        { label: 'DP',       pct: 30, phase: 'F1', day: 15,  autoDay: false },
+        { label: 'Termin 1', pct: 30, phase: 'F3', day: 75,  autoDay: true },
+        { label: 'Termin 2', pct: 30, phase: 'F5', day: 135, autoDay: true },
+        { label: 'BAST',     pct: 10, phase: 'F7', day: 180, autoDay: true }
       ],
       5: [
-        { label: 'DP', pct: 30, phase: 'F1' },
-        { label: 'T1', pct: 21, phase: 'F3' },
-        { label: 'T2', pct: 22, phase: 'F4' },
-        { label: 'T3', pct: 22, phase: 'F5' },
-        { label: 'BAST', pct: 5, phase: 'F7' }
+        { label: 'DP',   pct: 30, phase: 'F1', day: 15,  autoDay: false },
+        { label: 'T1',   pct: 21, phase: 'F3', day: 75,  autoDay: true },
+        { label: 'T2',   pct: 22, phase: 'F4', day: 115, autoDay: true },
+        { label: 'T3',   pct: 22, phase: 'F5', day: 155, autoDay: true },
+        { label: 'BAST', pct: 5,  phase: 'F7', day: 195, autoDay: true }
       ]
     };
 
     function setTerminCount(n) {
+      const prevDpDay = (clientTermins[0] && clientTermins[0].phase === 'F1') ? clientTermins[0].day : 15;
       const template = TERMIN_PRESETS[n] || TERMIN_PRESETS[5];
-      clientTermins = template.map(t => ({ ...t }));
+      clientTermins = template.map((t, i) => ({
+        ...t,
+        day: (i === 0 && t.phase === 'F1') ? prevDpDay : t.day
+      }));
       syncDpInputFromTermins();
       updateSegGroup(['term-cnt-1', 'term-cnt-2', 'term-cnt-3', 'term-cnt-4', 'term-cnt-5'], `term-cnt-${clientTermins.length}`);
       recalculateAll();
@@ -2230,24 +2527,114 @@
       recalculateAll();
     }
 
-    function renderTerminInputs() {
+    function onTerminDayInput(idx, val) {
+      const num = Math.max(0, Math.min(2000, Math.round(parseFloat(val) || 0)));
+      if (!clientTermins[idx]) return;
+      clientTermins[idx].day = num;
+      clientTermins[idx].autoDay = false;
+      recalculateAll();
+    }
+
+    function resetTerminDaysToAuto() {
+      clientTermins.forEach((t, idx) => {
+        if (idx === 0 && t.phase === 'F1') {
+          t.autoDay = false;
+        } else {
+          t.autoDay = true;
+        }
+      });
+      recalculateAll();
+      showToast('Hari cair Termin 1–BAST disinkronkan otomatis mengikuti jadwal produksi.');
+    }
+
+    function openTerminDayModal(idx) {
+      const sim = computeSimulation();
+      const rt = sim.resolvedTermins && sim.resolvedTermins[idx];
+      if (!rt || !clientTermins[idx]) return;
+      editingTerminIdx = idx;
+      document.getElementById('tm-badge').textContent = `Termin #${idx + 1} · ${rt.label}`;
+      document.getElementById('tm-label').value = clientTermins[idx].label;
+      document.getElementById('tm-pct').value = clientTermins[idx].pct;
+      document.getElementById('tm-day').value = rt.day;
+      document.getElementById('tm-date').value = dayOffsetToDateStr(rt.day);
+      document.getElementById('tm-auto').checked = Boolean(clientTermins[idx].autoDay);
+      document.getElementById('termin-day-modal').classList.remove('hidden');
+    }
+
+    function closeTerminDayModal() {
+      editingTerminIdx = null;
+      document.getElementById('termin-day-modal').classList.add('hidden');
+    }
+
+    function onTerminModalDateChange() {
+      const d = dateStrToDayOffset(document.getElementById('tm-date').value);
+      document.getElementById('tm-day').value = d;
+      document.getElementById('tm-auto').checked = false;
+    }
+
+    function onTerminModalDayChange() {
+      const d = Math.max(0, Math.round(parseFloat(document.getElementById('tm-day').value) || 0));
+      document.getElementById('tm-date').value = dayOffsetToDateStr(d);
+      document.getElementById('tm-auto').checked = false;
+    }
+
+    function saveTerminDayModal() {
+      if (editingTerminIdx === null || !clientTermins[editingTerminIdx]) return;
+      const t = clientTermins[editingTerminIdx];
+      const lbl = (document.getElementById('tm-label').value || '').trim();
+      if (lbl) t.label = lbl;
+      const pct = Math.max(0, Math.min(100, parseFloat(document.getElementById('tm-pct').value) || 0));
+      const day = Math.max(0, Math.min(2000, Math.round(parseFloat(document.getElementById('tm-day').value) || 0)));
+      const isAuto = document.getElementById('tm-auto').checked;
+      t.pct = pct;
+      t.day = day;
+      t.autoDay = isAuto;
+      syncDpInputFromTermins();
+      closeTerminDayModal();
+      recalculateAll();
+      showToast(`Pembayaran ${t.label} (${t.pct}%) diatur ke ${isAuto ? 'Auto-Ikut Fase' : `H-${t.day} (${fmtDateShortId(t.day)})`}.`);
+    }
+
+    function renderTerminInputs(simRef = null) {
       const container = document.getElementById('termin-inputs-row');
       if (!container) return;
+      const sim = simRef || computeSimulation();
       const n = clientTermins.length;
-      container.className = `grid grid-cols-${n} gap-1.5`;
+      const colMap = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-2 sm:grid-cols-4', 5: 'grid-cols-2 sm:grid-cols-5' };
+      container.className = `grid ${colMap[n] || 'grid-cols-5'} gap-1.5`;
       updateSegGroup(['term-cnt-1', 'term-cnt-2', 'term-cnt-3', 'term-cnt-4', 'term-cnt-5'], `term-cnt-${n}`);
+      updateSegGroup(['start-mode-after-dp', 'start-mode-day0'], startAfterDp ? 'start-mode-after-dp' : 'start-mode-day0');
 
-      container.innerHTML = clientTermins.map((t, idx) => `
-        <div class="rounded-lg border border-zinc-200 bg-white px-2 py-1">
-          <div class="text-[9px] font-semibold text-zinc-400 truncate">${idx + 1}. ${t.label}</div>
-          <div class="flex items-center">
-            <input type="number" min="0" max="100" step="1" value="${t.pct}"
-              onchange="onTerminPctInput(${idx}, this.value)"
-              class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
-            <span class="text-[10px] text-zinc-400">%</span>
+      const resolved = sim.resolvedTermins || [];
+      const hasManualPostDp = clientTermins.some((t, idx) => idx > 0 && !t.autoDay);
+      const autoBtn = document.getElementById('btn-termin-auto-day');
+      if (autoBtn) autoBtn.classList.toggle('hidden', !hasManualPostDp);
+
+      container.innerHTML = clientTermins.map((t, idx) => {
+        const rt = resolved[idx] || { day: t.day || 0, effDay: t.day || 0 };
+        const dayVal = rt.day;
+        const isManual = !t.autoDay;
+        return `
+          <div class="rounded-lg border ${isManual ? 'border-brand-300 bg-brand-50/20' : 'border-zinc-200 bg-white'} px-2 py-1.5 space-y-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="text-[9px] font-bold text-zinc-500 truncate">${idx + 1}. ${t.label}</span>
+              <span class="text-[8px] font-semibold ${isManual ? 'text-brand-700' : 'text-zinc-400'}">${isManual ? 'Set' : 'Auto'}</span>
+            </div>
+            <div class="flex items-center border-b border-zinc-100 pb-0.5">
+              <input type="number" min="0" max="100" step="1" value="${t.pct}"
+                onchange="onTerminPctInput(${idx}, this.value)" aria-label="Persentase ${t.label}"
+                class="w-full text-xs font-bold text-zinc-950 tnum bg-transparent focus:outline-none" />
+              <span class="text-[10px] text-zinc-400">%</span>
+            </div>
+            <div class="flex items-center gap-0.5 pt-0.5" title="Hari cair pembayaran (H-${dayVal} = ${fmtDateShortId(dayVal)})">
+              <span class="text-[9px] font-bold text-brand-700">H-</span>
+              <input type="number" min="0" max="2000" step="1" value="${dayVal}"
+                onchange="onTerminDayInput(${idx}, this.value)" aria-label="Hari cair ${t.label}"
+                class="w-full text-[11px] font-semibold text-brand-800 tnum bg-transparent focus:outline-none" />
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       const sumPct = Math.round(clientTermins.reduce((a, t) => a + (Number(t.pct) || 0), 0) * 10) / 10;
       const badgeEl = document.getElementById('termin-sum-badge');
@@ -2257,7 +2644,7 @@
       }
       const hintEl = document.getElementById('termin-summary-hint');
       if (hintEl) {
-        hintEl.textContent = `${n}× pembayaran (${clientTermins.map(t => `${t.label} ${t.pct}%`).join(' · ')})`;
+        hintEl.textContent = resolved.map(t => `${t.label} ${t.pct}% @ H-${t.effDay}`).join(' · ');
       }
     }
 
@@ -3054,6 +3441,7 @@
           document.getElementById('ctrl-overhead-day').value = vc.defaultOverheadJt;
         }
       }
+      applyMouldDefaultsForClass(classId);
       recalculateAll();
     }
 
@@ -3880,6 +4268,7 @@
         document.getElementById('ctrl-units').value = builtIn.units;
         const vc = VESSEL_CLASSES.find(v => v.id === builtIn.vesselClass);
         if (vc) document.getElementById('ctrl-overhead-day').value = vc.defaultOverheadJt;
+        applyMouldDefaultsForClass(builtIn.vesselClass);
         recalculateAll();
         return;
       }
@@ -3895,6 +4284,7 @@
             if (c) Object.assign(c, ov);
           });
         }
+        applyMouldDefaultsForClass(saved.vesselClass);
         if (saved.params) {
           document.getElementById('ctrl-units').value = saved.params.units;
           document.getElementById('ctrl-markup').value = saved.params.markupPct;
@@ -3907,8 +4297,19 @@
           feeBase = saved.params.feeBase || 'netto';
           delayDays = saved.params.delayDays || 0;
           capacityMultiplier = saved.params.capacityMultiplier || 1;
+          if (saved.params.prodLineConfig) {
+            prodLineConfig = { ...prodLineConfig, ...saved.params.prodLineConfig };
+            syncProdLineInputsToDom();
+          }
+          if (saved.params.startAfterDp !== undefined) startAfterDp = Boolean(saved.params.startAfterDp);
           if (Array.isArray(saved.params.clientTermins) && saved.params.clientTermins.length > 0) {
-            clientTermins = saved.params.clientTermins.map(t => ({ ...t }));
+            clientTermins = saved.params.clientTermins.map((t, idx) => ({
+              label: t.label,
+              pct: t.pct,
+              phase: t.phase,
+              day: t.day !== undefined ? t.day : (idx === 0 && t.phase === 'F1' ? 15 : 0),
+              autoDay: t.autoDay !== undefined ? t.autoDay : !(idx === 0 && t.phase === 'F1')
+            }));
             syncDpInputFromTermins();
           }
           if (saved.params.projectStartDate) projectStartDate = saved.params.projectStartDate;
@@ -3980,6 +4381,8 @@
           overheadPerDayJt: inp.overheadPerDayJt, accelCostJt: inp.accelCostJt,
           wapuBgPct: inp.wapuBgPct, costOfCapitalPct: inp.costOfCapitalPct,
           spkCount, feeBase, delayDays, capacityMultiplier,
+          prodLineConfig: { ...prodLineConfig },
+          startAfterDp,
           clientTermins: clientTermins.map(t => ({ ...t })),
           projectStartDate,
           phaseScheduleOverrides: { ...phaseScheduleOverrides }
@@ -4119,7 +4522,6 @@
       const effSpkCount = optsOverride.spkCount !== undefined ? optsOverride.spkCount : spkCount;
       const effFeeBase = optsOverride.feeBase || feeBase;
       const effDelayDays = optsOverride.delayDays !== undefined ? optsOverride.delayDays : delayDays;
-      const effCapacity = optsOverride.capacityMultiplier !== undefined ? optsOverride.capacityMultiplier : capacityMultiplier;
       const effOverheadJt = optsOverride.overheadPerDayJt !== undefined ? optsOverride.overheadPerDayJt : inp.overheadPerDayJt;
       const effAccelJt = optsOverride.accelCostJt !== undefined ? optsOverride.accelCostJt : inp.accelCostJt;
 
@@ -4136,22 +4538,69 @@
       const costOutfittingTotal = (outfitting.cost + nav.cost) * inp.units;
       const costPermitTotal = permit.cost * inp.units;
 
-      // 1. Timeline Boundaries (from active card specs + capacity + SP2D delay)
-      const adminDpDays = 15 + Math.round(effDelayDays * 0.5);
-      const rawRate = hull.isEmpty ? (inp.units > 10 ? 5 : 0.05) : hull.unitsPerDay;
-      const effectiveRate = Math.max(0.01, rawRate * effCapacity);
+      // 1. Mould = Production Line Physics & Resource Scaling
+      const cfg = prodLineConfig;
+      const mouldCount = Math.max(1, Math.round(optsOverride.mouldCount !== undefined ? optsOverride.mouldCount : cfg.mouldCount));
+      const activeMoulds = Math.min(mouldCount, Math.max(1, inp.units));
+      const effRatio = Math.max(0.3, Math.min(1, (cfg.effPct || 85) / 100));
+      const cycleDays = Math.max(0.5, Number(cfg.cycleDays) || 3);
+
+      const mouldRatePerDay = (activeMoulds * effRatio) / cycleDays;
+      const supplyCapPerMonth = Math.max(0, Number(cfg.engineSupplyCapPerMonth) || 0);
+      const supplyRatePerDay = supplyCapPerMonth > 0 ? (supplyCapPerMonth / 30) : Infinity;
+      const effectiveRate = Math.max(0.01, Math.min(mouldRatePerDay, supplyRatePerDay));
+      const bottleneck = supplyRatePerDay < mouldRatePerDay ? 'SUPPLY_ENGINE' : 'MOULD_LINE';
+      const unusedMouldPct = bottleneck === 'SUPPLY_ENGINE'
+        ? Math.max(0, Math.round((1 - supplyRatePerDay / Math.max(0.001, mouldRatePerDay)) * 100))
+        : 0;
+
+      const maxPerYard = Math.max(1, Number(cfg.maxPerYard) || 10);
+      const yardsNeeded = Math.max(1, Math.ceil(mouldCount / maxPerYard));
+      const extraYards = Math.max(0, yardsNeeded - 1);
+      const extraYardOverheadPerDayJt = extraYards * Math.max(0, Number(cfg.extraYardOverheadJt) || 0);
+      const effectiveOverheadPerDayJt = effOverheadJt + extraYardOverheadPerDayJt;
+
+      const laminatorsNeeded = activeMoulds * Math.max(1, Number(cfg.workersPerMould) || 5);
+      const finishingWorkersNeeded = Math.max(2, Math.ceil(effectiveRate * 4));
+      const totalWorkersNeeded = laminatorsNeeded + finishingWorkersNeeded;
+      const areaUnitM2 = Math.max(10, Number(cfg.areaPerMouldM2) || 35);
+      const requiredAreaM2 = Math.round(mouldCount * areaUnitM2 + Math.ceil(effectiveRate * 4) * areaUnitM2 * 0.7);
+
+      // Mould Capex (Upfront in F1) + Lifespan Refurbishment (no double-counting vs BoM flat mould allowance)
+      const mouldCapexF1 = hull.isEmpty ? 0 : Math.round((Math.max(0, Number(cfg.plugCostJt) || 0) + mouldCount * Math.max(0, Number(cfg.mouldCostJt) || 0)) * 1e6);
+      const lifespanPulls = Math.max(5, Number(cfg.lifespanPulls) || 50);
+      const pullsPerMould = inp.units / Math.max(1, activeMoulds);
+      const refurbCycles = hull.isEmpty ? 0 : Math.max(0, Math.floor((pullsPerMould - 1) / lifespanPulls));
+      const mouldRefurbTotal = Math.round(activeMoulds * refurbCycles * Math.max(0, Number(cfg.mouldCostJt) || 0) * 0.25 * 1e6);
+      const mouldCapexTotal = mouldCapexF1 + mouldRefurbTotal;
+      const mouldAmortPerUnit = Math.round(mouldCapexTotal / Math.max(1, inp.units));
+
+      const mouldUnitInBom = (hull.navalSpecs && Number.isFinite(hull.navalSpecs.mouldUnitRp)) ? hull.navalSpecs.mouldUnitRp : 0;
+      const mouldInBomTotal = hull.isEmpty ? 0 : Math.min(costHullTotal, Math.round(mouldUnitInBom * inp.units));
+      const baseComponentExMouldCOGS = Math.max(0, baseComponentCOGS - mouldInBomTotal);
+      const hullExMouldTotal = Math.max(0, costHullTotal - mouldInBomTotal);
+
+      // 2. Timeline Boundaries Coupled to DP Day, Start Mode, & Mould Ramp-Up
+      const dpTerminRaw = (clientTermins.length > 1 && clientTermins[0].phase === 'F1')
+        ? clientTermins[0]
+        : clientTermins.find(t => t.phase === 'F1');
+      const dpBaseDay = dpTerminRaw ? Math.max(0, Math.round(Number(dpTerminRaw.day) || 0)) : 0;
+      const effStartAfterDp = optsOverride.startAfterDp !== undefined ? optsOverride.startAfterDp : startAfterDp;
+
+      const plugDays = Math.max(4, Number(cfg.plugDays) || 14);
+      const mouldBuildDays = Math.max(1, Number(cfg.mouldBuildDays) || 3);
       const prepDays = hull.isEmpty
         ? 0
         : (inp.units === 1
-          ? Math.max(7, Math.ceil(hull.prepDays * 0.4))
-          : Math.ceil(hull.prepDays * (effCapacity > 1 ? 1.15 : 1)));
+          ? Math.max(7, Math.ceil(plugDays * 0.5))
+          : Math.round(plugDays + mouldBuildDays + Math.min(24, Math.ceil((mouldCount - 1) * 0.6))));
       const engineLeadAdd = engine.extraDays;
       const outfitAdd = outfitting.extraDays + nav.extraDays;
       const permitAdd = permit.extraDays;
 
       const rawProdDays = inp.units === 1
-        ? Math.max(14, Math.ceil(1 / effectiveRate))
-        : Math.max(16, Math.ceil(inp.units / effectiveRate));
+        ? Math.max(Math.ceil(cycleDays * 2.5), 10)
+        : Math.max(Math.ceil(cycleDays * 2), Math.ceil(inp.units / effectiveRate));
 
       const batch1Days = Math.ceil(rawProdDays * 0.28) + Math.ceil(outfitAdd * 0.25);
       const batch2Days = Math.ceil(rawProdDays * 0.26) + Math.ceil(outfitAdd * 0.25);
@@ -4160,8 +4609,10 @@
       const procDays = Math.max(15, Math.ceil(prepDays * 0.7) + Math.ceil(engineLeadAdd * 0.6));
       const qcBastDays = Math.max(10, Math.ceil(permitAdd * (inp.units === 1 ? 0.5 : 0.85)));
 
-      let f0Start = 0, f0End = adminDpDays;
-      let p1Start = f0End, p1End = p1Start + prepDays;
+      let f0Start = 0;
+      let f0End = dpTerminRaw ? dpBaseDay : Math.max(1, 15 + Math.round(effDelayDays * 0.5));
+      let p1Start = (effStartAfterDp && dpTerminRaw) ? f0End : 0;
+      let p1End = p1Start + prepDays;
       let p2Start = p1Start, p2End = p2Start + procDays;
       let p3Start = p1End, p3End = p3Start + batch1Days;
       let p4Start = p3End, p4End = p4Start + batch2Days;
@@ -4185,15 +4636,36 @@
       [p6Start, p6End] = applyOv('b4', p6Start, p6End);
       [p7Start, p7End] = applyOv('bast', p7Start, p7End);
 
-      const totalDays = Math.max(1, f0End, p1End, p2End, p3End, p4End, p5End, p6End, p7End);
+      // Resolve exact day for every client payment termin
+      const phaseDayMap = { F0: f0End, F1: dpBaseDay, F2: p2End, F3: p3End, F4: p4End, F5: p5End, F6: p6End, F7: p7End };
+      const rawTerminSum = clientTermins.reduce((a, t) => a + Math.max(0, Number(t.pct) || 0), 0);
+      const normFactor = rawTerminSum > 0 ? (100 / rawTerminSum) : 1;
 
-      // 2. Time-Driven Overhead & Acceleration COGS
-      const overheadCostTotal = Math.round(effOverheadJt * 1e6) * totalDays;
+      const resolvedTerminBase = clientTermins.map((t, idx) => {
+        const isDp = idx === 0 && t.phase === 'F1';
+        const baseDay = t.autoDay ? (phaseDayMap[t.phase] !== undefined ? phaseDayMap[t.phase] : p7End) : Math.max(0, Math.round(Number(t.day) || 0));
+        const effDay = isDp ? baseDay : (baseDay + effDelayDays);
+        const normPct = Math.max(0, Number(t.pct) || 0) * normFactor;
+        return { idx, label: t.label, pct: Number(t.pct) || 0, normPct, phase: t.phase || 'F7', isDp, day: baseDay, effDay, autoDay: Boolean(t.autoDay) };
+      });
+
+      const maxPayDay = resolvedTerminBase.reduce((mx, t) => Math.max(mx, t.effDay), 0);
+      if (!phaseScheduleOverrides.bast && maxPayDay > p7End) {
+        p7End = maxPayDay;
+      }
+
+      const totalDays = Math.max(1, f0End, p1End, p2End, p3End, p4End, p5End, p6End, p7End, maxPayDay);
+      const prodFinishDay = p6End;
+      const targetDeadlineDays = Math.max(15, Number(cfg.targetDeadlineDays) || 180);
+      const meetsDeadline = prodFinishDay <= targetDeadlineDays;
+
+      // 3. Time-Driven Overhead, Mould Capex, & Total COGS
+      const overheadCostTotal = Math.round(effectiveOverheadPerDayJt * 1e6) * totalDays;
       const accelCostTotal = Math.round(effAccelJt * 1e6) * inp.units;
-      const totalCOGS = baseComponentCOGS + overheadCostTotal + accelCostTotal;
+      const totalCOGS = baseComponentExMouldCOGS + mouldCapexTotal + overheadCostTotal + accelCostTotal;
       const cogsUnit = Math.round(totalCOGS / inp.units);
 
-      // 3. Project Value, Fee Basis, and Gov Friction
+      // 4. Project Value, Fee Basis, and Gov Friction
       const projectValue = Math.round(totalCOGS * (1 + inp.markupPct / 100));
       const grossContractValue = Math.round(projectValue * 1.11);
       const feeBasisAmount = effFeeBase === 'bruto' ? grossContractValue : projectValue;
@@ -4217,52 +4689,67 @@
       const govFrictionTotal = Math.round(projectValue * (inp.wapuBgPct / 100));
       const netCashInTotal = projectValue - govFrictionTotal;
 
-      // 4. Custom Multi-Installment Termin Structure & Delay Shifts
-      const rawTerminSum = clientTermins.reduce((a, t) => a + Math.max(0, Number(t.pct) || 0), 0);
-      const normFactor = rawTerminSum > 0 ? (100 / rawTerminSum) : 1;
-      const phasePctMap = { F1: 0, F3: 0, F4: 0, F5: 0, F7: 0 };
-      clientTermins.forEach(t => {
-        const ph = phasePctMap[t.phase] !== undefined ? t.phase : 'F7';
-        phasePctMap[ph] += Math.max(0, Number(t.pct) || 0) * normFactor;
+      // 5. Assign Exact Rupiah Amounts to Resolved Termins (Sum === netCashInTotal)
+      let assignedIn = 0;
+      const resolvedTermins = resolvedTerminBase.map((t, i) => {
+        const amt = (i === resolvedTerminBase.length - 1)
+          ? Math.max(0, netCashInTotal - assignedIn)
+          : Math.round(netCashInTotal * (t.normPct / 100));
+        assignedIn += amt;
+        return { ...t, amount: amt };
       });
 
-      const dpPct = Math.round(phasePctMap.F1 * 10) / 10;
-      const t1Pct = Math.round(phasePctMap.F3 * 10) / 10;
-      const t2Pct = Math.round(phasePctMap.F4 * 10) / 10;
-      const t3Pct = Math.round(phasePctMap.F5 * 10) / 10;
-      const retensiPct = Math.max(0, Math.round((100 - dpPct - t1Pct - t2Pct - t3Pct) * 10) / 10);
+      const dpResolved = resolvedTermins.find(t => t.isDp);
+      const dpPct = dpResolved ? Math.round(dpResolved.normPct * 10) / 10 : 0;
+      const dpEffDay = dpResolved ? dpResolved.effDay : f0End;
+      const lastTermin = resolvedTermins[resolvedTermins.length - 1];
+      const retensiPct = lastTermin ? Math.round(lastTermin.normPct * 10) / 10 : 0;
 
-      const totalDpNetIn = Math.round(netCashInTotal * (phasePctMap.F1 / 100));
-      const rawT1In = Math.round(netCashInTotal * (phasePctMap.F3 / 100));
-      const rawT2In = Math.round(netCashInTotal * (phasePctMap.F4 / 100));
-      const rawT3In = Math.round(netCashInTotal * (phasePctMap.F5 / 100));
+      // Map inflows to Phase Summary Table AND build exact chronological inflow events
+      const phaseInflows = { F0: 0, F1: 0, F2: 0, F3: 0, F4: 0, F5: 0, F6: 0, F7: 0 };
+      const phaseWindows = [
+        { code: 'F0', end: f0End },
+        { code: 'F1', end: p1End },
+        { code: 'F2', end: p2End },
+        { code: 'F3', end: p3End },
+        { code: 'F4', end: p4End },
+        { code: 'F5', end: p5End },
+        { code: 'F6', end: p6End },
+        { code: 'F7', end: p7End }
+      ];
+      const mapDayToPhaseCode = (day, preferredPhase) => {
+        if (preferredPhase === 'F1' && day <= p1End) return 'F1';
+        if (day <= f0End && preferredPhase === 'F0') return 'F0';
+        for (const w of phaseWindows) {
+          if (day <= w.end) return w.code;
+        }
+        return 'F7';
+      };
 
-      const lagRatio = Math.min(1, effDelayDays / 35);
-      const t1Lag = Math.round(rawT1In * lagRatio);
-      const t2Lag = Math.round(rawT2In * lagRatio);
-      const t3Lag = Math.round(rawT3In * lagRatio);
+      const inflowEvents = [];
+      resolvedTermins.forEach(rt => {
+        if (rt.amount <= 0) return;
+        if (rt.isDp && effSpkCount > 1) {
+          const spk1Dp = Math.round(rt.amount / effSpkCount);
+          const remDp = rt.amount - spk1Dp;
+          const d3 = Math.round(remDp / 3), d4 = Math.round(remDp / 3), d5 = remDp - d3 - d4;
+          const c1 = mapDayToPhaseCode(rt.effDay, 'F1');
+          phaseInflows[c1] += spk1Dp;
+          phaseInflows.F3 += d3; phaseInflows.F4 += d4; phaseInflows.F5 += d5;
+          inflowEvents.push({ day: rt.effDay, amount: spk1Dp, label: `${rt.label} SPK #1`, phase: c1 });
+          if (d3 > 0) inflowEvents.push({ day: p3End, amount: d3, label: `${rt.label} SPK Lanjutan 1`, phase: 'F3' });
+          if (d4 > 0) inflowEvents.push({ day: p4End, amount: d4, label: `${rt.label} SPK Lanjutan 2`, phase: 'F4' });
+          if (d5 > 0) inflowEvents.push({ day: p5End, amount: d5, label: `${rt.label} SPK Lanjutan 3`, phase: 'F5' });
+        } else {
+          const code = rt.autoDay ? rt.phase : mapDayToPhaseCode(rt.effDay, rt.phase);
+          phaseInflows[code] = (phaseInflows[code] || 0) + rt.amount;
+          inflowEvents.push({ day: rt.effDay, amount: rt.amount, label: `${rt.label} (${rt.pct}%)`, phase: code });
+        }
+      });
 
       const totalSignFee = Math.round(feeBasisAmount * (signPct / 100));
       const totalDpFee = Math.round(feeBasisAmount * (dpFeePct / 100));
-
-      let f0Fee = 0, f1Fee = 0, f3Fee = 0, f4Fee = 0, f5Fee = 0, f6Fee = 0, f7Fee = 0;
-      let f1DpIn = 0, f3DpIn = 0, f4DpIn = 0, f5DpIn = 0;
-
-      if (effSpkCount === 1) {
-        f1DpIn = totalDpNetIn;
-      } else {
-        f1DpIn = Math.round(totalDpNetIn / effSpkCount);
-        const remDp = totalDpNetIn - f1DpIn;
-        f3DpIn = Math.round(remDp / 3);
-        f4DpIn = Math.round(remDp / 3);
-        f5DpIn = remDp - f3DpIn - f4DpIn;
-      }
-
-      const f3In = f3DpIn + (rawT1In - t1Lag);
-      const f4In = f4DpIn + t1Lag + (rawT2In - t2Lag);
-      const f5In = f5DpIn + t2Lag + (rawT3In - t3Lag);
-      const f6In = t3Lag;
-      const f7In = netCashInTotal - (f1DpIn + f3In + f4In + f5In + f6In);
+      let f0Fee = 0, f1Fee = 0, f2Fee = 0, f3Fee = 0, f4Fee = 0, f5Fee = 0, f6Fee = 0, f7Fee = 0;
 
       if (feeMode === 'requested' || feeMode === 'custom') {
         if (effSpkCount === 1) {
@@ -4289,27 +4776,31 @@
           }
         } else {
           const denom = Math.max(1, netCashInTotal);
-          f3Fee = Math.round(totalFee * (f3In / denom));
-          f4Fee = Math.round(totalFee * (f4In / denom));
-          f5Fee = Math.round(totalFee * (f5In / denom));
-          f6Fee = Math.round(totalFee * (f6In / denom));
-          f7Fee = totalFee - (f3Fee + f4Fee + f5Fee + f6Fee);
+          f1Fee = Math.round(totalFee * (phaseInflows.F1 / denom));
+          f2Fee = Math.round(totalFee * (phaseInflows.F2 / denom));
+          f3Fee = Math.round(totalFee * (phaseInflows.F3 / denom));
+          f4Fee = Math.round(totalFee * (phaseInflows.F4 / denom));
+          f5Fee = Math.round(totalFee * (phaseInflows.F5 / denom));
+          f6Fee = Math.round(totalFee * (phaseInflows.F6 / denom));
+          f7Fee = totalFee - (f1Fee + f2Fee + f3Fee + f4Fee + f5Fee + f6Fee);
         }
       } else {
         const denom = Math.max(1, netCashInTotal);
-        f1Fee = Math.round(totalFee * (f1DpIn / denom));
-        f3Fee = Math.round(totalFee * (f3In / denom));
-        f4Fee = Math.round(totalFee * (f4In / denom));
-        f5Fee = Math.round(totalFee * (f5In / denom));
-        f6Fee = Math.round(totalFee * (f6In / denom));
-        f7Fee = totalFee - (f1Fee + f3Fee + f4Fee + f5Fee + f6Fee);
+        f0Fee = Math.round(totalFee * (phaseInflows.F0 / denom));
+        f1Fee = Math.round(totalFee * (phaseInflows.F1 / denom));
+        f2Fee = Math.round(totalFee * (phaseInflows.F2 / denom));
+        f3Fee = Math.round(totalFee * (phaseInflows.F3 / denom));
+        f4Fee = Math.round(totalFee * (phaseInflows.F4 / denom));
+        f5Fee = Math.round(totalFee * (phaseInflows.F5 / denom));
+        f6Fee = Math.round(totalFee * (phaseInflows.F6 / denom));
+        f7Fee = totalFee - (f0Fee + f1Fee + f2Fee + f3Fee + f4Fee + f5Fee + f6Fee);
       }
 
-      // 5. Ontology-Linked Payment Terms & Phase Outflows (Exact Sum === totalCOGS)
+      // 6. Ontology-Linked Payment Terms & Phase Outflows (Exact Sum === totalCOGS)
       const timeAndAccelTotal = overheadCostTotal + accelCostTotal;
       const spkProcFactor = effSpkCount === 1 ? 1.0 : Math.max(0.28, (1 + (effSpkCount - 1) * 0.12) / effSpkCount);
 
-      const hCash = allocCategoryCash(costHullTotal, hull, spkProcFactor, true);
+      const hCash = allocCategoryCash(hullExMouldTotal, hull, spkProcFactor, true);
       const eCash = allocCategoryCash(costEngineTotal, engine, spkProcFactor, false);
       const oCash = allocCategoryCash(outfitting.cost * inp.units, outfitting, spkProcFactor, false);
       const nCash = allocCategoryCash(nav.cost * inp.units, nav, spkProcFactor, false);
@@ -4320,11 +4811,14 @@
       const tRem = timeAndAccelTotal - t1 - t2;
       const t3 = Math.round(tRem * 0.25), t4 = Math.round(tRem * 0.25), t5 = Math.round(tRem * 0.25), t6 = tRem - t3 - t4 - t5;
 
-      const p1ProdOut = hCash[0] + eCash[0] + oCash[0] + nCash[0] + pCash[0] + t1;
+      const refurbF4 = Math.round(mouldRefurbTotal * 0.5);
+      const refurbF5 = mouldRefurbTotal - refurbF4;
+
+      const p1ProdOut = mouldCapexF1 + hCash[0] + eCash[0] + oCash[0] + nCash[0] + pCash[0] + t1;
       const p2ProdOut = hCash[1] + eCash[1] + oCash[1] + nCash[1] + pCash[1] + t2;
       const p3ProdOut = hCash[2] + eCash[2] + oCash[2] + nCash[2] + pCash[2] + t3;
-      const p4ProdOut = hCash[3] + eCash[3] + oCash[3] + nCash[3] + pCash[3] + t4;
-      const p5ProdOut = hCash[4] + eCash[4] + oCash[4] + nCash[4] + pCash[4] + t5;
+      const p4ProdOut = refurbF4 + hCash[3] + eCash[3] + oCash[3] + nCash[3] + pCash[3] + t4;
+      const p5ProdOut = refurbF5 + hCash[4] + eCash[4] + oCash[4] + nCash[4] + pCash[4] + t5;
       const p6ProdOut = hCash[5] + eCash[5] + oCash[5] + nCash[5] + pCash[5] + t6;
 
       const b1Units = Math.max(1, Math.round(inp.units * 0.25));
@@ -4335,89 +4829,118 @@
       const phases = [
         {
           key: 'sign', code: 'F0', category: 'fee',
-          name: effSpkCount > 1 ? `Teken SPK #1 (1/${effSpkCount}) & Tunggu SP2D DP` : 'Teken Kontrak & Tunggu SP2D DP',
-          detail: effSpkCount > 1
-            ? `Teken SPK batch 1, bayar fee awal 1/${effSpkCount} & proses administrasi SP2D DP.`
-            : 'Penandatanganan kontrak, jaminan pelaksanaan, bayar fee awal & tunggu SP2D DP.',
-          startDay: f0Start, endDay: f0End, cashEventDay: 0,
-          inflow: 0, feeOut: f0Fee, prodOut: 0
+          name: effSpkCount > 1 ? `Teken SPK #1 (1/${effSpkCount}) & Tunggu DP` : `Teken Kontrak & Tunggu DP (H-${dpEffDay})`,
+          detail: effStartAfterDp
+            ? `Kontrak diteken H-0; produksi menunggu DP cair di H-${dpEffDay} (${fmtDateShortId(dpEffDay)}).`
+            : `Kontrak diteken H-0; produksi langsung jalan H-0 pakai modal talangan sebelum DP H-${dpEffDay}.`,
+          startDay: f0Start, endDay: Math.max(1, f0End), cashEventDay: 0,
+          inflow: phaseInflows.F0, feeOut: f0Fee, prodOut: 0
         },
         {
           key: 'dp', code: 'F1', category: 'prep',
-          name: effSpkCount > 1 ? 'DP SPK #1 Cair & Persiapan Mould/Jig' : `Pencairan DP (${dpPct}%) & Mould/Jig`,
-          detail: `DP cair bersih (potong WAPU/BG ${inp.wapuBgPct}%), fee pasca-DP, & mould ${hull.name}.`,
+          name: `Master Plug & Cetak ${mouldCount} Mould (${yardsNeeded} Yard)`,
+          detail: `Capex F1: ${fmtRpShort(mouldCapexF1)} (Plug + ${mouldCount} mould @ ${cfg.mouldCostJt} Jt) · ${laminatorsNeeded} tukang laminasi.`,
           startDay: p1Start, endDay: p1End, cashEventDay: p1Start,
-          inflow: f1DpIn, feeOut: f1Fee, prodOut: p1ProdOut
+          inflow: phaseInflows.F1, feeOut: f1Fee, prodOut: p1ProdOut
         },
         {
           key: 'proc', code: 'F2', category: 'prep',
           name: `Pengadaan & DP Supplier (Mesin ${engine.dpSupplierPct}% · Hull ${hull.dpSupplierPct}%)`,
           detail: `DP supplier sesuai ontologi kartu: ${engine.name} & material awal.`,
           startDay: p2Start, endDay: p2End, cashEventDay: Math.round((p2Start + p2End) / 2),
-          inflow: 0, feeOut: 0, prodOut: p2ProdOut
+          inflow: phaseInflows.F2, feeOut: f2Fee, prodOut: p2ProdOut
         },
         {
           key: 'b1', code: 'F3', category: 'prod',
-          name: `Produksi Batch 1 (${inp.units === 1 ? 'Hull & Rangka' : b1Units.toLocaleString('id-ID') + ' Unit'}) → Termin 1`,
-          detail: `Fabrikasi batch 1 & pasang mesin${effDelayDays > 0 ? ` (SP2D delay +${effDelayDays}h)` : ''}.`,
+          name: `Produksi Batch 1 (${inp.units === 1 ? 'Hull & Rangka' : b1Units.toLocaleString('id-ID') + ' Unit'})`,
+          detail: `${activeMoulds} mould paralel · ${effectiveRate.toFixed(1)} u/hr${bottleneck === 'SUPPLY_ENGINE' ? ' (tertahan suplai mesin)' : ''}.`,
           startDay: p3Start, endDay: p3End, cashEventDay: p3End,
-          inflow: f3In, feeOut: f3Fee, prodOut: p3ProdOut
+          inflow: phaseInflows.F3, feeOut: f3Fee, prodOut: p3ProdOut
         },
         {
           key: 'b2', code: 'F4', category: 'prod',
-          name: `Produksi Batch 2 (${inp.units === 1 ? 'Outfitting' : b2Units.toLocaleString('id-ID') + ' Unit'}) → Termin 2`,
-          detail: 'Produksi batch 2, outfitting, pembayaran supplier tahap 2 & terima termin.',
+          name: `Produksi Batch 2 (${inp.units === 1 ? 'Outfitting' : b2Units.toLocaleString('id-ID') + ' Unit'})`,
+          detail: refurbF4 > 0 ? `Batch 2 + refurbish mould (${fmtRpShort(refurbF4)}) & pembayaran supplier.` : 'Produksi batch 2, outfitting & pembayaran supplier tahap 2.',
           startDay: p4Start, endDay: p4End, cashEventDay: p4End,
-          inflow: f4In, feeOut: f4Fee, prodOut: p4ProdOut
+          inflow: phaseInflows.F4, feeOut: f4Fee, prodOut: p4ProdOut
         },
         {
           key: 'b3', code: 'F5', category: 'prod',
-          name: `Produksi Batch 3 (${inp.units === 1 ? 'Nav & Listrik' : b3Units.toLocaleString('id-ID') + ' Unit'}) → Termin 3`,
-          detail: 'Produksi batch 3, instalasi navigasi/listrik & safety SOLAS, cair termin 3.',
+          name: `Produksi Batch 3 (${inp.units === 1 ? 'Nav & Listrik' : b3Units.toLocaleString('id-ID') + ' Unit'})`,
+          detail: refurbF5 > 0 ? `Batch 3 + refurbish mould (${fmtRpShort(refurbF5)}) & instalasi navigasi/SOLAS.` : 'Produksi batch 3, instalasi navigasi/listrik & safety SOLAS.',
           startDay: p5Start, endDay: p5End, cashEventDay: p5End,
-          inflow: f5In, feeOut: f5Fee, prodOut: p5ProdOut
+          inflow: phaseInflows.F5, feeOut: f5Fee, prodOut: p5ProdOut
         },
         {
           key: 'b4', code: 'F6', category: 'qc',
           name: `Batch 4 Final (${inp.units === 1 ? 'Sea Trial' : b4Units.toLocaleString('id-ID') + ' Unit'}), QC & Dokumen`,
           detail: `Penyelesaian unit akhir, ${permit.name}, sea trial & distribusi.`,
           startDay: p6Start, endDay: p6End, cashEventDay: p6End,
-          inflow: f6In, feeOut: f6Fee, prodOut: p6ProdOut
+          inflow: phaseInflows.F6, feeOut: f6Fee, prodOut: p6ProdOut
         },
         {
           key: 'bast', code: 'F7', category: 'qc',
-          name: `BAST 100% & Pelunasan Retensi (${retensiPct}%)`,
-          detail: `Serah terima final ${inp.units.toLocaleString('id-ID')} unit & pencairan retensi.`,
+          name: `BAST 100% & Pelunasan Akhir (${retensiPct}%)`,
+          detail: `Serah terima final ${inp.units.toLocaleString('id-ID')} unit & pelunasan hingga H-${p7End}.`,
           startDay: p7Start, endDay: p7End, cashEventDay: p7End,
-          inflow: f7In, feeOut: f7Fee, prodOut: 0
+          inflow: phaseInflows.F7, feeOut: f7Fee, prodOut: 0
         }
       ];
 
-      let cumCash = 0, peakDeficit = 0, peakDeficitPhase = '-';
-      const cashAtRiskDay0 = phases[0].feeOut;
-      const dpNetBuffer = phases[1].inflow - (phases[0].feeOut + phases[1].feeOut);
-
+      let cumPhaseCash = 0;
       phases.forEach(p => {
         p.netCash = p.inflow - p.feeOut - p.prodOut;
-        cumCash += p.netCash;
-        p.cumCash = cumCash;
-        if (cumCash < peakDeficit) {
-          peakDeficit = cumCash;
-          peakDeficitPhase = `${p.code} (${p.name.split('→')[0].trim()})`;
+        cumPhaseCash += p.netCash;
+        p.cumCash = cumPhaseCash;
+      });
+
+      // 7. Exact Event-Driven Chronological Cashflow Ledger (Daily Resolution)
+      const rawEvents = [];
+      if (f0Fee > 0) rawEvents.push({ day: 0, delta: -f0Fee, label: 'Fee Teken H-0' });
+      if (p1ProdOut > 0) rawEvents.push({ day: p1Start, delta: -p1ProdOut, label: `Capex ${mouldCount} Mould & Prep F1` });
+      if (f1Fee > 0) rawEvents.push({ day: dpEffDay, delta: -f1Fee, label: 'Fee Pasca-DP' });
+      if (p2ProdOut > 0) rawEvents.push({ day: Math.round((p2Start + p2End) / 2), delta: -p2ProdOut, label: 'Pengadaan & DP Supplier F2' });
+      if (f2Fee > 0) rawEvents.push({ day: p2End, delta: -f2Fee, label: 'Fee F2' });
+      if (p3ProdOut + f3Fee > 0) rawEvents.push({ day: p3End, delta: -(p3ProdOut + f3Fee), label: 'Biaya Batch 1 (F3)' });
+      if (p4ProdOut + f4Fee > 0) rawEvents.push({ day: p4End, delta: -(p4ProdOut + f4Fee), label: 'Biaya Batch 2 (F4)' });
+      if (p5ProdOut + f5Fee > 0) rawEvents.push({ day: p5End, delta: -(p5ProdOut + f5Fee), label: 'Biaya Batch 3 (F5)' });
+      if (p6ProdOut + f6Fee > 0) rawEvents.push({ day: p6End, delta: -(p6ProdOut + f6Fee), label: 'Biaya Batch 4 & QC (F6)' });
+      if (f7Fee > 0) rawEvents.push({ day: p7End, delta: -f7Fee, label: 'Fee Pelunasan (F7)' });
+      inflowEvents.forEach(ev => {
+        rawEvents.push({ day: ev.day, delta: ev.amount, label: `Cair ${ev.label}` });
+      });
+
+      const dayBucket = new Map();
+      dayBucket.set(0, { day: 0, delta: 0, labels: [] });
+      dayBucket.set(totalDays, { day: totalDays, delta: 0, labels: [] });
+      rawEvents.forEach(ev => {
+        const d = Math.max(0, Math.round(ev.day));
+        if (!dayBucket.has(d)) dayBucket.set(d, { day: d, delta: 0, labels: [] });
+        const b = dayBucket.get(d);
+        b.delta += ev.delta;
+        if (ev.label) b.labels.push(ev.label);
+      });
+
+      const sortedDays = Array.from(dayBucket.values()).sort((a, b) => a.day - b.day);
+      let runningBal = 0, prevDay = 0, deficitRpDays = 0;
+      let peakDeficit = 0, peakDeficitPhase = '-', peakDeficitDay = 0;
+      const cashTimeline = [];
+
+      sortedDays.forEach(pt => {
+        const dt = Math.max(0, pt.day - prevDay);
+        if (dt > 0 && runningBal < 0) deficitRpDays += Math.abs(runningBal) * dt;
+        runningBal += pt.delta;
+        prevDay = pt.day;
+        cashTimeline.push({ day: pt.day, delta: pt.delta, cumCash: runningBal, labels: pt.labels });
+        if (runningBal < peakDeficit) {
+          peakDeficit = runningBal;
+          peakDeficitDay = pt.day;
+          peakDeficitPhase = `H-${pt.day} (${pt.labels[0] || fmtDateShortId(pt.day)})`;
         }
       });
 
-      const events = phases.map(p => ({ day: p.cashEventDay, delta: p.netCash })).sort((a, b) => a.day - b.day);
-      let runningBal = 0, prevDay = 0, deficitRpDays = 0;
-      events.forEach(ev => {
-        const dt = Math.max(0, ev.day - prevDay);
-        if (dt > 0 && runningBal < 0) deficitRpDays += Math.abs(runningBal) * dt;
-        runningBal += ev.delta;
-        prevDay = ev.day;
-      });
-      if (totalDays > prevDay && runningBal < 0) {
-        deficitRpDays += Math.abs(runningBal) * (totalDays - prevDay);
-      }
+      const cashAtRiskDay0 = phases[0].feeOut + (!effStartAfterDp ? p1ProdOut : 0);
+      const dpNetBuffer = (dpResolved ? dpResolved.amount : 0) - (phases[0].feeOut + phases[1].feeOut);
 
       const financingCost = Math.round(deficitRpDays * (inp.costOfCapitalPct / 100) / 365);
       const netProfitBeforeFinancing = netCashInTotal - totalFee - totalCOGS;
@@ -4431,14 +4954,27 @@
       return {
         ...inp,
         feeMode, spkCount: effSpkCount, feeBase: effFeeBase, delayDays: effDelayDays,
-        capacityMultiplier: effCapacity, overheadPerDayJt: effOverheadJt, accelCostJt: effAccelJt,
+        overheadPerDayJt: effOverheadJt, effectiveOverheadPerDayJt, extraYardOverheadPerDayJt,
+        accelCostJt: effAccelJt, capacityMultiplier: yardsNeeded,
+        // Mould Production Line metrics
+        mouldCount, activeMoulds, cycleDays, effPct: cfg.effPct,
+        mouldRatePerDay, supplyCapPerMonth, supplyRatePerDay, effectiveRate,
+        bottleneck, unusedMouldPct,
+        yardsNeeded, extraYards, maxPerYard,
+        laminatorsNeeded, finishingWorkersNeeded, totalWorkersNeeded, requiredAreaM2,
+        mouldCapexF1, mouldRefurbTotal, mouldCapexTotal, mouldAmortPerUnit, mouldInBomTotal,
+        pullsPerMould, lifespanPulls, refurbCycles,
+        prodFinishDay, targetDeadlineDays, meetsDeadline,
+        // Payment Schedule & Daily Cashflow metrics
+        startAfterDp: effStartAfterDp, dpEffDay, resolvedTermins, cashTimeline,
         totalFeePct, signPct, dpFeePct,
         hull, engine, outfitting, nav, permit,
-        baseUnitCost, baseComponentCOGS, overheadCostTotal, accelCostTotal, totalCOGS, cogsUnit,
+        baseUnitCost, baseComponentCOGS, baseComponentExMouldCOGS,
+        overheadCostTotal, accelCostTotal, totalCOGS, cogsUnit,
         valUnit: Math.round(projectValue / inp.units),
         projectValue, grossContractValue, feeBasisAmount, totalFee, ppnFeeDiff,
         govFrictionTotal, netCashInTotal, financingCost, netProfitBeforeFinancing, realNetProfit, realNetMarginPct,
-        phases, totalDays, effectiveRate, peakDeficit, peakDeficitPhase, cashAtRiskDay0, dpNetBuffer, safetyStatus
+        phases, totalDays, peakDeficit, peakDeficitPhase, peakDeficitDay, cashAtRiskDay0, dpNetBuffer, safetyStatus
       };
     }
 
@@ -5033,7 +5569,7 @@
         `Konfigurasi aktif: <strong>${vc ? vc.name : ''}</strong> (${sim.hull.name} + <strong>${sim.engine.name}</strong>).`;
 
       document.getElementById('p1-assumption-pill').innerHTML =
-        `Asumsi aktif: <strong>${sim.spkCount} SPK</strong> · Fee <strong>${sim.feeBase.toUpperCase()}</strong> · Overhead <strong>Rp ${sim.overheadPerDayJt} Jt/hr</strong> · Lini <strong>${sim.capacityMultiplier}×</strong> · Jeda SP2D <strong>+${sim.delayDays} hr</strong> · PPh/BG <strong>${sim.wapuBgPct}%</strong>`;
+        `Asumsi aktif: <strong>${sim.mouldCount} Mould</strong> (${sim.effectiveRate.toFixed(1)} u/hr · ${sim.yardsNeeded} Yard) · DP cair <strong>H-${sim.dpEffDay}</strong> (${sim.startAfterDp ? 'Tunggu DP' : 'Talangan H-0'}) · <strong>${sim.spkCount} SPK</strong> · Overhead <strong>Rp ${sim.effectiveOverheadPerDayJt.toFixed(1)} Jt/hr</strong>`;
       document.getElementById('lbl-total-fee-pct').textContent = sim.totalFeePct;
 
       // Verdict Banner
@@ -5090,9 +5626,9 @@
         { label: `Total HPP / COGS (${sim.units.toLocaleString('id-ID')} u)`, val: fmtRpShort(sim.totalCOGS), sub: `${fmtRpShort(sim.cogsUnit)} / unit`, cls: 'text-zinc-950' },
         { label: `Nilai Proyek (DPP)`, val: fmtRpShort(sim.projectValue), sub: `Bruto PPN: ${fmtRpShort(sim.grossContractValue)}`, cls: 'text-brand-700' },
         { label: `Fee ${sim.totalFeePct}% (${sim.feeBase === 'bruto' ? 'Bruto' : 'Netto'})`, val: fmtRpShort(sim.totalFee), sub: `Hari-0: ${fmtRpShort(sim.cashAtRiskDay0)}`, cls: 'text-rose-700' },
-        { label: `Overhead + Akselerasi`, val: fmtRpShort(sim.overheadCostTotal + sim.accelCostTotal), sub: `${sim.totalDays} hr × ${sim.overheadPerDayJt}Jt + Aksel`, cls: 'text-zinc-800' },
+        { label: `Mould + Overhead`, val: fmtRpShort(sim.mouldCapexTotal + sim.overheadCostTotal + sim.accelCostTotal), sub: `${sim.mouldCount} Mould (${fmtRpShort(sim.mouldCapexF1)} F1) + OH`, cls: 'text-zinc-800' },
         { label: `Laba Bersih Riil`, val: fmtRpShort(sim.realNetProfit), sub: `Bunga Talangan: -${fmtRpShort(sim.financingCost)}`, cls: sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700' },
-        { label: 'Total Durasi', val: `${sim.totalDays} Hari`, sub: `± ${(sim.totalDays / 30).toFixed(1)} Bln · ${sim.capacityMultiplier}× Lini`, cls: 'text-zinc-950' }
+        { label: 'Total Durasi', val: `${sim.totalDays} Hari`, sub: `± ${(sim.totalDays / 30).toFixed(1)} Bln · ${sim.mouldCount} Mould · ${sim.yardsNeeded} Yard`, cls: sim.meetsDeadline ? 'text-zinc-950' : 'text-rose-700' }
       ];
       document.getElementById('kpi-strip').innerHTML = kpis.map(k => `
         <div class="p-4">
@@ -5102,7 +5638,7 @@
         </div>
       `).join('');
 
-      renderTerminInputs();
+      renderTerminInputs(sim);
 
       // Risk & Negotiation Box
       const plafonRp = sim.ceoPlafonM * 1e9;
@@ -5158,45 +5694,110 @@
     }
 
     function renderCostAndCapacityPage(sim) {
+      syncProdLineInputsToDom();
+
+      // 1. Live Production Line Telemetry Strip (4 Industrial Engineering KPIs)
+      const isSupplyBottleneck = sim.bottleneck === 'SUPPLY_ENGINE';
+      const mouldExceedsOrder = sim.mouldCount > sim.units;
+      const deadlineGap = sim.prodFinishDay - sim.targetDeadlineDays;
+      const telEl = document.getElementById('mould-telemetry-strip');
+      if (telEl) {
+        telEl.innerHTML = `
+          <div class="p-4 ${isSupplyBottleneck ? 'bg-amber-50/60' : ''}">
+            <div class="flex items-center justify-between gap-1 text-[11px] font-semibold text-zinc-500">
+              <span>Output Lini Efektif</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${isSupplyBottleneck ? 'bg-amber-200 text-amber-900' : 'bg-brand-50 text-brand-700'}">${isSupplyBottleneck ? 'BOTTLENECK MESIN' : 'MOULD DRIVEN'}</span>
+            </div>
+            <div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${sim.effectiveRate.toFixed(2)} unit/hari <span class="text-xs font-medium text-zinc-500">(±${Math.round(sim.effectiveRate * 30)}/bln)</span></div>
+            <div class="text-[11px] text-zinc-500 tnum mt-0.5">${isSupplyBottleneck ? `Mould sanggup ${sim.mouldRatePerDay.toFixed(1)} u/hr (${sim.unusedMouldPct}% idle tertahan kuota mesin)` : `${sim.activeMoulds} mould ÷ ${sim.cycleDays} hr × ${sim.effPct}% eff${mouldExceedsOrder ? ` (order ${sim.units} u)` : ''}`}</div>
+          </div>
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-1 text-[11px] font-semibold text-zinc-500">
+              <span>Galangan, Tim &amp; Lahan</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${sim.yardsNeeded > 1 ? 'bg-amber-100 text-amber-800' : 'bg-zinc-100 text-zinc-600'}">${sim.yardsNeeded} GALANGAN</span>
+            </div>
+            <div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">±${sim.totalWorkersNeeded} Pekerja <span class="text-xs font-medium text-zinc-500">(${sim.laminatorsNeeded} lam + ${sim.finishingWorkersNeeded} fin)</span></div>
+            <div class="text-[11px] text-zinc-500 tnum mt-0.5">Area ±${sim.requiredAreaM2.toLocaleString('id-ID')} m² · Overhead ${sim.effectiveOverheadPerDayJt.toFixed(1)} Jt/hr</div>
+          </div>
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-1 text-[11px] font-semibold text-zinc-500">
+              <span>Capex Mould (F1) &amp; Lifespan</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${sim.refurbCycles > 0 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">${Math.round(sim.pullsPerMould)} / ${sim.lifespanPulls} PULLS</span>
+            </div>
+            <div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.mouldCapexF1)} <span class="text-xs font-medium text-zinc-500">di F1</span></div>
+            <div class="text-[11px] text-zinc-500 tnum mt-0.5">Amortisasi ${fmtRpShort(sim.mouldAmortPerUnit)}/u${sim.mouldRefurbTotal > 0 ? ` (incl. refurb ${fmtRpShort(sim.mouldRefurbTotal)})` : ' · 0 refurb'}</div>
+          </div>
+          <div class="p-4 ${sim.meetsDeadline ? 'bg-emerald-50/40' : 'bg-rose-50/50'}">
+            <div class="flex items-center justify-between gap-1 text-[11px] font-semibold text-zinc-500">
+              <span>Status Target Deadline</span>
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${sim.meetsDeadline ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${sim.meetsDeadline ? 'LOLOS' : `LEWAT +${deadlineGap} HR`}</span>
+            </div>
+            <div class="text-base sm:text-lg font-bold tnum ${sim.meetsDeadline ? 'text-emerald-700' : 'text-rose-700'} mt-1">Produksi H-${sim.prodFinishDay} <span class="text-xs font-medium text-zinc-500">/ ${sim.targetDeadlineDays} hr</span></div>
+            <div class="text-[11px] text-zinc-500 tnum mt-0.5">Total kontrak s/d BAST: ${sim.totalDays} hari (${fmtDateShortId(sim.totalDays)})</div>
+          </div>
+        `;
+      }
+
+      // 2. COGS Breakdown Strip (zero double-counting of Moulding)
       document.getElementById('cogs-breakdown-strip').innerHTML = `
-        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">1. HPP Komponen Fisik &amp; Kirim</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.baseComponentCOGS)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${fmtRpShort(sim.baseUnitCost)} / u × ${sim.units.toLocaleString('id-ID')}</div></div>
-        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">2. Overhead Waktu Produksi</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.overheadCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${sim.totalDays} hari × Rp ${sim.overheadPerDayJt} Jt/hr</div></div>
-        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">3. Biaya Akselerasi Lini (${sim.capacityMultiplier}×)</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.accelCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">Rp ${sim.accelCostJt} Jt / unit</div></div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">1. HPP Komponen Fisik (ex-Mould)</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.baseComponentExMouldCOGS)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${fmtRpShort(Math.round(sim.baseComponentExMouldCOGS / sim.units))} / u × ${sim.units.toLocaleString('id-ID')}</div></div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">2. Capex ${sim.mouldCount} Mould &amp; Refurbish</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.mouldCapexTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">F1: ${fmtRpShort(sim.mouldCapexF1)} · ${fmtRpShort(sim.mouldAmortPerUnit)} / unit</div></div>
+        <div class="p-4"><div class="text-[11px] font-medium text-zinc-500">3. Overhead Waktu (${sim.yardsNeeded} Yard)${sim.accelCostTotal > 0 ? ' + Ekstra' : ''}</div><div class="text-base sm:text-lg font-bold tnum text-zinc-950 mt-1">${fmtRpShort(sim.overheadCostTotal + sim.accelCostTotal)}</div><div class="text-[11px] text-zinc-500 tnum mt-0.5">${sim.totalDays} hr × Rp ${sim.effectiveOverheadPerDayJt.toFixed(1)} Jt/hr</div></div>
         <div class="p-4 bg-brand-50/40"><div class="text-[11px] font-semibold text-brand-800">TOTAL HPP / COGS PROYEK</div><div class="text-base sm:text-lg font-bold tnum text-brand-700 mt-1">${fmtRpShort(sim.totalCOGS)}</div><div class="text-[11px] text-brand-800 tnum mt-0.5 font-medium">${fmtRpShort(sim.cogsUnit)} / unit (all-in)</div></div>
       `;
 
-      const rows = CAPACITY_MODES.map(mode => {
-        const useAccel = mode.mult === capacityMultiplier ? sim.accelCostJt : mode.defaultAccelJt;
-        const s = computeSimulation(null, { capacityMultiplier: mode.mult, accelCostJt: useAccel });
-        return { mode, s };
-      });
-      let bestMult = rows[0].mode.mult, bestProfit = rows[0].s.realNetProfit;
-      rows.forEach(r => { if (r.s.realNetProfit > bestProfit) { bestProfit = r.s.realNetProfit; bestMult = r.mode.mult; } });
+      // 3. Dynamic Sweet Spot Table across Mould Counts
+      const baseCands = sim.units >= 150
+        ? [5, 10, 15, 20, 30]
+        : (sim.units >= 25
+          ? [2, 5, 10, 15, 20]
+          : (sim.units >= 5 ? [1, 2, 3, 5, Math.min(8, sim.units)] : [1, Math.min(2, sim.units), Math.min(3, sim.units)]));
+      const candSet = new Set(baseCands.filter(m => m >= 1 && m <= Math.max(30, sim.units)));
+      candSet.add(sim.mouldCount);
+      const mouldCandidates = Array.from(candSet).sort((a, b) => a - b);
 
-      document.getElementById('tradeoff-table-body').innerHTML = rows.map(({ mode, s }) => {
-        const isActive = mode.mult === capacityMultiplier;
-        const isOptimum = mode.mult === bestMult;
+      const rows = mouldCandidates.map(m => ({ m, s: computeSimulation(null, { mouldCount: m }) }));
+      const meetingRows = rows.filter(r => r.s.meetsDeadline);
+      const pool = meetingRows.length > 0 ? meetingRows : rows;
+      let bestM = pool[0].m, bestExecCost = pool[0].s.totalCOGS + pool[0].s.financingCost;
+      pool.forEach(r => {
+        const cost = r.s.totalCOGS + r.s.financingCost;
+        if (cost < bestExecCost) { bestExecCost = cost; bestM = r.m; }
+      });
+
+      const deadlineBadge = document.getElementById('sweetspot-deadline-badge');
+      if (deadlineBadge) {
+        deadlineBadge.textContent = `Target Deadline: ${sim.targetDeadlineDays} hari · Maks ${sim.maxPerYard} mould/yard`;
+      }
+
+      document.getElementById('tradeoff-table-body').innerHTML = rows.map(({ m, s }) => {
+        const isActive = m === sim.mouldCount;
+        const isOptimum = m === bestM;
         return `
-          <tr onclick="setCapacity(${mode.mult})" class="tradeoff-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
+          <tr onclick="setMouldCount(${m})" class="tradeoff-row ${isActive ? 'is-active' : 'hover:bg-zinc-50'}">
             <td class="py-3 px-4">
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-1.5">
                 <span class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${isActive ? 'border-brand-700 bg-brand-700' : 'border-zinc-300 bg-white'}">${isActive ? '<span class="w-1.5 h-1.5 rounded-full bg-white"></span>' : ''}</span>
-                <span class="font-semibold text-zinc-950">${mode.label}</span>
+                <span class="font-bold text-zinc-950 tnum">${m} Mould</span>
                 ${isOptimum ? '<span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">SWEET SPOT</span>' : ''}
+                ${!s.meetsDeadline ? '<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">LEWAT DEADLINE</span>' : ''}
               </div>
             </td>
-            <td class="py-3 px-3 text-right tnum font-semibold text-zinc-900 whitespace-nowrap">${s.totalDays} hari</td>
-            <td class="py-3 px-3 text-right tnum text-zinc-600 whitespace-nowrap">${fmtRpShort(s.baseComponentCOGS)}</td>
+            <td class="py-3 px-3 text-right tnum whitespace-nowrap">
+              <div class="font-semibold text-zinc-900">${s.effectiveRate.toFixed(1)} u/hr</div>
+              <div class="text-[10px] ${s.bottleneck === 'SUPPLY_ENGINE' ? 'text-amber-700 font-semibold' : 'text-zinc-400'}">${s.bottleneck === 'SUPPLY_ENGINE' ? 'Cap mesin' : `${Math.round(s.pullsPerMould)} pulls`}</div>
+            </td>
+            <td class="py-3 px-3 text-right tnum text-zinc-700 whitespace-nowrap">${s.yardsNeeded} Yard · ±${s.totalWorkersNeeded} org</td>
+            <td class="py-3 px-3 text-right tnum font-semibold ${s.meetsDeadline ? 'text-zinc-900' : 'text-rose-700'} whitespace-nowrap">${s.totalDays} hr <span class="text-[10px] font-normal text-zinc-400">(prod ${s.prodFinishDay})</span></td>
+            <td class="py-3 px-3 text-right tnum text-zinc-800 whitespace-nowrap">${fmtRpShort(s.mouldCapexF1)}</td>
             <td class="py-3 px-3 text-right tnum text-zinc-800 whitespace-nowrap">${fmtRpShort(s.overheadCostTotal)}</td>
-            <td class="py-3 px-3 text-right tnum text-zinc-800 whitespace-nowrap">${fmtRpShort(s.accelCostTotal)}</td>
-            <td class="py-3 px-3 text-right tnum font-bold text-zinc-950 whitespace-nowrap">${fmtRpShort(s.totalCOGS)}</td>
-            <td class="py-3 px-3 text-right tnum text-rose-700 whitespace-nowrap">-${fmtRpShort(s.financingCost)}</td>
+            <td class="py-3 px-3 text-right tnum ${s.peakDeficit < 0 ? 'text-rose-700' : 'text-emerald-700'} whitespace-nowrap">${s.peakDeficit < 0 ? fmtRpShort(s.peakDeficit) : 'Rp 0'}</td>
             <td class="py-3 px-4 text-right tnum font-bold ${s.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'} whitespace-nowrap">${fmtRpShort(s.realNetProfit)}</td>
           </tr>
         `;
       }).join('');
 
-      document.getElementById('capacity-note').textContent = `Output efektif: ${sim.effectiveRate.toFixed(1)} unit/hari · Overhead waktu: ${fmtRpShort(sim.overheadCostTotal)}`;
+      document.getElementById('capacity-note').textContent = `${sim.mouldCount} mould → ${sim.effectiveRate.toFixed(2)} u/hr · ${sim.yardsNeeded} yard · Capex F1 ${fmtRpShort(sim.mouldCapexF1)}`;
 
       document.getElementById('active-wbs-table-body').innerHTML = WBS_CATEGORIES.map(cat => {
         const card = getSafeCard(cat.id);
@@ -5297,11 +5898,45 @@
       const startDateEl = document.getElementById('ctrl-start-date');
       if (startDateEl && startDateEl.value !== projectStartDate) startDateEl.value = projectStartDate;
 
+      const payPinsHtml = (sim.resolvedTermins || []).map(rt => {
+        const pctPos = Math.max(0, Math.min(98, (rt.effDay / total) * 100));
+        return `
+          <button type="button" onclick="openTerminDayModal(${rt.idx})" title="Klik untuk edit hari cair ${rt.label} (${rt.pct}%) · H-${rt.effDay} (${fmtDateShortId(rt.effDay)})"
+            style="left: ${pctPos.toFixed(2)}%;"
+            class="absolute top-1 -translate-x-1/2 z-10 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-bold tnum shadow-sm whitespace-nowrap transition">
+            <span>${rt.label}</span>
+            <span class="opacity-85">H-${rt.effDay}</span>
+          </button>
+        `;
+      }).join('');
+
+      const payGuideLinesHtml = (sim.resolvedTermins || []).map(rt => {
+        const pctPos = Math.max(0, Math.min(100, (rt.effDay / total) * 100));
+        return `<div style="left: ${pctPos.toFixed(2)}%;" class="pointer-events-none absolute top-0 bottom-0 border-l border-dashed border-emerald-400/70"></div>`;
+      }).join('');
+
       document.getElementById('gantt-container').innerHTML = `
         <div class="grid grid-cols-12 gap-3 items-center pb-2.5 border-b border-zinc-200 text-[11px] font-semibold text-zinc-500">
           <div class="col-span-4">Fase &amp; Deliverable (Klik untuk Edit Tanggal)</div>
           <div class="col-span-6 flex justify-between tnum px-1">${ticks.map(d => `<span>H-${d} (${fmtDateShortId(d).slice(0, 6)})</span>`).join('')}</div>
           <div class="col-span-2 text-right">Tanggal / Net Kas</div>
+        </div>
+        <!-- Dedicated Clickable Client Payment Milestones Track -->
+        <div class="grid grid-cols-12 gap-3 items-center py-2 bg-emerald-50/40 rounded-lg px-1.5 border border-emerald-200/70">
+          <div class="col-span-4 pr-2">
+            <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+              <i class="ph-fill ph-currency-circle-dollar text-emerald-600 text-sm"></i>
+              <span>Jadwal Cair Pembayaran</span>
+            </div>
+            <div class="text-[10px] text-emerald-700 mt-0.5">Klik pin untuk ubah hari H-X · Mode: ${sim.startAfterDp ? 'Kerja setelah DP' : 'Start H-0 (Talangan)'}</div>
+          </div>
+          <div class="col-span-6 relative h-7 bg-white/80 rounded-md border border-emerald-100">
+            ${payPinsHtml}
+          </div>
+          <div class="col-span-2 text-right tnum">
+            <div class="text-xs font-bold text-emerald-800">${(sim.resolvedTermins || []).length}× Termin</div>
+            <div class="text-[10px] font-semibold text-emerald-700">+${fmtRpShort(sim.netCashInTotal)}</div>
+          </div>
         </div>
         ${sim.phases.map(p => {
           const ov = phaseScheduleOverrides[p.key];
@@ -5323,6 +5958,7 @@
                 <div class="text-[10px] text-zinc-500 truncate mt-0.5 tnum">${dateRangeTxt} · ${dur} hr</div>
               </div>
               <div class="col-span-6 relative h-7 bg-zinc-100 rounded-md overflow-hidden">
+                ${payGuideLinesHtml}
                 <div class="gantt-bar absolute top-1 bottom-1 rounded ${colorMap[p.category]} flex items-center justify-center text-[10px] font-semibold text-white tnum px-1.5 truncate"
                      style="left: ${leftPct.toFixed(2)}%; width: ${Math.min(100 - leftPct, widthPct).toFixed(2)}%;">
                   ${dur > 10 ? `H${p.startDay}–${p.endDay}` : ''}
@@ -5338,7 +5974,7 @@
       `;
 
       document.getElementById('timeline-subtitle').innerHTML =
-        `Periode kontrak: <strong class="tnum text-zinc-900">${fmtDateShortId(0)} – ${fmtDateShortId(sim.totalDays)}</strong> (<strong class="tnum text-zinc-900">${sim.totalDays} hari / ± ${(sim.totalDays / 30).toFixed(1)} bln</strong>) · ${sim.spkCount} SPK · Jeda SP2D +${sim.delayDays} hr.`;
+        `Periode kontrak: <strong class="tnum text-zinc-900">${fmtDateShortId(0)} – ${fmtDateShortId(sim.totalDays)}</strong> (<strong class="tnum text-zinc-900">${sim.totalDays} hari / ± ${(sim.totalDays / 30).toFixed(1)} bln</strong>) · <strong>${sim.mouldCount} Mould</strong> (${sim.effectiveRate.toFixed(1)} u/hr) · DP cair <strong>H-${sim.dpEffDay}</strong>.`;
 
       document.getElementById('table-unit-badge').textContent =
         `${sim.units.toLocaleString('id-ID')} Unit · ${sim.spkCount} SPK · Kas Masuk Bersih ${fmtRpShort(sim.netCashInTotal)}`;
@@ -5380,13 +6016,28 @@
 
     function renderCashflowChart(sim, safeSim) {
       const ctx = document.getElementById('cashflowChart').getContext('2d');
-      const labels = sim.phases.map(p => `${p.code} · H-${p.endDay}`);
       const useBillion = sim.projectValue >= 1e9;
       const divisor = useBillion ? 1e9 : 1e6;
       const unitLabel = useBillion ? 'Miliar Rp' : 'Juta Rp';
 
-      const activeSeries = sim.phases.map(p => Number((p.cumCash / divisor).toFixed(2)));
-      const safeSeries = safeSim.phases.map(p => Number((p.cumCash / divisor).toFixed(2)));
+      // Build unified chronological daily timeline across both active & benchmark curves
+      const daySet = new Set();
+      (sim.cashTimeline || []).forEach(p => daySet.add(p.day));
+      (safeSim.cashTimeline || []).forEach(p => daySet.add(p.day));
+      const allDays = Array.from(daySet).sort((a, b) => a - b);
+
+      const sampleAtDay = (timeline, day) => {
+        let val = 0;
+        for (const pt of (timeline || [])) {
+          if (pt.day <= day) val = pt.cumCash;
+          else break;
+        }
+        return val;
+      };
+
+      const labels = allDays.map(d => `H-${d}`);
+      const activeSeries = allDays.map(d => Number((sampleAtDay(sim.cashTimeline, d) / divisor).toFixed(2)));
+      const safeSeries = allDays.map(d => Number((sampleAtDay(safeSim.cashTimeline, d) / divisor).toFixed(2)));
 
       if (cashflowChartInstance) cashflowChartInstance.destroy();
 
@@ -5453,6 +6104,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      syncProdLineInputsToDom();
       recalculateAll();
       renderCloudSyncUi();
       syncAllFromSupabase();
