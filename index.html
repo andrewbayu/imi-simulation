@@ -198,17 +198,17 @@
   <!-- ===================================================================== -->
   <!-- LEFT SIDEBAR NAVIGATION                                               -->
   <!-- ===================================================================== -->
-  <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-72 shrink-0 bg-white border-r border-zinc-200 flex flex-col justify-between transition-transform duration-200 -translate-x-full lg:translate-x-0 overflow-y-auto no-print">
+  <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-60 shrink-0 bg-white border-r border-zinc-200 flex flex-col justify-between transition-transform duration-200 -translate-x-full lg:translate-x-0 overflow-y-auto no-print">
     <div class="p-4 space-y-5">
       <!-- Brand -->
-      <div class="flex items-center justify-between gap-2 pb-4 border-b border-zinc-200">
+      <div class="flex items-center justify-between gap-2 pb-3.5 border-b border-zinc-200">
         <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-9 h-9 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0">
-            <i class="ph-bold ph-anchor text-lg"></i>
+          <div class="w-8 h-8 rounded-lg bg-zinc-950 text-white flex items-center justify-center shrink-0">
+            <i class="ph-bold ph-anchor text-base"></i>
           </div>
           <div class="min-w-0">
-            <div class="text-sm font-bold tracking-tight text-zinc-950 truncate">PT Inovasi Maritim</div>
-            <div class="text-[11px] text-zinc-500 truncate">Rancang Kapal &amp; Simulasi Proyek</div>
+            <div class="text-xs font-bold tracking-tight text-zinc-950 truncate">PT Inovasi Maritim</div>
+            <div class="text-[11px] text-zinc-500 truncate">Simulasi Kapal &amp; Proyek</div>
           </div>
         </div>
         <button type="button" onclick="toggleMobileSidebar(false)" class="lg:hidden text-zinc-400 hover:text-zinc-700 p-1">
@@ -218,188 +218,165 @@
 
       <!-- Navigation Steps -->
       <nav aria-label="Menu Utama" class="space-y-1">
-        <div class="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-400">Alur Kerja Simulasi</div>
+        <div class="px-2.5 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-zinc-400">Alur Kerja</div>
 
-        <button type="button" id="nav-page-spec" onclick="switchPage('page-spec')" class="side-nav-btn active w-full flex items-center justify-between px-3 py-2.5 text-xs text-left">
-          <span class="flex items-center gap-2.5">
+        <button type="button" id="nav-page-spec" onclick="switchPage('page-spec')" class="side-nav-btn active w-full flex items-center justify-between px-2.5 py-2 text-xs text-left">
+          <span class="flex items-center gap-2">
             <i class="ph ph-cubes text-base"></i>
-            <span>1. Rancang Spesifikasi</span>
+            <span>1. Rancang Kapal</span>
           </span>
-          <span id="nav-ontology-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full">Sesuai</span>
+          <span id="nav-ontology-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full">OK</span>
         </button>
 
-        <button type="button" id="nav-page-1" onclick="switchPage('page-1')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
-          <span class="flex items-center gap-2.5">
+        <button type="button" id="nav-page-1" onclick="switchPage('page-1')" class="side-nav-btn w-full flex items-center justify-between px-2.5 py-2 text-xs text-zinc-600 text-left">
+          <span class="flex items-center gap-2">
             <i class="ph ph-chart-line-up text-base"></i>
-            <span>2. Simulasi &amp; Risiko CEO</span>
+            <span>2. Simulasi &amp; CEO</span>
           </span>
           <span id="nav-risk-dot" class="w-2 h-2 rounded-full bg-rose-600"></span>
         </button>
 
-        <button type="button" id="nav-page-2" onclick="switchPage('page-2')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
-          <span class="flex items-center gap-2.5">
+        <button type="button" id="nav-page-2" onclick="switchPage('page-2')" class="side-nav-btn w-full flex items-center justify-between px-2.5 py-2 text-xs text-zinc-600 text-left">
+          <span class="flex items-center gap-2">
             <i class="ph ph-factory text-base"></i>
-            <span>3. Struktur Biaya &amp; Lini</span>
+            <span>3. Biaya &amp; Lini</span>
           </span>
         </button>
 
-        <button type="button" id="nav-page-3" onclick="switchPage('page-3')" class="side-nav-btn w-full flex items-center justify-between px-3 py-2.5 text-xs text-zinc-600 text-left">
-          <span class="flex items-center gap-2.5">
+        <button type="button" id="nav-page-3" onclick="switchPage('page-3')" class="side-nav-btn w-full flex items-center justify-between px-2.5 py-2 text-xs text-zinc-600 text-left">
+          <span class="flex items-center gap-2">
             <i class="ph ph-calendar-check text-base"></i>
-            <span>4. Jadwal &amp; Arus Kas</span>
+            <span>4. Jadwal &amp; Kas</span>
           </span>
         </button>
       </nav>
 
-      <!-- Live Vessel & Financial Telemetry in Sidebar -->
-      <div class="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2.5">
+      <!-- Compact Live Summary in Sidebar -->
+      <div class="pt-4 border-t border-zinc-200 space-y-2">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Ringkasan Aktif</span>
-          <span id="sb-class-pill" class="text-[10px] font-semibold px-2 py-0.5 rounded bg-brand-50 text-brand-700 border border-brand-200">Kapal Ikan 3 GT</span>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Ringkasan</span>
+          <span id="sb-class-pill" class="text-[10px] font-semibold text-brand-700">Kapal Ikan 3 GT</span>
         </div>
-        <div id="sb-telemetry" class="space-y-2 text-xs tnum">
+        <div id="sb-telemetry" class="space-y-1.5 text-xs tnum">
           <!-- Populated by JS -->
         </div>
       </div>
     </div>
 
     <!-- Sidebar Footer Actions -->
-    <div class="p-4 border-t border-zinc-200 space-y-2 bg-zinc-50/50">
+    <div class="p-4 border-t border-zinc-200 space-y-2">
       <button type="button" id="sb-next-btn" onclick="goToNextPage()" class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
-        <span>Lanjut ke Simulasi Proyek</span>
+        <span>Lanjut ke Simulasi</span>
         <i class="ph-bold ph-arrow-right text-xs"></i>
       </button>
-      <div class="grid grid-cols-2 gap-2">
-        <button type="button" onclick="openSaveModal()" class="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 text-xs font-medium transition">
-          <i class="ph ph-floppy-disk text-sm"></i> Simpan
-        </button>
-        <button type="button" onclick="window.print()" class="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-medium transition">
-          <i class="ph ph-printer text-sm"></i> Cetak PDF
-        </button>
-      </div>
+      <button type="button" onclick="window.print()" class="w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-medium transition">
+        <i class="ph ph-printer text-sm"></i> Cetak PDF
+      </button>
     </div>
   </aside>
 
   <!-- ===================================================================== -->
   <!-- MAIN WORKSPACE                                                        -->
   <!-- ===================================================================== -->
-  <main id="main-workspace" class="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 max-w-[1280px] mx-auto space-y-6">
+  <main id="main-workspace" class="flex-1 min-w-0 px-5 sm:px-8 py-6 max-w-[1320px] mx-auto space-y-5">
 
     <!-- =================================================================== -->
     <!-- VIEW 1 (DEFAULT): BUILDER SPESIFIKASI KAPAL (DRAG & DROP + ONTOLOGY)-->
     <!-- ===================================================================== -->
-    <div id="page-spec" class="page-view space-y-6">
+    <div id="page-spec" class="page-view space-y-5">
 
-      <!-- Header + Predefined Dropdown + Save Controls -->
-      <section class="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+      <!-- Compact Single-Row Header + Preset Dropdown + Save -->
+      <section class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-700 mb-1.5">Langkah 1 · Rancang Spesifikasi Kapal</p>
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 leading-[1.15]">
-            Rancang Spesifikasi &amp; Cek Kecocokan Teknis
-          </h1>
-          <p class="text-sm text-zinc-600 mt-1.5 max-w-[62ch]">
-            Pilih jenis kapal atau muat preset, lalu klik <strong>(+)</strong> atau tarik kartu ke blueprint di kanan.
-          </p>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950">Rancang Spesifikasi Kapal</h1>
+          <p class="text-xs text-zinc-500 mt-0.5">Pilih jenis kapal atau muat preset, lalu klik <strong>(+)</strong> atau tarik komponen ke blueprint.</p>
         </div>
 
-        <!-- Predefined & Saved Presets Dropdown + Save Button -->
-        <div class="flex flex-wrap items-center gap-2.5 shrink-0 no-print">
-          <div class="min-w-[260px]">
-            <label for="preset-dropdown" class="block text-[11px] font-semibold text-zinc-500 mb-1">Pilih Preset Kapal &amp; Konfigurasi</label>
-            <select id="preset-dropdown" onchange="onPresetDropdownChange(this.value)" class="w-full text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
-              <!-- Populated dynamically with Built-in + LocalStorage saved presets -->
-            </select>
-          </div>
-          <div class="pt-4">
-            <button type="button" onclick="openSaveModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition">
-              <i class="ph ph-floppy-disk text-sm"></i> Simpan Konfigurasi
-            </button>
-          </div>
+        <div class="flex flex-wrap items-center gap-2 shrink-0 no-print">
+          <select id="preset-dropdown" onchange="onPresetDropdownChange(this.value)" aria-label="Pilih Preset Kapal"
+            class="min-w-[250px] text-xs font-semibold bg-white border border-zinc-300 rounded-lg px-3 py-2 text-zinc-900 focus:outline-none focus:border-brand-700">
+            <!-- Populated dynamically -->
+          </select>
+          <button type="button" onclick="openSaveModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold transition whitespace-nowrap">
+            <i class="ph ph-floppy-disk text-sm"></i> Simpan
+          </button>
         </div>
       </section>
 
-      <!-- Step 1A: Pilih Jenis Kapal -->
-      <section class="panel p-4 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <span class="text-xs font-bold text-zinc-950">1. Pilih Jenis Kapal</span>
-            <span class="text-[11px] text-zinc-500 ml-1.5">Otomatis menyaring komponen &amp; mengecek kecocokan teknis</span>
-          </div>
-          <label class="inline-flex items-center gap-2 text-xs text-zinc-600 cursor-pointer select-none no-print">
-            <input id="toggle-show-all-cards" type="checkbox" onchange="onToggleCuration(this.checked)" class="rounded border-zinc-300 text-brand-700 focus:ring-brand-700" />
-            <span>Tampilkan semua opsi (termasuk yang tidak cocok)</span>
-          </label>
-        </div>
-        <div id="vessel-class-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2.5">
+      <!-- Step 1A: Sleek 4-Segment Vessel Class Bar (No heavy outer card) -->
+      <section class="space-y-2">
+        <div id="vessel-class-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-2">
           <!-- Populated by JS -->
         </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-500 px-0.5">
+          <span id="vessel-class-desc"></span>
+          <label class="inline-flex items-center gap-1.5 text-zinc-600 cursor-pointer select-none no-print">
+            <input id="toggle-show-all-cards" type="checkbox" onchange="onToggleCuration(this.checked)" class="rounded border-zinc-300 text-brand-700 focus:ring-brand-700" />
+            <span>Tampilkan opsi di luar kelas kapal</span>
+          </label>
+        </div>
       </section>
 
-      <!-- Step 1B: Split Builder Workspace (Catalog Left + Blueprint Drop Slots & Compatibility Right) -->
-      <section class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+      <!-- Step 1B: Split Builder Workspace (Catalog Left + Blueprint Right) -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
 
-        <!-- LEFT: Component Card Catalog (Drag or Click +) -->
+        <!-- LEFT: Component Card Catalog -->
         <div class="xl:col-span-7 panel overflow-hidden">
-          <div class="px-4 py-3 bg-zinc-50 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h2 class="text-sm font-bold text-zinc-950">2. Katalog Komponen (Klik <span class="text-brand-700">(+)</span> atau Tarik ke Kanan)</h2>
-              <p class="text-[11px] text-zinc-500">Spesifikasi OEM/PK/Material terkunci; harga satuan, jadwal &amp; DP supplier bisa diubah.</p>
+          <!-- Short Clean Category Tabs (Zero Clipping) -->
+          <div class="px-4 py-3 border-b border-zinc-200 flex items-center justify-between gap-2 bg-white">
+            <div class="flex items-center gap-1 overflow-x-auto no-print" id="catalog-filter-tabs">
+              <!-- Populated by JS -->
             </div>
-            <button id="btn-reset-cards" type="button" onclick="resetCatalogEdits()" class="hidden no-print text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-md transition">
-              Reset Nilai Standar
+            <button id="btn-reset-cards" type="button" onclick="resetCatalogEdits()" class="hidden no-print shrink-0 text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded transition">
+              Reset
             </button>
           </div>
 
-          <!-- Category Filter Tabs -->
-          <div class="px-4 py-2.5 border-b border-zinc-200 flex items-center gap-1.5 overflow-x-auto bg-white no-print" id="catalog-filter-tabs">
-            <!-- Populated by JS -->
-          </div>
-
-          <div id="catalog-cards-container" class="p-4 space-y-4 max-h-[760px] overflow-y-auto bg-zinc-50/40">
+          <div id="catalog-cards-container" class="p-4 space-y-5">
             <!-- Populated by JS -->
           </div>
         </div>
 
-        <!-- RIGHT: Active Vessel Blueprint (5 Drop Zones) + Compatibility Alerts -->
+        <!-- RIGHT: Compatibility Status + Clean Hairline Blueprint -->
         <div class="xl:col-span-5 space-y-4">
 
-          <!-- Compatibility Status Panel -->
-          <div id="ontology-alert-panel" class="panel p-4 space-y-2.5">
+          <!-- Compact Compatibility Bar -->
+          <div id="ontology-alert-panel" class="rounded-xl px-3.5 py-2.5 border text-xs">
             <!-- Populated by JS -->
           </div>
 
-          <!-- Active Vessel Blueprint Drop Slots -->
+          <!-- Active Vessel Blueprint Drop Slots (Light header + hairline divide-y rows) -->
           <div class="panel overflow-hidden">
-            <div class="px-4 py-3 bg-zinc-950 text-white flex items-center justify-between">
+            <div class="px-4 py-3 border-b border-zinc-200 bg-zinc-50/80 flex items-center justify-between">
               <div>
-                <div class="text-xs font-bold">Spesifikasi Kapal Terpasang (5 Komponen)</div>
-                <div class="text-[11px] text-zinc-400">Tarik kartu ke slot di bawah atau klik untuk atur harga &amp; jadwal</div>
+                <div class="text-xs font-bold text-zinc-950">Blueprint Terpasang</div>
+                <div class="text-[11px] text-zinc-500">Tarik kartu ke baris atau klik untuk ubah harga</div>
               </div>
-              <span id="bp-unit-cogs" class="text-xs font-bold tnum text-blue-300"></span>
+              <span id="bp-unit-cogs" class="text-xs font-bold tnum text-brand-700"></span>
             </div>
 
-            <div id="blueprint-slots-container" class="p-3.5 space-y-2.5 bg-zinc-50/50">
+            <div id="blueprint-slots-container" class="divide-y divide-zinc-200 bg-white">
               <!-- Populated by JS -->
             </div>
 
-            <!-- Reference Visual Strip (Shows 3GT photos when 3GT is active) -->
-            <div id="bp-reference-photos" class="p-3.5 pt-0 grid grid-cols-2 gap-2.5">
+            <!-- Reference Visual Strip (3GT only) -->
+            <div id="bp-reference-photos" class="p-3 border-t border-zinc-200 bg-zinc-50/40 grid grid-cols-2 gap-2.5">
               <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
-                <img src="assets/ref-kapal-1.jpg" alt="Referensi Kapal 3 GT 1" class="w-full h-24 object-cover" />
-                <figcaption class="px-2 py-1 text-[10px] text-zinc-600 truncate">Ref 1: Lambung terbuka 9,2m × 1,2m</figcaption>
+                <img src="assets/ref-kapal-1.jpg" alt="Referensi Kapal 3 GT 1" class="w-full h-20 object-cover" />
+                <figcaption class="px-2 py-1 text-[10px] text-zinc-500 truncate">Ref 1 · 9,2m × 1,2m</figcaption>
               </figure>
               <figure class="rounded-lg overflow-hidden border border-zinc-200 bg-white">
-                <img src="assets/ref-kapal-2.jpg" alt="Referensi Kapal 3 GT 2" class="w-full h-24 object-cover" />
-                <figcaption class="px-2 py-1 text-[10px] text-zinc-600 truncate">Ref 2: Yamaha 15 PK + Box Ikan</figcaption>
+                <img src="assets/ref-kapal-2.jpg" alt="Referensi Kapal 3 GT 2" class="w-full h-20 object-cover" />
+                <figcaption class="px-2 py-1 text-[10px] text-zinc-500 truncate">Ref 2 · Yamaha 15 PK</figcaption>
               </figure>
             </div>
 
-            <div class="p-3.5 border-t border-zinc-200 bg-white flex items-center justify-between gap-3 no-print">
+            <div class="px-4 py-3 border-t border-zinc-200 bg-white flex items-center justify-between gap-3 no-print">
               <div class="text-[11px] text-zinc-500">
-                Tambahan Lead Time: <strong id="bp-extra-days" class="text-zinc-900 tnum"></strong>
+                Lead Time: <strong id="bp-extra-days" class="text-zinc-900 tnum"></strong>
               </div>
-              <button type="button" onclick="switchPage('page-1')" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
-                <span>Simulasi Proyek &amp; Pembayaran</span>
+              <button type="button" onclick="switchPage('page-1')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold transition">
+                <span>Simulasi Proyek</span>
                 <i class="ph-bold ph-arrow-right text-xs"></i>
               </button>
             </div>
@@ -2174,29 +2151,32 @@
     }
 
     function renderVesselClasses() {
+      const activeVc = VESSEL_CLASSES.find(v => v.id === activeVesselClass);
       document.getElementById('vessel-class-grid').innerHTML = VESSEL_CLASSES.map(vc => {
         const isSel = vc.id === activeVesselClass;
         return `
           <button type="button" onclick="selectVesselClass('${vc.id}')"
-            class="vessel-class-btn text-left p-3 border ${isSel ? 'is-selected' : 'border-zinc-200 bg-white hover:bg-zinc-50'}">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-xs font-bold ${isSel ? 'text-brand-800' : 'text-zinc-950'}">${vc.name}</span>
-              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${isSel ? 'bg-brand-100 text-brand-800' : 'bg-zinc-100 text-zinc-600'} tnum">${vc.badge}</span>
-            </div>
-            <div class="text-[11px] text-zinc-500 mt-1">${vc.desc}</div>
+            class="vessel-class-btn text-left px-3 py-2.5 border flex items-center justify-between gap-2 ${isSel ? 'is-selected' : 'border-zinc-200 bg-white hover:bg-zinc-50'}">
+            <span class="text-xs font-bold truncate ${isSel ? 'text-brand-800' : 'text-zinc-950'}">${vc.name}</span>
+            <span class="text-[10px] font-semibold shrink-0 px-1.5 py-0.5 rounded ${isSel ? 'bg-brand-100 text-brand-800' : 'bg-zinc-100 text-zinc-500'} tnum">${vc.badge}</span>
           </button>
         `;
       }).join('');
+      const descEl = document.getElementById('vessel-class-desc');
+      if (descEl && activeVc) {
+        descEl.innerHTML = `<strong>${activeVc.name}:</strong> ${activeVc.desc}`;
+      }
     }
 
     function renderCatalogTabs() {
       const container = document.getElementById('catalog-filter-tabs');
-      const tabs = [{ id: 'all', label: 'Semua Kategori' }, ...WBS_CATEGORIES.map(c => ({ id: c.id, label: `${c.code} · ${c.title.split(' ')[0]}` }))];
+      const shortLabels = { hull: 'Body', engine: 'Mesin', outfitting: 'Outfitting', nav_elec: 'Navigasi', permit_delivery: 'Izin & Kirim' };
+      const tabs = [{ id: 'all', label: 'Semua' }, ...WBS_CATEGORIES.map(c => ({ id: c.id, label: shortLabels[c.id] || c.title }))];
       container.innerHTML = tabs.map(t => {
         const active = catalogCategoryFilter === t.id;
         return `
           <button type="button" onclick="setCatalogCategoryFilter('${t.id}')"
-            class="text-[11px] font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition ${active ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}">
+            class="text-xs font-medium px-2.5 py-1 rounded-md whitespace-nowrap transition ${active ? 'bg-zinc-950 text-white font-semibold' : 'text-zinc-600 hover:bg-zinc-100'}">
             ${t.label}
           </button>
         `;
@@ -2223,49 +2203,42 @@
         });
 
         return `
-          <div class="space-y-2">
-            <div class="flex items-center justify-between text-xs font-bold text-zinc-800 px-0.5">
-              <span class="flex items-center gap-1.5"><i class="ph ${cat.icon} text-brand-700"></i> ${cat.code} — ${cat.title}</span>
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-xs font-semibold text-zinc-500">
+              <span>${cat.code} · ${cat.title}</span>
               <span class="text-[11px] font-normal text-zinc-400 tnum">${cards.length} opsi</span>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               ${cards.map(card => {
                 const isEquipped = selectedCards[card.category] === card.id;
                 const isCompatible = card.compatibleClasses.includes(activeVesselClass);
-                const leadTxt = card.category === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} unit/hr` : (card.extraDays > 0 ? `+${card.extraDays} hr` : '+0 hr');
+                const leadTxt = card.category === 'hull' ? `Mould ${card.prepDays} hr · ${card.unitsPerDay} u/hr` : (card.extraDays > 0 ? `+${card.extraDays} hr` : '+0 hr');
                 return `
                   <div draggable="true" ondragstart="onCardDragStart(event, '${card.id}')"
                     class="catalog-card p-3 border bg-white ${isEquipped ? 'is-equipped' : 'border-zinc-200 hover:border-zinc-300'} flex flex-col justify-between gap-2.5">
                     <div>
                       <div class="flex items-start justify-between gap-2">
-                        <div class="flex items-center gap-1.5 min-w-0">
-                          <i class="ph ph-dots-six-vertical text-zinc-300 shrink-0 text-sm"></i>
-                          <span class="text-xs font-bold text-zinc-950 leading-snug">${card.name}</span>
-                        </div>
+                        <span class="text-xs font-semibold text-zinc-950 leading-snug">${card.name}</span>
                         ${!isCompatible ? '<span class="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800">Tidak Cocok</span>' : ''}
                       </div>
-                      <div class="mt-1.5 flex flex-wrap items-center gap-1 text-[10px]">
-                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 font-medium">
-                          <i class="ph-fill ph-lock-simple text-[9px] text-zinc-400"></i> ${card.locked.brand}
-                        </span>
-                        <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 font-medium tnum">
-                          <i class="ph-fill ph-lock-simple text-[9px] text-zinc-400"></i> ${card.locked.powerLabel}
-                        </span>
+                      <div class="mt-1 text-[11px] text-zinc-500 flex items-center gap-1 truncate" title="${card.locked.brand} · ${card.locked.powerLabel} · ${card.locked.materialOrCycle}">
+                        <i class="ph-fill ph-lock-simple text-[10px] text-zinc-400 shrink-0"></i>
+                        <span class="truncate">${card.locked.brand} · ${card.locked.powerLabel}</span>
                       </div>
                     </div>
 
-                    <div class="pt-2 border-t border-zinc-200/70 flex items-center justify-between gap-2">
+                    <div class="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2">
                       <div class="tnum">
-                        <div class="text-xs font-bold text-zinc-950">${fmtRpShort(card.cost)}<span class="text-[10px] font-normal text-zinc-400">/unit</span></div>
-                        <div class="text-[10px] text-zinc-500">${leadTxt} · DP Supplier ${card.dpSupplierPct}%</div>
+                        <div class="text-xs font-bold text-zinc-950">${fmtRpShort(card.cost)}<span class="text-[10px] font-normal text-zinc-400">/u</span></div>
+                        <div class="text-[10px] text-zinc-400">${leadTxt}</div>
                       </div>
                       <div class="flex items-center gap-1">
                         <button type="button" onclick="openInspectorModal('${card.id}')" title="Ubah Harga, Lead Time & DP Supplier"
-                          class="p-1.5 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600 text-xs">
+                          class="p-1.5 rounded-md text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 text-xs transition">
                           <i class="ph ph-sliders-horizontal"></i>
                         </button>
                         <button type="button" onclick="equipCard('${card.id}')"
-                          class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${isEquipped ? 'bg-brand-700 text-white' : 'bg-zinc-950 hover:bg-zinc-800 text-white'}">
+                          class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition ${isEquipped ? 'bg-brand-700 text-white' : 'bg-zinc-100 hover:bg-zinc-950 text-zinc-800 hover:text-white'}">
                           ${isEquipped ? 'Terpasang ✓' : '(+) Pasang'}
                         </button>
                       </div>
@@ -2280,47 +2253,42 @@
     }
 
     function renderOntologyAndBlueprint(sim, ontology) {
-      // 1. Compatibility Status Panel
+      // 1. Compact Compatibility Banner (Single-line when valid; expands on alerts)
       const ontPanel = document.getElementById('ontology-alert-panel');
-      let headerBg, iconCls, titleTxt;
-      if (ontology.status === 'critical') {
-        headerBg = 'bg-rose-50 border-rose-300';
-        iconCls = 'ph-fill ph-warning-octagon text-rose-600';
-        titleTxt = `Peringatan Kecocokan Teknis (${ontology.criticalCount} Kritis, ${ontology.warningCount} Catatan)`;
-      } else if (ontology.status === 'warning') {
-        headerBg = 'bg-amber-50 border-amber-300';
-        iconCls = 'ph-fill ph-warning text-amber-600';
-        titleTxt = `Catatan Kecocokan Teknis (${ontology.warningCount} Peringatan)`;
+      const vcName = VESSEL_CLASSES.find(v => v.id === activeVesselClass).name;
+
+      if (ontology.alerts.length === 0) {
+        ontPanel.className = 'rounded-xl px-3.5 py-2.5 border border-emerald-200 bg-emerald-50/70 flex items-center justify-between gap-2 text-xs';
+        ontPanel.innerHTML = `
+          <div class="flex items-center gap-2 text-emerald-950 font-medium">
+            <i class="ph-fill ph-check-circle text-emerald-600 text-base shrink-0"></i>
+            <span>Kecocokan Teknis: <strong>Sesuai</strong> untuk ${vcName}</span>
+          </div>
+          <span class="text-[10px] text-emerald-700 font-semibold shrink-0">5/5 Valid</span>
+        `;
       } else {
-        headerBg = 'bg-emerald-50 border-emerald-300';
-        iconCls = 'ph-fill ph-check-circle text-emerald-600';
-        titleTxt = 'Kecocokan Teknis: Sesuai (Siap Simulasi)';
+        const isCrit = ontology.status === 'critical';
+        ontPanel.className = `rounded-xl p-3.5 border space-y-2 ${isCrit ? 'bg-rose-50/80 border-rose-200' : 'bg-amber-50/80 border-amber-200'}`;
+        ontPanel.innerHTML = `
+          <div class="flex items-center justify-between gap-2 text-xs font-bold ${isCrit ? 'text-rose-900' : 'text-amber-900'}">
+            <span class="flex items-center gap-1.5">
+              <i class="ph-fill ${isCrit ? 'ph-warning-octagon text-rose-600' : 'ph-warning text-amber-600'} text-base"></i>
+              ${isCrit ? `Peringatan Kecocokan (${ontology.criticalCount} Kritis)` : `Catatan Kecocokan (${ontology.warningCount})`}
+            </span>
+          </div>
+          <div class="space-y-1.5">${ontology.alerts.map(a => `
+            <div class="p-2 rounded-lg bg-white border ${a.level === 'critical' ? 'border-rose-200' : 'border-amber-200'} text-[11px]">
+              <div class="font-semibold ${a.level === 'critical' ? 'text-rose-800' : 'text-amber-800'}">${a.title}</div>
+              <div class="text-zinc-600 mt-0.5 leading-snug">${a.msg}</div>
+            </div>
+          `).join('')}</div>
+        `;
       }
 
-      ontPanel.className = `panel p-4 space-y-2.5 border ${headerBg}`;
-      ontPanel.innerHTML = `
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2 text-xs font-bold text-zinc-950">
-            <i class="${iconCls} text-base"></i>
-            <span>${titleTxt}</span>
-          </div>
-          <span class="text-[10px] font-semibold text-zinc-500">Cek Otomatis</span>
-        </div>
-        ${ontology.alerts.length === 0
-          ? `<p class="text-[11px] text-emerald-900">Lambung, Mesin (${sim.engine.locked.powerLabel}), Outfitting, Kelistrikan, dan Dokumen cocok untuk kelas <strong>${VESSEL_CLASSES.find(v=>v.id===activeVesselClass).name}</strong>.</p>`
-          : `<div class="space-y-1.5">${ontology.alerts.map(a => `
-              <div class="p-2.5 rounded-lg bg-white border ${a.level === 'critical' ? 'border-rose-200' : 'border-amber-200'} text-[11px]">
-                <div class="font-bold ${a.level === 'critical' ? 'text-rose-800' : 'text-amber-800'}">${a.title}</div>
-                <div class="text-zinc-700 mt-0.5 leading-snug">${a.msg}</div>
-              </div>
-            `).join('')}</div>`
-        }
-      `;
-
-      // 2. Blueprint 5 Drop Slots
-      document.getElementById('bp-unit-cogs').textContent = `${fmtRpShort(sim.baseUnitCost)} / unit (Fisik)`;
+      // 2. Blueprint 5 Hairline Drop Slots
+      document.getElementById('bp-unit-cogs').textContent = `${fmtRpShort(sim.baseUnitCost)} / unit`;
       const extraDaysSum = sim.engine.extraDays + sim.outfitting.extraDays + sim.nav.extraDays + sim.permit.extraDays;
-      document.getElementById('bp-extra-days').textContent = `+${extraDaysSum} hari (Mould ${sim.hull.prepDays} hr)`;
+      document.getElementById('bp-extra-days').textContent = `+${extraDaysSum} hr (Mould ${sim.hull.prepDays} hr)`;
 
       document.getElementById('blueprint-slots-container').innerHTML = WBS_CATEGORIES.map(cat => {
         const card = getCardById(selectedCards[cat.id]);
@@ -2328,21 +2296,19 @@
         return `
           <div onclick="openInspectorModal('${card.id}')"
             ondragover="onSlotDragOver(event)" ondragleave="onSlotDragLeave(event)" ondrop="onSlotDrop(event, '${cat.id}')"
-            class="drop-slot cursor-pointer p-3 bg-white border ${isMismatch ? 'border-rose-300 bg-rose-50/30' : 'border-zinc-200 hover:border-brand-700'} flex items-center justify-between gap-3">
+            class="drop-slot cursor-pointer px-4 py-3 ${isMismatch ? 'bg-rose-50/40' : 'hover:bg-zinc-50'} flex items-center justify-between gap-3">
             <div class="min-w-0">
-              <div class="flex items-center gap-1.5 text-[10px] font-semibold text-zinc-500">
-                <span>${cat.code} · ${cat.title}</span>
-                ${isMismatch ? '<span class="text-rose-700 font-bold">· Tidak Sesuai Kelas</span>' : ''}
+              <div class="text-[10px] font-semibold ${isMismatch ? 'text-rose-700' : 'text-zinc-400'}">
+                ${cat.code} · ${cat.title} ${isMismatch ? '· Tidak Cocok' : ''}
               </div>
-              <div class="text-xs font-bold text-zinc-950 truncate mt-0.5">${card.name}</div>
-              <div class="text-[10px] text-zinc-500 mt-0.5 flex items-center gap-2 tnum">
-                <span><i class="ph-fill ph-lock-simple text-zinc-400"></i> ${card.locked.brand} · ${card.locked.powerLabel}</span>
-                <span>DP Supplier: ${card.dpSupplierPct}%</span>
+              <div class="text-xs font-semibold text-zinc-950 truncate mt-0.5">${card.name}</div>
+              <div class="text-[11px] text-zinc-500 mt-0.5 truncate tnum">
+                ${card.locked.brand} · ${card.locked.powerLabel} · DP ${card.dpSupplierPct}%
               </div>
             </div>
             <div class="text-right shrink-0 tnum">
               <div class="text-xs font-bold text-brand-700">${fmtRpShort(card.cost)}</div>
-              <div class="text-[10px] text-zinc-400">Ubah Harga &amp; Jadwal</div>
+              <div class="text-[10px] text-zinc-400">Ubah →</div>
             </div>
           </div>
         `;
@@ -2364,19 +2330,16 @@
         ontBadge.textContent = `${ontology.warningCount}`;
       } else {
         ontBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
-        ontBadge.textContent = 'Sesuai';
+        ontBadge.textContent = 'OK';
       }
 
       const riskDot = document.getElementById('nav-risk-dot');
       riskDot.className = `w-2 h-2 rounded-full ${sim.safetyStatus === 'DANGER' ? 'bg-rose-600' : (sim.safetyStatus === 'CAUTION' ? 'bg-amber-500' : 'bg-emerald-500')}`;
 
       document.getElementById('sb-telemetry').innerHTML = `
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">Mesin</span><span class="font-semibold text-zinc-900 truncate">${sim.engine.locked.brand} ${sim.engine.locked.powerLabel.split(' ')[0]}</span></div>
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">Volume / Durasi</span><span class="font-semibold text-zinc-900">${sim.units.toLocaleString('id-ID')} u · ${sim.totalDays} hr</span></div>
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">HPP All-In / Unit</span><span class="font-semibold text-zinc-900">${fmtRpShort(sim.cogsUnit)}</span></div>
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">Nilai Proyek (DPP)</span><span class="font-bold text-brand-700">${fmtRpShort(sim.projectValue)}</span></div>
-        <div class="flex justify-between gap-2"><span class="text-zinc-500">Dana Berisiko (H-0)</span><span class="font-bold ${sim.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'}">${sim.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(sim.cashAtRiskDay0) : 'Rp 0'}</span></div>
-        <div class="flex justify-between gap-2 pt-1.5 border-t border-zinc-200"><span class="text-zinc-600 font-semibold">Laba Bersih Riil</span><span class="font-bold ${sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'}">${fmtRpShort(sim.realNetProfit)}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Nilai (DPP)</span><span class="font-bold text-brand-700">${fmtRpShort(sim.projectValue)}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Risiko H-0</span><span class="font-bold ${sim.cashAtRiskDay0 > 0 ? 'text-rose-700' : 'text-emerald-700'}">${sim.cashAtRiskDay0 > 0 ? '-' + fmtRpShort(sim.cashAtRiskDay0) : 'Rp 0'}</span></div>
+        <div class="flex justify-between gap-2"><span class="text-zinc-500">Laba Riil</span><span class="font-bold ${sim.realNetProfit > 0 ? 'text-emerald-700' : 'text-rose-700'}">${fmtRpShort(sim.realNetProfit)}</span></div>
       `;
     }
 
